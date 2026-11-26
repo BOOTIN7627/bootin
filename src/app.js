@@ -19,6 +19,8 @@ function routeView(r){
     case 'memo': return vMemo();
     case 'tools': return vTools();
     case 'weather': return vWeather(arg);
+    case 'bosai': return vBosai();
+    case 'guide': return vGuide();
     case 'otayori': return vOtayori();
     case 'search': return vSearch(arg);
     case 'settings': return vSettings();
@@ -53,6 +55,7 @@ function render(){
 }
 function after(r){
   tick();
+  if((r==='home'||r.startsWith('weather')||r==='bosai')&&!bosaiLoading){ const b=S.cache.bosai; if(!(b&&b.lat===S.set.wx.lat&&b.lon===S.set.wx.lon&&Date.now()-b.at<10*60e3)&&!(S.cache.bosaiErr&&Date.now()-S.cache.bosaiErr<60e3)){ loadBosai().then(d=>{ if(!d) S.cache.bosaiErr=Date.now(); if(cur()===r) render(); }).catch(()=>{ S.cache.bosaiErr=Date.now(); if(cur()===r) render(); }); } }
   if(r==='home'||r.startsWith('weather')){ const c=S.cache.wx; if(!(c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon&&Date.now()-c.at<30*60e3)&&!(S.cache.wxErr&&Date.now()-S.cache.wxErr<60e3)){ if(!wxLoading) loadWx().then(d=>{ if((d||S.cache.wxErr)&&cur()===r) render(); }); } }
   const dm=$('#daymemo'); if(dm){ let tm; dm.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{const s=cur().split('/')[1]; S.daymemo[s]=dm.value; if(!dm.value.trim()) delete S.daymemo[s]; save();},400);}); }
   const pq=$('#pq'); if(pq) pq.addEventListener('input',()=>{UI.pQ=pq.value;$('#plist').innerHTML=peopleList();});
@@ -60,6 +63,7 @@ function after(r){
   const tmo=$('#ev-tmode'); if(tmo) tmo.addEventListener('change',()=>{ const v=$('#ev-tmode input:checked').value; $('#ev-times').hidden=v!=='set'; });
   const pla=$('#plarea'); if(pla) pla.addEventListener('change',()=>{UI.plArea=pla.value; UI.plNear=null; render();});
   const pad_=$('#pl-addr'); if(pad_) pad_.addEventListener('input',()=>{ const pr=prefOf(pad_.value), ct=cityOf(pad_.value); if(pr) $('#pl-pref').value=pr; if(ct) $('#pl-city').value=ct; $('[name=lat]').value=''; $('[name=lon]').value=''; $('#pl-pos').textContent='住所を入れると、登録するときに位置を自動で調べます'; });
+  const gq=$('#gq'); if(gq) gq.addEventListener('input',()=>{UI.gQ=gq.value; const tmp=document.createElement('div'); tmp.innerHTML=vGuide(); const n=tmp.querySelector('#glist'); if(n) $('#glist').innerHTML=n.innerHTML;});
   const mq=$('#mq'); if(mq) mq.addEventListener('input',()=>{UI.memoQ=mq.value;$('#mlist').innerHTML=memoList();});
   const sq=$('#sq'); if(sq&&!sq.value) try{sq.focus();}catch(e){}
   const wc=$('#wx-city'); if(wc) wc.addEventListener('change',()=>{const c=CITIES.find(x=>x[0]===wc.value); if(c){S.set.wx={name:c[0],lat:c[1],lon:c[2]}; S.cache.wxErr=0; save(); render(); loadWx(true).then(()=>render());}});
@@ -157,7 +161,7 @@ const ACTS={
   plg:(el,d)=>{ UI.plG=d.c; render(); },
   opening:()=>playOpening(),
   menu:()=>{ const bg=sheet('MENU',`<div class="grid menu">${menuCells()}</div>
-    <div class="btns" style="margin-top:10px"><button class="btn plain" data-go="search/">🔍 探す</button><button class="btn plain" data-go="people">📇 人物帳</button><button class="btn plain" data-go="places">🏢 施設帳</button><button class="btn plain" data-go="settings">⚙️ 設定</button></div>`);
+    <div class="btns" style="margin-top:10px"><button class="btn plain" data-go="search/">🔍 探す</button><button class="btn plain" data-go="people">📇 人物帳</button><button class="btn plain" data-go="places">🏢 施設帳</button><button class="btn plain" data-go="settings">⚙️ 設定</button><button class="btn plain" data-go="guide">📖 使い方</button></div>`);
     bg.querySelectorAll('[data-act=open],[data-go]').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>bg.remove(),0))); },
   plall:()=>{ UI.plArea=''; render(); },
   plnear:async()=>{ if(UI.plNear){UI.plNear=null; UI.plArea='home'; render(); return;}
@@ -190,6 +194,7 @@ const ACTS={
     D.textContent=T.calc||'0';
   },
   wxhere:()=>{ if(!navigator.geolocation){toast('この画面では今いる場所が使えません');return;} navigator.geolocation.getCurrentPosition(p=>{S.set.wx={name:'今いる場所',lat:+p.coords.latitude.toFixed(2),lon:+p.coords.longitude.toFixed(2)}; S.cache.wxErr=0; save(); render(); loadWx(true).then(()=>render());},()=>toast('今いる場所を使えませんでした。一覧から選んでください'),{timeout:10000}); },
+  bosaireload:()=>{ S.cache.bosaiErr=0; if(bosaiLoading) return; loadBosai(true).then(()=>render()).catch(()=>render()); render(); },
   wxreload:()=>{ S.cache.wxErr=0; S.cache.wx=null; render(); loadWx(true).then(()=>render()); },
   featall:()=>{ S.set.off={}; save(); render(); toast('すべて表示しました'); },
   featimpl:()=>{ const off={}; for(const id in NODES){ const n=NODES[id]; if(n.lv==='y'&&!hasImpl(id)&&!LOCKED.has(id)) off[id]=true; if(n.lv!=='y'&&!hasImpl(id)&&!LOCKED.has(id)) off[id]=true; } S.set.off=off; save(); render(); toast('使える機能だけにしました'); },
