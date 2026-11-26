@@ -341,3 +341,10 @@ html.f3 .hd .brand span{display:none}
 :root[data-kise="ichimatsu"]{--bee:#4A5E45;--beeInk:#FFFFFF;--beePat:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2732%27 height=%2732%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%23FFFFFF%27 opacity=%27.12%27/%3E%3Crect x=%2716%27 y=%2716%27 width=%2716%27 height=%2716%27 fill=%27%23FFFFFF%27 opacity=%27.12%27/%3E%3C/svg%3E")}
 .clock{background-image:var(--beePat,none);background-repeat:repeat}
 .kise label .sw.pat{background-size:12px 12px}
+
+.plarea{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.plarea select{flex:1 1 180px;min-width:0;padding:10px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-weight:700}
+.plarea .btn{flex:1 1 160px;min-height:44px;padding:6px 10px}
+.linkb{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;font-weight:700}
+.row .km{color:var(--accent)}
+.plarea .btn{white-space:nowrap;font-size:.92rem}

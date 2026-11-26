@@ -344,6 +344,13 @@ html.f3 .hd .brand span{display:none}
 :root[data-kise="ichimatsu"]{--bee:#4A5E45;--beeInk:#FFFFFF;--beePat:url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2732%27 height=%2732%27%3E%3Crect width=%2716%27 height=%2716%27 fill=%27%23FFFFFF%27 opacity=%27.12%27/%3E%3Crect x=%2716%27 y=%2716%27 width=%2716%27 height=%2716%27 fill=%27%23FFFFFF%27 opacity=%27.12%27/%3E%3C/svg%3E")}
 .clock{background-image:var(--beePat,none);background-repeat:repeat}
 .kise label .sw.pat{background-size:12px 12px}
+
+.plarea{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.plarea select{flex:1 1 180px;min-width:0;padding:10px;border:2px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);font-weight:700}
+.plarea .btn{flex:1 1 160px;min-height:44px;padding:6px 10px}
+.linkb{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;font-weight:700}
+.row .km{color:var(--accent)}
+.plarea .btn{white-space:nowrap;font-size:.92rem}
 </style>
 <div id="app"></div>
 <script>
@@ -438,7 +445,7 @@ function genresOf(b){ const d=PLACE_GENRE[b]||{}; const all=Object.values(d).fla
 function fresh(){
   return {v:1,
     set:{mode:'normal',font:1,kise:'bee',theme:'',grid:ROOTS.slice(0,9),off:{},cn:true,
-      home:{addr:'',tel:'',telName:''},me:{name:'',kana:'',bday:'',blood:'',addr:'',tel:'',allergy:'',sick:'',med:'',contact:'',contactTel:'',note:''},
+      home:{addr:'',tel:'',telName:''},area:{pref:'',city:''},me:{name:'',kana:'',bday:'',blood:'',addr:'',tel:'',allergy:'',sick:'',med:'',contact:'',contactTel:'',note:''},
       wx:{name:'東京',lat:35.68,lon:139.77},evcats:EVCATS.map(c=>({...c})),
       pcats:[{id:'c1',name:'家族',color:0},{id:'c2',name:'親せき',color:1},{id:'c3',name:'友人',color:3},{id:'c4',name:'仕事',color:5},{id:'c5',name:'ご近所',color:7},{id:'other',name:'その他',color:9}],
       minStep:15,hFrom:6,hTo:22,topCal:'from',meal:{b:'07:00',l:'12:00',d:'18:00',s:'22:00'},genres:{},started:new Date().toISOString().slice(0,10)},
@@ -563,10 +570,18 @@ function readPhoto(file,max=360){
     fr.readAsDataURL(file);
   });
 }
+
+/* ---- 地域（都道府県・市町村）と距離 ---- */
+const PREFS=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+function prefOf(a){ a=String(a||''); for(const p of PREFS){ if(a.startsWith(p)) return p; } for(const p of PREFS){ const s=p.replace(/[都府県]$/,''); if(p!=='北海道'&&a.startsWith(s)) return p; } return ''; }
+function cityOf(a){ a=String(a||''); const p=prefOf(a); if(p) a=a.slice(a.startsWith(p)?p.length:p.replace(/[都府県]$/,'').length); const m=a.match(/^(.+?郡.+?[町村]|.+?市|.+?区|.+?[町村])/); return m?m[1]:''; }
+function homeArea(){ const ar=S.set.area||{}; if(ar.pref) return ar; const a=S.set.home&&S.set.home.addr; return {pref:prefOf(a),city:cityOf(a)}; }
+function kmBetween(a,b,c,d){ const R=6371,r=x=>x*Math.PI/180; const x=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2; return 2*R*Math.asin(Math.sqrt(x)); }
+async function geocode(addr){ try{ const r=await fetch('https://msearch.gsi.go.jp/address-search/AddressSearch?q='+encodeURIComponent(addr)); const j=await r.json(); if(j&&j[0]){ const [lon,lat]=j[0].geometry.coordinates; return {lat:+lat,lon:+lon}; } }catch(e){} return null; }
 /* ===== 画面 ===== */
 const IN_FRAME=(()=>{try{return window.top!==window;}catch(e){return true;}})();
 let stack=['home'];
-const UI={editGrid:false,dayCat:'',calCat:'',pCat:'',pQ:'',plBig:'',plQ:'',shopTab:'often',memoSrc:'',memoQ:'',toolTab:'clock',openReds:new Set(),confirm:''};
+const UI={plArea:'home',plNear:null,editGrid:false,dayCat:'',calCat:'',pCat:'',pQ:'',plBig:'',plQ:'',shopTab:'often',memoSrc:'',memoQ:'',toolTab:'clock',openReds:new Set(),confirm:''};
 const cur=()=>stack[stack.length-1];
 function go(r,replace){
   UI.confirm='';
@@ -840,11 +855,12 @@ function vPCats(){
 const BIG_EMOJI={'食事':'🍽️','買い物':'🛒','医療':'🏥','介護':'🤝','運動':'🏃','遊び・趣味':'🎤','公共':'🏛️','寺社':'⛩️','業者':'🔧','美容':'💇','車・交通':'🚗','学び・子ども':'🎒','その他':'📍'};
 function stars(sc){ sc=+sc||0; if(!sc) return '<span class="muted small">点数なし</span>'; if(sc>=10) return '<span class="stars"><span class="ten">★</span></span> <span class="small">10点</span>'; return `<span class="stars">${'★'.repeat(Math.floor(sc/5))}${'☆'.repeat(sc%5)}</span> <span class="small">${sc}点</span>`; }
 function placeRow(p){ const b=(p.big||[])[0]||'その他';
-  return `<button class="row" data-go="place/${p.id}"><span class="em">${BIG_EMOJI[b]||'📍'}</span><span class="t"><b>${h(p.name)}</b><span>${h([(p.genre||[]).join('・'),p.addr].filter(Boolean).join('　'))}</span></span>${p.silver?'<span class="badge ok">シルバー割</span>':''}<span class="go">›</span></button>`; }
+  return `<button class="row" data-go="place/${p.id}"><span class="em">${BIG_EMOJI[b]||'📍'}</span><span class="t"><b>${h(p.name)}</b><span>${h([(p.genre||[]).join('・'),[p.pref,p.city].filter(Boolean).join(' ')||p.addr].filter(Boolean).join('　'))}${p._km!=null?`　<b class="km">約${p._km<1?Math.round(p._km*1000)+'m':p._km.toFixed(1)+'km'}</b>`:''}</span></span>${p.silver?'<span class="badge ok">シルバー割</span>':''}<span class="go">›</span></button>`; }
 function vPlaces(){
   const chips=[''].concat(PLACE_BIG).map(b=>`<button class="chip" aria-pressed="${UI.plBig===b}" data-act="plbig" data-c="${b}">${b?BIG_EMOJI[b]+' '+b:'すべて'}</button>`).join('');
   return sub('施設帳',`<p class="small muted" style="margin:0 0 6px">お店・病院・役所などの場所は、ここに1回だけ登録します。予定やほかの機能からも呼び出せます。</p>
-  <input class="search" id="plq" type="search" placeholder="名前・ジャンル・住所で探す" value="${h(UI.plQ)}">
+  <input class="search" id="plq" type="search" placeholder="🔍 ラーメン・店の名前・地名などで探す" value="${h(UI.plQ)}">
+  ${plAreaBar()}
   <div class="chips">${chips}</div>${UI.plBig?plGenreChips():''}<div id="pllist">${placeList()}</div>
   <div class="btns"><button class="btn" data-go="pledit/new">＋ 場所を登録</button></div>`,{crumb:'店・利用施設'});
 }
@@ -853,11 +869,31 @@ function plGenreChips(){
   if(!used.length) return '';
   return `<div class="chips" style="padding-top:0"><span class="small muted">細かく：</span>${['',...used].map(g=>`<button class="chip" aria-pressed="${(UI.plG||'')===g}" data-act="plg" data-c="${h(g)}">${g?h(g):'すべて'}</button>`).join('')}</div>`;
 }
+function plAreaBar(){
+  const ha=homeArea(); const used={}; S.places.forEach(p=>{ if(p.pref) used[p.pref]=(used[p.pref]||0)+1; });
+  const opts=[['home',ha.pref?`🏠 ふだんの地域（${ha.pref}${ha.city?' '+ha.city:''}）`:'🏠 ふだんの地域（まだ決めていません）'],['','🗾 全国（すべて）']].concat(PREFS.filter(p=>used[p]).map(p=>[p,`${p}（${used[p]}）`]));
+  return `<div class="plarea"><select id="plarea" aria-label="地域">${opts.map(([v,t])=>`<option value="${h(v)}" ${UI.plArea===v?'selected':''}>${h(t)}</option>`).join('')}</select>
+  <button class="btn ${UI.plNear?'':'plain'}" data-act="plnear">📍 ${UI.plNear?'近い順をやめる':'今いる場所の近い順'}</button></div>
+  ${!ha.pref?`<p class="small muted" style="margin:4px 0 0">ふだんの地域は <button class="linkb" data-go="settings">設定</button> で決められます（自宅の住所からも自動で決まります）。</p>`:''}
+  ${UI.plNear?`<p class="small muted" style="margin:4px 0 0">今いる場所から近い順に、全国の登録店を並べています。</p>`:''}`;
+}
+function plText(p){ return [p.name,(p.big||[]).join(' '),(p.genre||[]).join(' '),p.addr,p.pref,p.city,p.hours,(p.log||[]).map(x=>x.text).join(' ')].join(' '); }
 function placeList(){
-  const q=UI.plQ.trim();
-  const list=S.places.filter(p=>(!UI.plBig||(p.big||[]).includes(UI.plBig))&&(!UI.plG||(p.genre||[]).includes(UI.plG))&&(!q||[p.name,(p.genre||[]).join(' '),p.addr].join(' ').includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  const q=UI.plQ.trim(); const ha=homeArea();
   if(!S.places.length) return `<div class="empty">${BOO_IMG}まだ場所が登録されていません。<br>よく行くお店やかかりつけの病院から入れてみよう。<div class="btns"><button class="btn plain" data-act="sample">見本の人とお店を入れてみる</button></div></div>`;
-  return list.length?`<div class="list">${list.map(placeRow).join('')}</div>`:'<div class="empty">見つかりませんでした。</div>';
+  let list=S.places.filter(p=>(!UI.plBig||(p.big||[]).includes(UI.plBig))&&(!UI.plG||(p.genre||[]).includes(UI.plG))&&(!q||plText(p).includes(q)));
+  list.forEach(p=>{ p._km=(UI.plNear&&p.lat!=null)?kmBetween(UI.plNear.lat,UI.plNear.lon,p.lat,p.lon):null; });
+  const byName=(a,b)=>a.name.localeCompare(b.name,'ja');
+  if(UI.plNear){ list.sort((a,b)=>(a._km??1e9)-(b._km??1e9)||byName(a,b)); const known=list.filter(p=>p._km!=null), unk=list.filter(p=>p._km==null);
+    return (known.length?`<div class="list">${known.map(placeRow).join('')}</div>`:'<div class="empty">近い店は見つかりませんでした。</div>')+(unk.length?`<h3 class="small muted" style="margin:10px 0 4px">場所がわからない店（住所を入れると近い順に入ります）</h3><div class="list">${unk.map(placeRow).join('')}</div>`:''); }
+  list.sort(byName);
+  const area=UI.plArea==='home'?ha.pref:UI.plArea;
+  if(!area) return list.length?`<div class="list">${list.map(placeRow).join('')}</div>`:'<div class="empty">見つかりませんでした。</div>';
+  const inA=list.filter(p=>p.pref===area), outA=list.filter(p=>p.pref!==area);
+  const homeCity=UI.plArea==='home'&&ha.city; if(homeCity) inA.sort((a,b)=>(b.city===homeCity)-(a.city===homeCity)||byName(a,b));
+  let html=inA.length?`<div class="list">${inA.map(placeRow).join('')}</div>`:`<div class="empty">${h(area)}には${q?'「'+h(q)+'」に合う店が':'登録した場所が'}ありません。</div>`;
+  if(outA.length) html+=q?`<h3 class="small muted" style="margin:10px 0 4px">ほかの地域（${outA.length}件）</h3><div class="list">${outA.map(placeRow).join('')}</div>`:`<p class="small muted" style="margin:8px 0 0">ほかの地域にも${outA.length}件あります。<button class="linkb" data-act="plall">全国で見る</button></p>`;
+  return html;
 }
 function vShops(){
   const tabs=[['often','よく行く'],['want','行ってみたい'],['all','すべて']];
@@ -903,7 +939,10 @@ function vPlEdit(id){
   <div class="f"><span class="lb">② 細かいジャンル</span>
     <div style="display:flex;gap:6px;margin-bottom:6px"><input id="pl-newg" type="search" placeholder="🔍 探す・足す（例：飲み屋、うなぎ）" style="flex:1;min-width:0;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:var(--card)"><button type="button" class="mini" data-act="addgenre">足す</button></div>
     <div id="pl-genre">${genreChips(p.big||[],p.genre||[])}</div></div>
-  <div class="f"><label for="pl-addr">住所（MAP・NAVIに使います）</label><input id="pl-addr" name="addr" value="${h(p.addr||'')}"></div>
+  <div class="f"><label for="pl-addr">住所（MAP・NAVI・近い順に使います）</label><input id="pl-addr" name="addr" value="${h(p.addr||'')}" placeholder="例：東京都新宿区西新宿2-8-1"></div>
+  <div class="two"><div class="f"><label for="pl-pref">都道府県</label><select id="pl-pref" name="pref"><option value="">（えらぶ）</option>${PREFS.map(x=>`<option ${(p.pref||'')===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="f"><label for="pl-city">市区町村</label><input id="pl-city" name="city" value="${h(p.city||'')}" placeholder="例：静岡市"></div></div>
+  <input type="hidden" name="lat" value="${p.lat??''}"><input type="hidden" name="lon" value="${p.lon??''}">
+  <p class="small muted" style="margin:-4px 0 8px"><span id="pl-pos">${p.lat!=null?'📍 位置は登録済みです':'住所を入れると、登録するときに位置を自動で調べます'}</span>　<button type="button" class="linkb" data-act="plhere">今いる場所をこの店の位置にする</button></p>
   <div class="two"><div class="f"><label for="pl-tel">電話</label><input id="pl-tel" type="tel" name="tel" value="${h(p.tel||'')}"></div><div class="f"><label for="pl-score">点数（10点満点）</label><select id="pl-score" name="score">${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${+p.score===n?'selected':''}>${n?n+'点':'なし'}</option>`).join('')}</select></div></div>
   <div class="f"><label for="pl-hours">営業時間・休み</label><input id="pl-hours" name="hours" value="${h(p.hours||'')}" placeholder="例：9:00〜18:00　木曜休み"></div>
   <div class="f"><label for="pl-hp">ホームページ</label><input id="pl-hp" type="url" name="hp" value="${h(p.hp||'')}" placeholder="https://"></div>
@@ -1016,7 +1055,7 @@ function vSearch(q){
   if(q){
     const nodes=Object.values(NODES).filter(n=>!isOff(n.id)&&(n.name.includes(q)||(n.items||[]).some(x=>x[0].includes(q)))).slice(0,30);
     const ppl=S.people.filter(p=>[p.name,p.kana,(p.log||[]).map(x=>x.text).join(' ')].join(' ').includes(q));
-    const pls=S.places.filter(p=>[p.name,p.addr,(p.genre||[]).join(' ')].join(' ').includes(q));
+    const pls=S.places.filter(p=>plText(p).includes(q));
     const evs=S.events.filter(e=>(e.title+' '+(e.memo||'')).includes(q)).slice(0,20);
     const mms=allMemos().filter(m=>m.text.includes(q)).slice(0,20);
     const sec=(t,arr,f)=>arr.length?`<div class="sec"><h3>${t}（${arr.length}）</h3><div class="list">${arr.map(f).join('')}</div></div>`:'';
@@ -1044,6 +1083,8 @@ function vSettings(){
   <div class="sec"><h3>予定の時刻</h3><div class="choose">${r('minStep',15,+s.minStep,'15分きざみ')}${r('minStep',10,+s.minStep,'10分きざみ')}${r('minStep',5,+s.minStep,'5分きざみ')}${r('minStep',1,+s.minStep,'1分きざみ')}</div>
     <div class="f"><span class="lb">よく使う時間帯（この外は「早朝・深夜」にまとめます）</span><span class="tsel"><select data-act="sethr" data-k="hFrom" aria-label="から">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hFrom===i?'selected':''}>${i}時</option>`).join('')}</select>から<select data-act="sethr" data-k="hTo" aria-label="まで">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hTo===i?'selected':''}>${i}時</option>`).join('')}</select>まで</span></div></div>
   <div class="sec"><h3>文字の大きさ</h3><div class="choose">${r('font',1,s.font,'ふつう')}${r('font',2,s.font,'大きめ')}${r('font',3,s.font,'とても大きい')}</div></div>
+  <div class="sec"><h3>ふだんの地域</h3><p class="small muted" style="margin:0 0 6px">施設帳では、ふだんはこの地域の店が先に出ます。空のときは自宅の住所から決めます。</p>
+  <div class="two"><select data-act="setarea" data-k="pref" aria-label="都道府県"><option value="">（自宅の住所から）</option>${PREFS.map(x=>`<option ${(s.area||{}).pref===x?'selected':''}>${x}</option>`).join('')}</select><input data-act="setarea" data-k="city" value="${h((s.area||{}).city||'')}" placeholder="市区町村（例：静岡市）" aria-label="市区町村"></div></div>
   <div class="sec"><h3>着せかえ（枠の色）</h3><p class="small muted" style="margin:0 0 6px">押すとすぐ変わります。気分で変えてください。</p><div class="choose kise">${[['bee','#F6C915','きいろ'],['aka','#D93A2B','あか'],['ao','#2D62C8','あお'],['kuro','#1E1B14','くろ'],['midori','#2E8B4F','みどり'],['orange','#F08A00','オレンジ'],['murasaki','#6B4FC8','むらさき'],['sakura','#F4A7B9','さくら'],['sora','#8CCBF0','そら'],['wakaba','#A8D672','わかば']].map(([k,c,t])=>r('kise',k,s.kise,`<span class="sw" style="background:${c}"></span>${t}`)).join('')}</div>
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>
@@ -1305,6 +1346,8 @@ function after(r){
   const dm=$('#daymemo'); if(dm){ let tm; dm.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{const s=cur().split('/')[1]; S.daymemo[s]=dm.value; if(!dm.value.trim()) delete S.daymemo[s]; save();},400);}); }
   const pq=$('#pq'); if(pq) pq.addEventListener('input',()=>{UI.pQ=pq.value;$('#plist').innerHTML=peopleList();});
   const plq=$('#plq'); if(plq) plq.addEventListener('input',()=>{UI.plQ=plq.value;$('#pllist').innerHTML=placeList();});
+  const pla=$('#plarea'); if(pla) pla.addEventListener('change',()=>{UI.plArea=pla.value; UI.plNear=null; render();});
+  const pad_=$('#pl-addr'); if(pad_) pad_.addEventListener('input',()=>{ const pr=prefOf(pad_.value), ct=cityOf(pad_.value); if(pr) $('#pl-pref').value=pr; if(ct) $('#pl-city').value=ct; $('[name=lat]').value=''; $('[name=lon]').value=''; $('#pl-pos').textContent='住所を入れると、登録するときに位置を自動で調べます'; });
   const mq=$('#mq'); if(mq) mq.addEventListener('input',()=>{UI.memoQ=mq.value;$('#mlist').innerHTML=memoList();});
   const sq=$('#sq'); if(sq&&!sq.value) try{sq.focus();}catch(e){}
   const wc=$('#wx-city'); if(wc) wc.addEventListener('change',()=>{const c=CITIES.find(x=>x[0]===wc.value); if(c){S.set.wx={name:c[0],lat:c[1],lon:c[2]}; S.cache.wxErr=0; save(); render(); loadWx(true).then(()=>render());}});
@@ -1362,6 +1405,7 @@ document.addEventListener('change',ev=>{
   const el=ev.target;
   if(el.dataset.act==='setr'){ const v=isNaN(+el.value)||el.value===''?el.value:+el.value; S.set[el.name]=v; save(); render(); }
   if(el.dataset.act==='sethr'){ S.set[el.dataset.k]=+el.value; if(+S.set.hFrom>+S.set.hTo){const a=S.set.hFrom;S.set.hFrom=S.set.hTo;S.set.hTo=a;} save(); render(); }
+  if(el.dataset.act==='setarea'){ S.set.area=S.set.area||{pref:'',city:''}; S.set.area[el.dataset.k]=el.value.trim(); save(); }
   if(el.dataset.act==='setcn'){ S.set.cn=el.checked; save(); }
   if(el.dataset.act==='feat'){ const id=el.dataset.id; if(el.checked) delete S.set.off[id]; else S.set.off[id]=true; save(); }
 });
@@ -1398,6 +1442,17 @@ const ACTS={
     if(!exists){ const b=bigs[0]; S.set.genres[b]=S.set.genres[b]||[]; S.set.genres[b].push(v); save(); toast('「'+v+'」を「'+b+'」に足しました'); }
     const sel=[...new Set($$('#pl-genre input:checked').map(x=>x.value).concat(v))]; inp.value=''; $('#pl-genre').innerHTML=genreChips(bigs,sel); },
   plg:(el,d)=>{ UI.plG=d.c; render(); },
+  plall:()=>{ UI.plArea=''; render(); },
+  plnear:async()=>{ if(UI.plNear){UI.plNear=null; UI.plArea='home'; render(); return;}
+    if(!navigator.geolocation){ toast('この画面では今いる場所が使えません'); return; }
+    toast('今いる場所を調べています…');
+    navigator.geolocation.getCurrentPosition(async pos=>{ UI.plNear={lat:pos.coords.latitude,lon:pos.coords.longitude}; UI.plArea=''; render();
+      const need=S.places.filter(p=>p.lat==null&&p.addr).slice(0,30); let ch=0;
+      for(const p of need){ const g=await geocode(p.addr); if(g){p.lat=g.lat;p.lon=g.lon;ch++;} }
+      if(ch){ save(); if(UI.plNear) render(); } },
+      ()=>toast('今いる場所を使えませんでした。スマホの位置情報をオンにしてください'),{timeout:10000,maximumAge:60000}); },
+  plhere:()=>{ if(!navigator.geolocation){ toast('この画面では今いる場所が使えません'); return; }
+    navigator.geolocation.getCurrentPosition(pos=>{ $('[name=lat]').value=pos.coords.latitude.toFixed(6); $('[name=lon]').value=pos.coords.longitude.toFixed(6); $('#pl-pos').textContent='📍 今いる場所を位置にしました（登録すると保存）'; },()=>toast('今いる場所を使えませんでした'),{timeout:10000}); },
   qmemo:()=>quickMemo(),
   otasuke:()=>otasuke(),
   tmadd:(el,d)=>{ if(T.timerRun) T.timerEnd+=(+d.s)*1000; else T.timerLeft+=(+d.s)*1000; render(); },
@@ -1454,8 +1509,11 @@ const FORMS={
   },
   place:(f,fd)=>{
     const id=f.dataset.id; const p=id?S.places.find(x=>x.id===id):{id:uid(),log:[]};
-    Object.assign(p,{name:fd.get('name').trim(),big:fd.getAll('big'),genre:[...new Set(fd.getAll('genre'))],addr:fd.get('addr').trim(),tel:fd.get('tel').trim(),hp:fd.get('hp').trim(),hours:fd.get('hours').trim(),score:+fd.get('score')||0,often:!!fd.get('often'),want:!!fd.get('want'),silver:!!fd.get('silver')});
+    const oldAddr=p.addr; Object.assign(p,{name:fd.get('name').trim(),big:fd.getAll('big'),genre:[...new Set(fd.getAll('genre'))],addr:fd.get('addr').trim(),pref:fd.get('pref')||prefOf(fd.get('addr')),city:(fd.get('city')||'').trim()||cityOf(fd.get('addr')),tel:fd.get('tel').trim(),hp:fd.get('hp').trim(),hours:fd.get('hours').trim(),score:+fd.get('score')||0,often:!!fd.get('often'),want:!!fd.get('want'),silver:!!fd.get('silver')});
+    const la=fd.get('lat'), lo=fd.get('lon');
+    if(la&&lo){ p.lat=+la; p.lon=+lo; } else if(p.addr!==oldAddr){ delete p.lat; delete p.lon; }
     if(!p.big.length) p.big=['その他'];
+    if(p.addr&&p.lat==null){ geocode(p.addr).then(g=>{ if(g){ p.lat=g.lat; p.lon=g.lon; save(); } }); }
     if(!id) S.places.push(p); save(); toast('登録しました'); go('place/'+p.id,true);
   },
   log:(f,fd)=>{
@@ -1522,10 +1580,11 @@ function addSample(){
   const c=P({name:'見本 三郎',kana:'みほん さぶろう',cats:['c5'],phones:[{label:'自宅',num:'054-000-0003'}]});
   S.people.push(a,b,c);
   const L=(o)=>({id:uid(),sample:true,log:[],genre:[],score:0,...o});
-  const s1=L({name:'見本スーパー',big:['買い物'],genre:['スーパー'],addr:'静岡駅',often:true,score:7,silver:true,hours:'9:00〜21:00'});
-  const s2=L({name:'見本歯科',big:['医療'],genre:['歯科'],addr:'静岡市役所',tel:'054-000-0010',hours:'9:00〜18:00　木・日休み'});
-  const s3=L({name:'見本食堂',big:['食事'],genre:['和食'],addr:'駿府城公園',want:true,score:10});
-  S.places.push(s1,s2,s3);
+  const s1=L({name:'見本スーパー',big:['買い物'],genre:['スーパー'],addr:'静岡駅',pref:'静岡県',city:'静岡市',lat:34.9716,lon:138.389,often:true,score:7,silver:true,hours:'9:00〜21:00'});
+  const s2=L({name:'見本歯科',big:['医療'],genre:['歯科'],addr:'静岡市役所',pref:'静岡県',city:'静岡市',lat:34.9756,lon:138.3828,tel:'054-000-0010',hours:'9:00〜18:00　木・日休み'});
+  const s3=L({name:'見本食堂',big:['食事'],genre:['和食'],addr:'駿府城公園',pref:'静岡県',city:'静岡市',lat:34.9786,lon:138.383,want:true,score:10});
+  const s4=L({name:'見本ラーメン',big:['食事'],genre:['ラーメン'],addr:'東京都千代田区丸の内1丁目',pref:'東京都',city:'千代田区',lat:35.681,lon:139.767,want:true,score:8});
+  S.places.push(s1,s2,s3,s4);
   const E=(o)=>({id:uid(),sample:true,time:'',etime:'',rep:'',place:'',placeId:'',people:[],memo:'',...o});
   S.events.push(E({title:'歯医者（見本）',date:t,time:'10:30',etime:'11:00',cat:'health',placeId:s2.id,memo:'保険証を持っていく'}),
     E({title:'ゴミ出し（燃えるゴミ）',date:t,cat:'local',rep:'w'}),

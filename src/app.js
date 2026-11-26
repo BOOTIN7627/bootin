@@ -57,6 +57,8 @@ function after(r){
   const dm=$('#daymemo'); if(dm){ let tm; dm.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{const s=cur().split('/')[1]; S.daymemo[s]=dm.value; if(!dm.value.trim()) delete S.daymemo[s]; save();},400);}); }
   const pq=$('#pq'); if(pq) pq.addEventListener('input',()=>{UI.pQ=pq.value;$('#plist').innerHTML=peopleList();});
   const plq=$('#plq'); if(plq) plq.addEventListener('input',()=>{UI.plQ=plq.value;$('#pllist').innerHTML=placeList();});
+  const pla=$('#plarea'); if(pla) pla.addEventListener('change',()=>{UI.plArea=pla.value; UI.plNear=null; render();});
+  const pad_=$('#pl-addr'); if(pad_) pad_.addEventListener('input',()=>{ const pr=prefOf(pad_.value), ct=cityOf(pad_.value); if(pr) $('#pl-pref').value=pr; if(ct) $('#pl-city').value=ct; $('[name=lat]').value=''; $('[name=lon]').value=''; $('#pl-pos').textContent='住所を入れると、登録するときに位置を自動で調べます'; });
   const mq=$('#mq'); if(mq) mq.addEventListener('input',()=>{UI.memoQ=mq.value;$('#mlist').innerHTML=memoList();});
   const sq=$('#sq'); if(sq&&!sq.value) try{sq.focus();}catch(e){}
   const wc=$('#wx-city'); if(wc) wc.addEventListener('change',()=>{const c=CITIES.find(x=>x[0]===wc.value); if(c){S.set.wx={name:c[0],lat:c[1],lon:c[2]}; S.cache.wxErr=0; save(); render(); loadWx(true).then(()=>render());}});
@@ -114,6 +116,7 @@ document.addEventListener('change',ev=>{
   const el=ev.target;
   if(el.dataset.act==='setr'){ const v=isNaN(+el.value)||el.value===''?el.value:+el.value; S.set[el.name]=v; save(); render(); }
   if(el.dataset.act==='sethr'){ S.set[el.dataset.k]=+el.value; if(+S.set.hFrom>+S.set.hTo){const a=S.set.hFrom;S.set.hFrom=S.set.hTo;S.set.hTo=a;} save(); render(); }
+  if(el.dataset.act==='setarea'){ S.set.area=S.set.area||{pref:'',city:''}; S.set.area[el.dataset.k]=el.value.trim(); save(); }
   if(el.dataset.act==='setcn'){ S.set.cn=el.checked; save(); }
   if(el.dataset.act==='feat'){ const id=el.dataset.id; if(el.checked) delete S.set.off[id]; else S.set.off[id]=true; save(); }
 });
@@ -150,6 +153,17 @@ const ACTS={
     if(!exists){ const b=bigs[0]; S.set.genres[b]=S.set.genres[b]||[]; S.set.genres[b].push(v); save(); toast('「'+v+'」を「'+b+'」に足しました'); }
     const sel=[...new Set($$('#pl-genre input:checked').map(x=>x.value).concat(v))]; inp.value=''; $('#pl-genre').innerHTML=genreChips(bigs,sel); },
   plg:(el,d)=>{ UI.plG=d.c; render(); },
+  plall:()=>{ UI.plArea=''; render(); },
+  plnear:async()=>{ if(UI.plNear){UI.plNear=null; UI.plArea='home'; render(); return;}
+    if(!navigator.geolocation){ toast('この画面では今いる場所が使えません'); return; }
+    toast('今いる場所を調べています…');
+    navigator.geolocation.getCurrentPosition(async pos=>{ UI.plNear={lat:pos.coords.latitude,lon:pos.coords.longitude}; UI.plArea=''; render();
+      const need=S.places.filter(p=>p.lat==null&&p.addr).slice(0,30); let ch=0;
+      for(const p of need){ const g=await geocode(p.addr); if(g){p.lat=g.lat;p.lon=g.lon;ch++;} }
+      if(ch){ save(); if(UI.plNear) render(); } },
+      ()=>toast('今いる場所を使えませんでした。スマホの位置情報をオンにしてください'),{timeout:10000,maximumAge:60000}); },
+  plhere:()=>{ if(!navigator.geolocation){ toast('この画面では今いる場所が使えません'); return; }
+    navigator.geolocation.getCurrentPosition(pos=>{ $('[name=lat]').value=pos.coords.latitude.toFixed(6); $('[name=lon]').value=pos.coords.longitude.toFixed(6); $('#pl-pos').textContent='📍 今いる場所を位置にしました（登録すると保存）'; },()=>toast('今いる場所を使えませんでした'),{timeout:10000}); },
   qmemo:()=>quickMemo(),
   otasuke:()=>otasuke(),
   tmadd:(el,d)=>{ if(T.timerRun) T.timerEnd+=(+d.s)*1000; else T.timerLeft+=(+d.s)*1000; render(); },
@@ -206,8 +220,11 @@ const FORMS={
   },
   place:(f,fd)=>{
     const id=f.dataset.id; const p=id?S.places.find(x=>x.id===id):{id:uid(),log:[]};
-    Object.assign(p,{name:fd.get('name').trim(),big:fd.getAll('big'),genre:[...new Set(fd.getAll('genre'))],addr:fd.get('addr').trim(),tel:fd.get('tel').trim(),hp:fd.get('hp').trim(),hours:fd.get('hours').trim(),score:+fd.get('score')||0,often:!!fd.get('often'),want:!!fd.get('want'),silver:!!fd.get('silver')});
+    const oldAddr=p.addr; Object.assign(p,{name:fd.get('name').trim(),big:fd.getAll('big'),genre:[...new Set(fd.getAll('genre'))],addr:fd.get('addr').trim(),pref:fd.get('pref')||prefOf(fd.get('addr')),city:(fd.get('city')||'').trim()||cityOf(fd.get('addr')),tel:fd.get('tel').trim(),hp:fd.get('hp').trim(),hours:fd.get('hours').trim(),score:+fd.get('score')||0,often:!!fd.get('often'),want:!!fd.get('want'),silver:!!fd.get('silver')});
+    const la=fd.get('lat'), lo=fd.get('lon');
+    if(la&&lo){ p.lat=+la; p.lon=+lo; } else if(p.addr!==oldAddr){ delete p.lat; delete p.lon; }
     if(!p.big.length) p.big=['その他'];
+    if(p.addr&&p.lat==null){ geocode(p.addr).then(g=>{ if(g){ p.lat=g.lat; p.lon=g.lon; save(); } }); }
     if(!id) S.places.push(p); save(); toast('登録しました'); go('place/'+p.id,true);
   },
   log:(f,fd)=>{
@@ -274,10 +291,11 @@ function addSample(){
   const c=P({name:'見本 三郎',kana:'みほん さぶろう',cats:['c5'],phones:[{label:'自宅',num:'054-000-0003'}]});
   S.people.push(a,b,c);
   const L=(o)=>({id:uid(),sample:true,log:[],genre:[],score:0,...o});
-  const s1=L({name:'見本スーパー',big:['買い物'],genre:['スーパー'],addr:'静岡駅',often:true,score:7,silver:true,hours:'9:00〜21:00'});
-  const s2=L({name:'見本歯科',big:['医療'],genre:['歯科'],addr:'静岡市役所',tel:'054-000-0010',hours:'9:00〜18:00　木・日休み'});
-  const s3=L({name:'見本食堂',big:['食事'],genre:['和食'],addr:'駿府城公園',want:true,score:10});
-  S.places.push(s1,s2,s3);
+  const s1=L({name:'見本スーパー',big:['買い物'],genre:['スーパー'],addr:'静岡駅',pref:'静岡県',city:'静岡市',lat:34.9716,lon:138.389,often:true,score:7,silver:true,hours:'9:00〜21:00'});
+  const s2=L({name:'見本歯科',big:['医療'],genre:['歯科'],addr:'静岡市役所',pref:'静岡県',city:'静岡市',lat:34.9756,lon:138.3828,tel:'054-000-0010',hours:'9:00〜18:00　木・日休み'});
+  const s3=L({name:'見本食堂',big:['食事'],genre:['和食'],addr:'駿府城公園',pref:'静岡県',city:'静岡市',lat:34.9786,lon:138.383,want:true,score:10});
+  const s4=L({name:'見本ラーメン',big:['食事'],genre:['ラーメン'],addr:'東京都千代田区丸の内1丁目',pref:'東京都',city:'千代田区',lat:35.681,lon:139.767,want:true,score:8});
+  S.places.push(s1,s2,s3,s4);
   const E=(o)=>({id:uid(),sample:true,time:'',etime:'',rep:'',place:'',placeId:'',people:[],memo:'',...o});
   S.events.push(E({title:'歯医者（見本）',date:t,time:'10:30',etime:'11:00',cat:'health',placeId:s2.id,memo:'保険証を持っていく'}),
     E({title:'ゴミ出し（燃えるゴミ）',date:t,cat:'local',rep:'w'}),

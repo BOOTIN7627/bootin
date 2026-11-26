@@ -1,7 +1,7 @@
 /* ===== 画面 ===== */
 const IN_FRAME=(()=>{try{return window.top!==window;}catch(e){return true;}})();
 let stack=['home'];
-const UI={editGrid:false,dayCat:'',calCat:'',pCat:'',pQ:'',plBig:'',plQ:'',shopTab:'often',memoSrc:'',memoQ:'',toolTab:'clock',openReds:new Set(),confirm:''};
+const UI={plArea:'home',plNear:null,editGrid:false,dayCat:'',calCat:'',pCat:'',pQ:'',plBig:'',plQ:'',shopTab:'often',memoSrc:'',memoQ:'',toolTab:'clock',openReds:new Set(),confirm:''};
 const cur=()=>stack[stack.length-1];
 function go(r,replace){
   UI.confirm='';
@@ -275,11 +275,12 @@ function vPCats(){
 const BIG_EMOJI={'食事':'🍽️','買い物':'🛒','医療':'🏥','介護':'🤝','運動':'🏃','遊び・趣味':'🎤','公共':'🏛️','寺社':'⛩️','業者':'🔧','美容':'💇','車・交通':'🚗','学び・子ども':'🎒','その他':'📍'};
 function stars(sc){ sc=+sc||0; if(!sc) return '<span class="muted small">点数なし</span>'; if(sc>=10) return '<span class="stars"><span class="ten">★</span></span> <span class="small">10点</span>'; return `<span class="stars">${'★'.repeat(Math.floor(sc/5))}${'☆'.repeat(sc%5)}</span> <span class="small">${sc}点</span>`; }
 function placeRow(p){ const b=(p.big||[])[0]||'その他';
-  return `<button class="row" data-go="place/${p.id}"><span class="em">${BIG_EMOJI[b]||'📍'}</span><span class="t"><b>${h(p.name)}</b><span>${h([(p.genre||[]).join('・'),p.addr].filter(Boolean).join('　'))}</span></span>${p.silver?'<span class="badge ok">シルバー割</span>':''}<span class="go">›</span></button>`; }
+  return `<button class="row" data-go="place/${p.id}"><span class="em">${BIG_EMOJI[b]||'📍'}</span><span class="t"><b>${h(p.name)}</b><span>${h([(p.genre||[]).join('・'),[p.pref,p.city].filter(Boolean).join(' ')||p.addr].filter(Boolean).join('　'))}${p._km!=null?`　<b class="km">約${p._km<1?Math.round(p._km*1000)+'m':p._km.toFixed(1)+'km'}</b>`:''}</span></span>${p.silver?'<span class="badge ok">シルバー割</span>':''}<span class="go">›</span></button>`; }
 function vPlaces(){
   const chips=[''].concat(PLACE_BIG).map(b=>`<button class="chip" aria-pressed="${UI.plBig===b}" data-act="plbig" data-c="${b}">${b?BIG_EMOJI[b]+' '+b:'すべて'}</button>`).join('');
   return sub('施設帳',`<p class="small muted" style="margin:0 0 6px">お店・病院・役所などの場所は、ここに1回だけ登録します。予定やほかの機能からも呼び出せます。</p>
-  <input class="search" id="plq" type="search" placeholder="名前・ジャンル・住所で探す" value="${h(UI.plQ)}">
+  <input class="search" id="plq" type="search" placeholder="🔍 ラーメン・店の名前・地名などで探す" value="${h(UI.plQ)}">
+  ${plAreaBar()}
   <div class="chips">${chips}</div>${UI.plBig?plGenreChips():''}<div id="pllist">${placeList()}</div>
   <div class="btns"><button class="btn" data-go="pledit/new">＋ 場所を登録</button></div>`,{crumb:'店・利用施設'});
 }
@@ -288,11 +289,31 @@ function plGenreChips(){
   if(!used.length) return '';
   return `<div class="chips" style="padding-top:0"><span class="small muted">細かく：</span>${['',...used].map(g=>`<button class="chip" aria-pressed="${(UI.plG||'')===g}" data-act="plg" data-c="${h(g)}">${g?h(g):'すべて'}</button>`).join('')}</div>`;
 }
+function plAreaBar(){
+  const ha=homeArea(); const used={}; S.places.forEach(p=>{ if(p.pref) used[p.pref]=(used[p.pref]||0)+1; });
+  const opts=[['home',ha.pref?`🏠 ふだんの地域（${ha.pref}${ha.city?' '+ha.city:''}）`:'🏠 ふだんの地域（まだ決めていません）'],['','🗾 全国（すべて）']].concat(PREFS.filter(p=>used[p]).map(p=>[p,`${p}（${used[p]}）`]));
+  return `<div class="plarea"><select id="plarea" aria-label="地域">${opts.map(([v,t])=>`<option value="${h(v)}" ${UI.plArea===v?'selected':''}>${h(t)}</option>`).join('')}</select>
+  <button class="btn ${UI.plNear?'':'plain'}" data-act="plnear">📍 ${UI.plNear?'近い順をやめる':'今いる場所の近い順'}</button></div>
+  ${!ha.pref?`<p class="small muted" style="margin:4px 0 0">ふだんの地域は <button class="linkb" data-go="settings">設定</button> で決められます（自宅の住所からも自動で決まります）。</p>`:''}
+  ${UI.plNear?`<p class="small muted" style="margin:4px 0 0">今いる場所から近い順に、全国の登録店を並べています。</p>`:''}`;
+}
+function plText(p){ return [p.name,(p.big||[]).join(' '),(p.genre||[]).join(' '),p.addr,p.pref,p.city,p.hours,(p.log||[]).map(x=>x.text).join(' ')].join(' '); }
 function placeList(){
-  const q=UI.plQ.trim();
-  const list=S.places.filter(p=>(!UI.plBig||(p.big||[]).includes(UI.plBig))&&(!UI.plG||(p.genre||[]).includes(UI.plG))&&(!q||[p.name,(p.genre||[]).join(' '),p.addr].join(' ').includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  const q=UI.plQ.trim(); const ha=homeArea();
   if(!S.places.length) return `<div class="empty">${BOO_IMG}まだ場所が登録されていません。<br>よく行くお店やかかりつけの病院から入れてみよう。<div class="btns"><button class="btn plain" data-act="sample">見本の人とお店を入れてみる</button></div></div>`;
-  return list.length?`<div class="list">${list.map(placeRow).join('')}</div>`:'<div class="empty">見つかりませんでした。</div>';
+  let list=S.places.filter(p=>(!UI.plBig||(p.big||[]).includes(UI.plBig))&&(!UI.plG||(p.genre||[]).includes(UI.plG))&&(!q||plText(p).includes(q)));
+  list.forEach(p=>{ p._km=(UI.plNear&&p.lat!=null)?kmBetween(UI.plNear.lat,UI.plNear.lon,p.lat,p.lon):null; });
+  const byName=(a,b)=>a.name.localeCompare(b.name,'ja');
+  if(UI.plNear){ list.sort((a,b)=>(a._km??1e9)-(b._km??1e9)||byName(a,b)); const known=list.filter(p=>p._km!=null), unk=list.filter(p=>p._km==null);
+    return (known.length?`<div class="list">${known.map(placeRow).join('')}</div>`:'<div class="empty">近い店は見つかりませんでした。</div>')+(unk.length?`<h3 class="small muted" style="margin:10px 0 4px">場所がわからない店（住所を入れると近い順に入ります）</h3><div class="list">${unk.map(placeRow).join('')}</div>`:''); }
+  list.sort(byName);
+  const area=UI.plArea==='home'?ha.pref:UI.plArea;
+  if(!area) return list.length?`<div class="list">${list.map(placeRow).join('')}</div>`:'<div class="empty">見つかりませんでした。</div>';
+  const inA=list.filter(p=>p.pref===area), outA=list.filter(p=>p.pref!==area);
+  const homeCity=UI.plArea==='home'&&ha.city; if(homeCity) inA.sort((a,b)=>(b.city===homeCity)-(a.city===homeCity)||byName(a,b));
+  let html=inA.length?`<div class="list">${inA.map(placeRow).join('')}</div>`:`<div class="empty">${h(area)}には${q?'「'+h(q)+'」に合う店が':'登録した場所が'}ありません。</div>`;
+  if(outA.length) html+=q?`<h3 class="small muted" style="margin:10px 0 4px">ほかの地域（${outA.length}件）</h3><div class="list">${outA.map(placeRow).join('')}</div>`:`<p class="small muted" style="margin:8px 0 0">ほかの地域にも${outA.length}件あります。<button class="linkb" data-act="plall">全国で見る</button></p>`;
+  return html;
 }
 function vShops(){
   const tabs=[['often','よく行く'],['want','行ってみたい'],['all','すべて']];
@@ -338,7 +359,10 @@ function vPlEdit(id){
   <div class="f"><span class="lb">② 細かいジャンル</span>
     <div style="display:flex;gap:6px;margin-bottom:6px"><input id="pl-newg" type="search" placeholder="🔍 探す・足す（例：飲み屋、うなぎ）" style="flex:1;min-width:0;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:var(--card)"><button type="button" class="mini" data-act="addgenre">足す</button></div>
     <div id="pl-genre">${genreChips(p.big||[],p.genre||[])}</div></div>
-  <div class="f"><label for="pl-addr">住所（MAP・NAVIに使います）</label><input id="pl-addr" name="addr" value="${h(p.addr||'')}"></div>
+  <div class="f"><label for="pl-addr">住所（MAP・NAVI・近い順に使います）</label><input id="pl-addr" name="addr" value="${h(p.addr||'')}" placeholder="例：東京都新宿区西新宿2-8-1"></div>
+  <div class="two"><div class="f"><label for="pl-pref">都道府県</label><select id="pl-pref" name="pref"><option value="">（えらぶ）</option>${PREFS.map(x=>`<option ${(p.pref||'')===x?'selected':''}>${x}</option>`).join('')}</select></div><div class="f"><label for="pl-city">市区町村</label><input id="pl-city" name="city" value="${h(p.city||'')}" placeholder="例：静岡市"></div></div>
+  <input type="hidden" name="lat" value="${p.lat??''}"><input type="hidden" name="lon" value="${p.lon??''}">
+  <p class="small muted" style="margin:-4px 0 8px"><span id="pl-pos">${p.lat!=null?'📍 位置は登録済みです':'住所を入れると、登録するときに位置を自動で調べます'}</span>　<button type="button" class="linkb" data-act="plhere">今いる場所をこの店の位置にする</button></p>
   <div class="two"><div class="f"><label for="pl-tel">電話</label><input id="pl-tel" type="tel" name="tel" value="${h(p.tel||'')}"></div><div class="f"><label for="pl-score">点数（10点満点）</label><select id="pl-score" name="score">${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${+p.score===n?'selected':''}>${n?n+'点':'なし'}</option>`).join('')}</select></div></div>
   <div class="f"><label for="pl-hours">営業時間・休み</label><input id="pl-hours" name="hours" value="${h(p.hours||'')}" placeholder="例：9:00〜18:00　木曜休み"></div>
   <div class="f"><label for="pl-hp">ホームページ</label><input id="pl-hp" type="url" name="hp" value="${h(p.hp||'')}" placeholder="https://"></div>
@@ -451,7 +475,7 @@ function vSearch(q){
   if(q){
     const nodes=Object.values(NODES).filter(n=>!isOff(n.id)&&(n.name.includes(q)||(n.items||[]).some(x=>x[0].includes(q)))).slice(0,30);
     const ppl=S.people.filter(p=>[p.name,p.kana,(p.log||[]).map(x=>x.text).join(' ')].join(' ').includes(q));
-    const pls=S.places.filter(p=>[p.name,p.addr,(p.genre||[]).join(' ')].join(' ').includes(q));
+    const pls=S.places.filter(p=>plText(p).includes(q));
     const evs=S.events.filter(e=>(e.title+' '+(e.memo||'')).includes(q)).slice(0,20);
     const mms=allMemos().filter(m=>m.text.includes(q)).slice(0,20);
     const sec=(t,arr,f)=>arr.length?`<div class="sec"><h3>${t}（${arr.length}）</h3><div class="list">${arr.map(f).join('')}</div></div>`:'';
@@ -479,6 +503,8 @@ function vSettings(){
   <div class="sec"><h3>予定の時刻</h3><div class="choose">${r('minStep',15,+s.minStep,'15分きざみ')}${r('minStep',10,+s.minStep,'10分きざみ')}${r('minStep',5,+s.minStep,'5分きざみ')}${r('minStep',1,+s.minStep,'1分きざみ')}</div>
     <div class="f"><span class="lb">よく使う時間帯（この外は「早朝・深夜」にまとめます）</span><span class="tsel"><select data-act="sethr" data-k="hFrom" aria-label="から">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hFrom===i?'selected':''}>${i}時</option>`).join('')}</select>から<select data-act="sethr" data-k="hTo" aria-label="まで">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hTo===i?'selected':''}>${i}時</option>`).join('')}</select>まで</span></div></div>
   <div class="sec"><h3>文字の大きさ</h3><div class="choose">${r('font',1,s.font,'ふつう')}${r('font',2,s.font,'大きめ')}${r('font',3,s.font,'とても大きい')}</div></div>
+  <div class="sec"><h3>ふだんの地域</h3><p class="small muted" style="margin:0 0 6px">施設帳では、ふだんはこの地域の店が先に出ます。空のときは自宅の住所から決めます。</p>
+  <div class="two"><select data-act="setarea" data-k="pref" aria-label="都道府県"><option value="">（自宅の住所から）</option>${PREFS.map(x=>`<option ${(s.area||{}).pref===x?'selected':''}>${x}</option>`).join('')}</select><input data-act="setarea" data-k="city" value="${h((s.area||{}).city||'')}" placeholder="市区町村（例：静岡市）" aria-label="市区町村"></div></div>
   <div class="sec"><h3>着せかえ（枠の色）</h3><p class="small muted" style="margin:0 0 6px">押すとすぐ変わります。気分で変えてください。</p><div class="choose kise">${[['bee','#F6C915','きいろ'],['aka','#D93A2B','あか'],['ao','#2D62C8','あお'],['kuro','#1E1B14','くろ'],['midori','#2E8B4F','みどり'],['orange','#F08A00','オレンジ'],['murasaki','#6B4FC8','むらさき'],['sakura','#F4A7B9','さくら'],['sora','#8CCBF0','そら'],['wakaba','#A8D672','わかば']].map(([k,c,t])=>r('kise',k,s.kise,`<span class="sw" style="background:${c}"></span>${t}`)).join('')}</div>
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>

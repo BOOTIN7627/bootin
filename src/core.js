@@ -86,7 +86,7 @@ function genresOf(b){ const d=PLACE_GENRE[b]||{}; const all=Object.values(d).fla
 function fresh(){
   return {v:1,
     set:{mode:'normal',font:1,kise:'bee',theme:'',grid:ROOTS.slice(0,9),off:{},cn:true,
-      home:{addr:'',tel:'',telName:''},me:{name:'',kana:'',bday:'',blood:'',addr:'',tel:'',allergy:'',sick:'',med:'',contact:'',contactTel:'',note:''},
+      home:{addr:'',tel:'',telName:''},area:{pref:'',city:''},me:{name:'',kana:'',bday:'',blood:'',addr:'',tel:'',allergy:'',sick:'',med:'',contact:'',contactTel:'',note:''},
       wx:{name:'東京',lat:35.68,lon:139.77},evcats:EVCATS.map(c=>({...c})),
       pcats:[{id:'c1',name:'家族',color:0},{id:'c2',name:'親せき',color:1},{id:'c3',name:'友人',color:3},{id:'c4',name:'仕事',color:5},{id:'c5',name:'ご近所',color:7},{id:'other',name:'その他',color:9}],
       minStep:15,hFrom:6,hTo:22,topCal:'from',meal:{b:'07:00',l:'12:00',d:'18:00',s:'22:00'},genres:{},started:new Date().toISOString().slice(0,10)},
@@ -211,3 +211,11 @@ function readPhoto(file,max=360){
     fr.readAsDataURL(file);
   });
 }
+
+/* ---- 地域（都道府県・市町村）と距離 ---- */
+const PREFS=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+function prefOf(a){ a=String(a||''); for(const p of PREFS){ if(a.startsWith(p)) return p; } for(const p of PREFS){ const s=p.replace(/[都府県]$/,''); if(p!=='北海道'&&a.startsWith(s)) return p; } return ''; }
+function cityOf(a){ a=String(a||''); const p=prefOf(a); if(p) a=a.slice(a.startsWith(p)?p.length:p.replace(/[都府県]$/,'').length); const m=a.match(/^(.+?郡.+?[町村]|.+?市|.+?区|.+?[町村])/); return m?m[1]:''; }
+function homeArea(){ const ar=S.set.area||{}; if(ar.pref) return ar; const a=S.set.home&&S.set.home.addr; return {pref:prefOf(a),city:cityOf(a)}; }
+function kmBetween(a,b,c,d){ const R=6371,r=x=>x*Math.PI/180; const x=Math.sin(r(c-a)/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(r(d-b)/2)**2; return 2*R*Math.asin(Math.sqrt(x)); }
+async function geocode(addr){ try{ const r=await fetch('https://msearch.gsi.go.jp/address-search/AddressSearch?q='+encodeURIComponent(addr)); const j=await r.json(); if(j&&j[0]){ const [lon,lat]=j[0].geometry.coordinates; return {lat:+lat,lon:+lon}; } }catch(e){} return null; }
