@@ -45,7 +45,7 @@ function vHome(){
     const ctl=UI.editGrid?`<span class="ctl"><button data-act="gmove" data-i="${i}" data-d="-1" aria-label="前へ">◀</button><button data-act="gpick" data-i="${i}" aria-label="変える">✎</button><button data-act="gmove" data-i="${i}" data-d="1" aria-label="後ろへ">▶</button></span>`:'';
     if(!ok) return `<div class="cell empty" ${UI.editGrid?'':`data-act="gpick" data-i="${i}" role="button" tabindex="0"`}><span class="em">＋</span><span class="nm">空き</span>${ctl}</div>`;
     const tag=UI.editGrid?'div':'button';
-    return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="lv ${n.lv}"></span><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
+    return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
   }).join('');
   const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
@@ -70,7 +70,7 @@ function evRow(it,s,compact){
   if(it.k==='bd'){ const p=it.p; const tel=p.phones&&p.phones.find(x=>x.num);
     return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">🎂</span><span class="bd"><button style="all:unset;cursor:pointer" data-go="person/${p.id}"><b>${h(p.name)}さんの誕生日${it.age!=null?`（${it.age}歳）`:''}</b></button>${tel&&!compact?`<span class="minis"><a class="mini tel" href="${telHref(tel.num)}">📞 電話</a></span>`:''}</span></div>`; }
   const e=it.e; const pl=placeOf(e); const ppl=(e.people||[]).map(id=>S.people.find(p=>p.id===id)).filter(Boolean);
-  const tm=e.time?(e.time+(e.etime&&!compact?`<br><span class="small muted">〜${e.etime}</span>`:'')):'終日';
+  const tm=e.time?(e.time+(e.etime&&!compact?`<br><span class="small muted">〜${e.etime}</span>`:'')):(e.tmode==='unknown'?'<span class="unk">時刻<br>不明</span>':'終日');
   return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">${tm}</span><span class="bd">
     <button style="all:unset;cursor:pointer;display:block" data-go="ev/${e.id}"><b>${h(e.title)}</b>
     <span>${h(evCat(e.cat).name)}${e.rep?'・'+REP_LABEL[e.rep]:''}${pl?'・📍'+h(pl.name):''}${ppl.length?'・'+ppl.map(p=>h(p.name)).join('、'):''}</span>
@@ -184,9 +184,11 @@ function vEvent(id,date){
   <div class="f"><label for="ev-title">なにをする</label><input id="ev-title" name="title" required value="${h(e.title)}" placeholder="例：歯医者、町内会の溝掃除"></div>
   <div class="two"><div class="f"><label for="ev-date">日にち</label><input id="ev-date" type="date" name="date" required value="${e.date}"></div>
     <div class="f"><label for="ev-rep">くり返し</label><select id="ev-rep" name="rep">${[['','なし'],['w','毎週'],['m','毎月'],['y','毎年']].map(([v,t])=>`<option value="${v}" ${e.rep===v?'selected':''}>${t}</option>`).join('')}</select></div></div>
-  <div class="two"><div class="f"><label for="ev-time">始まり（「--」なら終日）</label>${timeSel('time',e.time,'ev-time')}</div>
-    <div class="f"><label for="ev-etime">終わり</label>${timeSel('etime',e.etime,'ev-etime')}</div></div>
-  <p class="small muted" style="margin:2px 0 0">分は${S.set.minStep||15}分きざみ。きざみ方とよく使う時間帯は「設定」で変えられます。</p>
+  <div class="f"><span class="lb">時刻</span><div class="choose" id="ev-tmode">${[['set','🕘 時刻を決める'],['allday','☀️ 終日'],['unknown','❓ 時刻不明']].map(([v,t])=>`<label><input type="radio" name="tmode" value="${v}" ${(e.time?'set':(e.tmode==='unknown'?'unknown':(isNew?'set':'allday')))===v?'checked':''}>${t}</label>`).join('')}</div>
+  <p class="small muted" style="margin:4px 0 0">終日＝一日じゅうの予定。時刻不明＝あるのは決まっているが、時間がまだわからない予定。</p></div>
+  <div id="ev-times" ${e.time||isNew?'':'hidden'}><div class="two"><div class="f"><label for="ev-time">始まり</label>${timeSel('time',e.time,'ev-time')}</div>
+    <div class="f"><label for="ev-etime">終わり（なくてもよい）</label>${timeSel('etime',e.etime,'ev-etime')}</div></div>
+  <p class="small muted" style="margin:2px 0 0">分は${S.set.minStep||15}分きざみ。きざみ方とよく使う時間帯は「設定」で変えられます。</p></div>
   <div class="f"><span class="lb">カテゴリー（色）</span><div class="choose">${S.set.evcats.map(c=>`<label><input type="radio" name="cat" value="${c.id}" ${e.cat===c.id?'checked':''}><span class="dot" style="background:${c.color}"></span>${h(c.name)}</label>`).join('')}</div></div>
   <div class="f"><label for="ev-pid">場所（施設帳から選ぶ）</label><select id="ev-pid" name="placeId"><option value="">― 選ばない ―</option>${pls.map(p=>`<option value="${p.id}" ${e.placeId===p.id?'selected':''}>${h(p.name)}</option>`).join('')}</select></div>
   <div class="f"><label for="ev-place">場所（自由に書く）</label><input id="ev-place" name="place" value="${h(e.place||'')}" placeholder="例：静岡駅北口、〇〇公民館"></div>
@@ -505,6 +507,7 @@ function vSettings(){
   <div class="sec"><h3>文字の大きさ</h3><div class="choose">${r('font',1,s.font,'ふつう')}${r('font',2,s.font,'大きめ')}${r('font',3,s.font,'とても大きい')}</div></div>
   <div class="sec"><h3>ふだんの地域</h3><p class="small muted" style="margin:0 0 6px">施設帳では、ふだんはこの地域の店が先に出ます。空のときは自宅の住所から決めます。</p>
   <div class="two"><select data-act="setarea" data-k="pref" aria-label="都道府県"><option value="">（自宅の住所から）</option>${PREFS.map(x=>`<option ${(s.area||{}).pref===x?'selected':''}>${x}</option>`).join('')}</select><input data-act="setarea" data-k="city" value="${h((s.area||{}).city||'')}" placeholder="市区町村（例：静岡市）" aria-label="市区町村"></div></div>
+  <div class="sec"><h3>トップの入口の上のライン</h3><div class="choose">${[['r','#E0452B','赤'],['bee','var(--bee)','枠と同じ色'],['ink','#1E1B14','黒'],['b','#3B82D6','青'],['g','#2E9B4F','緑'],['rb','linear-gradient(90deg,#E0452B,#F08A00,#D9B300,#2E9B4F,#2D6CDF,#B94FC8)','にじ'],['none','transparent','なし']].map(([k,c,t])=>r('gline',k,s.gline||'r',`<span class="sw" style="background:${c};width:22px;height:8px;border-radius:4px;display:inline-block;border:1px solid var(--line)"></span>${t}`)).join('')}</div></div>
   <div class="sec"><h3>着せかえ（枠の色）</h3><p class="small muted" style="margin:0 0 6px">押すとすぐ変わります。気分で変えてください。</p><div class="choose kise">${[['bee','#F6C915','きいろ'],['aka','#D93A2B','あか'],['ao','#2D62C8','あお'],['kuro','#1E1B14','くろ'],['midori','#2E8B4F','みどり'],['orange','#F08A00','オレンジ'],['murasaki','#6B4FC8','むらさき'],['sakura','#F4A7B9','さくら'],['sora','#8CCBF0','そら'],['wakaba','#A8D672','わかば']].map(([k,c,t])=>r('kise',k,s.kise,`<span class="sw" style="background:${c}"></span>${t}`)).join('')}</div>
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>

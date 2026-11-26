@@ -45,7 +45,7 @@ function render(){
   const root=document.documentElement;
   root.classList.toggle('f2',S.set.font==2); root.classList.toggle('f3',S.set.font==3||(S.set.mode==='elder'&&S.set.font==1));
   if(S.set.theme) root.setAttribute('data-theme',S.set.theme); else root.removeAttribute('data-theme');
-  root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
+  root.setAttribute('data-gline',S.set.gline||'r'); root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
   const r=cur();
   if(r==='home'&&!IN_FRAME) {}
   $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','','TOPへ'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['people','📇','人物帳'],['memo','✏️','メモ一覧']].map(([g,e,t])=>(g==='home'?`<button class="tb-top" data-go="home" aria-label="トップ画面へ" ${r==='home'?'aria-current="page"':''}><span class="topbtn">TOPへ</span></button>`:`<button data-go="${g}" ${r.split('/')[0]===g.split('/')[0]?'aria-current="page"':''}><span>${e}</span>${t}</button>`)).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
@@ -57,6 +57,7 @@ function after(r){
   const dm=$('#daymemo'); if(dm){ let tm; dm.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{const s=cur().split('/')[1]; S.daymemo[s]=dm.value; if(!dm.value.trim()) delete S.daymemo[s]; save();},400);}); }
   const pq=$('#pq'); if(pq) pq.addEventListener('input',()=>{UI.pQ=pq.value;$('#plist').innerHTML=peopleList();});
   const plq=$('#plq'); if(plq) plq.addEventListener('input',()=>{UI.plQ=plq.value;$('#pllist').innerHTML=placeList();});
+  const tmo=$('#ev-tmode'); if(tmo) tmo.addEventListener('change',()=>{ const v=$('#ev-tmode input:checked').value; $('#ev-times').hidden=v!=='set'; });
   const pla=$('#plarea'); if(pla) pla.addEventListener('change',()=>{UI.plArea=pla.value; UI.plNear=null; render();});
   const pad_=$('#pl-addr'); if(pad_) pad_.addEventListener('input',()=>{ const pr=prefOf(pad_.value), ct=cityOf(pad_.value); if(pr) $('#pl-pref').value=pr; if(ct) $('#pl-city').value=ct; $('[name=lat]').value=''; $('[name=lon]').value=''; $('#pl-pos').textContent='住所を入れると、登録するときに位置を自動で調べます'; });
   const mq=$('#mq'); if(mq) mq.addEventListener('input',()=>{UI.memoQ=mq.value;$('#mlist').innerHTML=memoList();});
@@ -207,7 +208,7 @@ const FORMS={
   event:(f,fd)=>{
     const id=f.dataset.id; const e=id?S.events.find(x=>x.id===id):{id:uid()};
     const tm=k=>fd.get(k+'_h')?fd.get(k+'_h')+':'+fd.get(k+'_m'):'';
-    Object.assign(e,{title:fd.get('title').trim(),date:fd.get('date'),time:tm('time'),etime:tm('time')?tm('etime'):'',cat:fd.get('cat')||'other',rep:fd.get('rep')||'',placeId:fd.get('placeId')||'',place:fd.get('place').trim(),people:fd.getAll('people'),memo:fd.get('memo').trim()});
+    Object.assign(e,{title:fd.get('title').trim(),date:fd.get('date'),time:fd.get('tmode')==='set'?tm('time'):'',etime:fd.get('tmode')==='set'&&tm('time')?tm('etime'):'',tmode:fd.get('tmode')==='unknown'?'unknown':'',cat:fd.get('cat')||'other',rep:fd.get('rep')||'',placeId:fd.get('placeId')||'',place:fd.get('place').trim(),people:fd.getAll('people'),memo:fd.get('memo').trim()});
     if(!id) S.events.push(e); save(); toast('予定を登録しました'); stack=['home']; go('day/'+e.date,true);
   },
   person:(f,fd)=>{

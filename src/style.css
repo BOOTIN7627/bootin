@@ -348,3 +348,12 @@ html.f3 .hd .brand span{display:none}
 .linkb{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;font-weight:700}
 .row .km{color:var(--accent)}
 .plarea .btn{white-space:nowrap;font-size:.92rem}
+
+/* トップの入口：上辺に色のライン（設定で色を変える） */
+:root{--gline:#E0452B}
+:root[data-gline="bee"]{--gline:var(--bee)}:root[data-gline="ink"]{--gline:var(--ink)}:root[data-gline="b"]{--gline:#3B82D6}:root[data-gline="g"]{--gline:#2E9B4F}
+:root[data-gline="rb"]{--gline:linear-gradient(90deg,#E0452B,#F08A00,#D9B300,#2E9B4F,#2D6CDF,#B94FC8)}
+.grid .cell:not(.empty){overflow:hidden}
+.grid .cell:not(.empty)::before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:var(--gline)}
+:root[data-gline="none"] .grid .cell::before{display:none}
+.ev .unk{font-size:.8rem;line-height:1.2;color:var(--warn);font-weight:900}

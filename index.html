@@ -351,6 +351,15 @@ html.f3 .hd .brand span{display:none}
 .linkb{all:unset;cursor:pointer;color:var(--accent);text-decoration:underline;font-weight:700}
 .row .km{color:var(--accent)}
 .plarea .btn{white-space:nowrap;font-size:.92rem}
+
+/* トップの入口：上辺に色のライン（設定で色を変える） */
+:root{--gline:#E0452B}
+:root[data-gline="bee"]{--gline:var(--bee)}:root[data-gline="ink"]{--gline:var(--ink)}:root[data-gline="b"]{--gline:#3B82D6}:root[data-gline="g"]{--gline:#2E9B4F}
+:root[data-gline="rb"]{--gline:linear-gradient(90deg,#E0452B,#F08A00,#D9B300,#2E9B4F,#2D6CDF,#B94FC8)}
+.grid .cell:not(.empty){overflow:hidden}
+.grid .cell:not(.empty)::before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:var(--gline)}
+:root[data-gline="none"] .grid .cell::before{display:none}
+.ev .unk{font-size:.8rem;line-height:1.2;color:var(--warn);font-weight:900}
 </style>
 <div id="app"></div>
 <script>
@@ -444,7 +453,7 @@ const PLACE_GENRE={
 function genresOf(b){ const d=PLACE_GENRE[b]||{}; const all=Object.values(d).flat(); const OLD=['カフェ','本','病院','ゴルフ','市役所','霊園','清掃','水道・電気']; const add=((S.set.genres||{})[b]||[]).filter(g=>!all.includes(g)&&!OLD.includes(g)); const o={...d}; if(add.length) o['自分で足したもの']=add; return o; }
 function fresh(){
   return {v:1,
-    set:{mode:'normal',font:1,kise:'bee',theme:'',grid:ROOTS.slice(0,9),off:{},cn:true,
+    set:{mode:'normal',font:1,kise:'bee',theme:'',grid:ROOTS.slice(0,9),gline:'r',off:{},cn:true,
       home:{addr:'',tel:'',telName:''},area:{pref:'',city:''},me:{name:'',kana:'',bday:'',blood:'',addr:'',tel:'',allergy:'',sick:'',med:'',contact:'',contactTel:'',note:''},
       wx:{name:'東京',lat:35.68,lon:139.77},evcats:EVCATS.map(c=>({...c})),
       pcats:[{id:'c1',name:'家族',color:0},{id:'c2',name:'親せき',color:1},{id:'c3',name:'友人',color:3},{id:'c4',name:'仕事',color:5},{id:'c5',name:'ご近所',color:7},{id:'other',name:'その他',color:9}],
@@ -547,11 +556,11 @@ function occurs(e,s){
 }
 function itemsOn(s,catFilter){
   const out=[];
-  for(const e of S.events){ if(occurs(e,s)&&(!catFilter||e.cat===catFilter)) out.push({k:'ev',e,allday:!e.time,time:e.time||'',color:evCat(e.cat).color}); }
+  for(const e of S.events){ if(occurs(e,s)&&(!catFilter||e.cat===catFilter)) out.push({k:'ev',e,allday:!e.time,unk:!e.time&&e.tmode==='unknown',time:e.time||'',color:evCat(e.cat).color}); }
   if(!catFilter||catFilter==='home'){
     for(const p of S.people){ if(p.bday&&p.bday.slice(5)===s.slice(5)){ const a=age(p.bday,s); out.push({k:'bd',p,allday:true,time:'',color:'#D6457A',age:a}); } }
   }
-  out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||a.time.localeCompare(b.time));
+  out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||(!!a.unk-!!b.unk)||a.time.localeCompare(b.time));
   return out;
 }
 const REP_LABEL={'':'','w':'毎週','m':'毎月','y':'毎年'};
@@ -625,7 +634,7 @@ function vHome(){
     const ctl=UI.editGrid?`<span class="ctl"><button data-act="gmove" data-i="${i}" data-d="-1" aria-label="前へ">◀</button><button data-act="gpick" data-i="${i}" aria-label="変える">✎</button><button data-act="gmove" data-i="${i}" data-d="1" aria-label="後ろへ">▶</button></span>`:'';
     if(!ok) return `<div class="cell empty" ${UI.editGrid?'':`data-act="gpick" data-i="${i}" role="button" tabindex="0"`}><span class="em">＋</span><span class="nm">空き</span>${ctl}</div>`;
     const tag=UI.editGrid?'div':'button';
-    return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="lv ${n.lv}"></span><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
+    return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
   }).join('');
   const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
@@ -650,7 +659,7 @@ function evRow(it,s,compact){
   if(it.k==='bd'){ const p=it.p; const tel=p.phones&&p.phones.find(x=>x.num);
     return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">🎂</span><span class="bd"><button style="all:unset;cursor:pointer" data-go="person/${p.id}"><b>${h(p.name)}さんの誕生日${it.age!=null?`（${it.age}歳）`:''}</b></button>${tel&&!compact?`<span class="minis"><a class="mini tel" href="${telHref(tel.num)}">📞 電話</a></span>`:''}</span></div>`; }
   const e=it.e; const pl=placeOf(e); const ppl=(e.people||[]).map(id=>S.people.find(p=>p.id===id)).filter(Boolean);
-  const tm=e.time?(e.time+(e.etime&&!compact?`<br><span class="small muted">〜${e.etime}</span>`:'')):'終日';
+  const tm=e.time?(e.time+(e.etime&&!compact?`<br><span class="small muted">〜${e.etime}</span>`:'')):(e.tmode==='unknown'?'<span class="unk">時刻<br>不明</span>':'終日');
   return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">${tm}</span><span class="bd">
     <button style="all:unset;cursor:pointer;display:block" data-go="ev/${e.id}"><b>${h(e.title)}</b>
     <span>${h(evCat(e.cat).name)}${e.rep?'・'+REP_LABEL[e.rep]:''}${pl?'・📍'+h(pl.name):''}${ppl.length?'・'+ppl.map(p=>h(p.name)).join('、'):''}</span>
@@ -764,9 +773,11 @@ function vEvent(id,date){
   <div class="f"><label for="ev-title">なにをする</label><input id="ev-title" name="title" required value="${h(e.title)}" placeholder="例：歯医者、町内会の溝掃除"></div>
   <div class="two"><div class="f"><label for="ev-date">日にち</label><input id="ev-date" type="date" name="date" required value="${e.date}"></div>
     <div class="f"><label for="ev-rep">くり返し</label><select id="ev-rep" name="rep">${[['','なし'],['w','毎週'],['m','毎月'],['y','毎年']].map(([v,t])=>`<option value="${v}" ${e.rep===v?'selected':''}>${t}</option>`).join('')}</select></div></div>
-  <div class="two"><div class="f"><label for="ev-time">始まり（「--」なら終日）</label>${timeSel('time',e.time,'ev-time')}</div>
-    <div class="f"><label for="ev-etime">終わり</label>${timeSel('etime',e.etime,'ev-etime')}</div></div>
-  <p class="small muted" style="margin:2px 0 0">分は${S.set.minStep||15}分きざみ。きざみ方とよく使う時間帯は「設定」で変えられます。</p>
+  <div class="f"><span class="lb">時刻</span><div class="choose" id="ev-tmode">${[['set','🕘 時刻を決める'],['allday','☀️ 終日'],['unknown','❓ 時刻不明']].map(([v,t])=>`<label><input type="radio" name="tmode" value="${v}" ${(e.time?'set':(e.tmode==='unknown'?'unknown':(isNew?'set':'allday')))===v?'checked':''}>${t}</label>`).join('')}</div>
+  <p class="small muted" style="margin:4px 0 0">終日＝一日じゅうの予定。時刻不明＝あるのは決まっているが、時間がまだわからない予定。</p></div>
+  <div id="ev-times" ${e.time||isNew?'':'hidden'}><div class="two"><div class="f"><label for="ev-time">始まり</label>${timeSel('time',e.time,'ev-time')}</div>
+    <div class="f"><label for="ev-etime">終わり（なくてもよい）</label>${timeSel('etime',e.etime,'ev-etime')}</div></div>
+  <p class="small muted" style="margin:2px 0 0">分は${S.set.minStep||15}分きざみ。きざみ方とよく使う時間帯は「設定」で変えられます。</p></div>
   <div class="f"><span class="lb">カテゴリー（色）</span><div class="choose">${S.set.evcats.map(c=>`<label><input type="radio" name="cat" value="${c.id}" ${e.cat===c.id?'checked':''}><span class="dot" style="background:${c.color}"></span>${h(c.name)}</label>`).join('')}</div></div>
   <div class="f"><label for="ev-pid">場所（施設帳から選ぶ）</label><select id="ev-pid" name="placeId"><option value="">― 選ばない ―</option>${pls.map(p=>`<option value="${p.id}" ${e.placeId===p.id?'selected':''}>${h(p.name)}</option>`).join('')}</select></div>
   <div class="f"><label for="ev-place">場所（自由に書く）</label><input id="ev-place" name="place" value="${h(e.place||'')}" placeholder="例：静岡駅北口、〇〇公民館"></div>
@@ -1085,6 +1096,7 @@ function vSettings(){
   <div class="sec"><h3>文字の大きさ</h3><div class="choose">${r('font',1,s.font,'ふつう')}${r('font',2,s.font,'大きめ')}${r('font',3,s.font,'とても大きい')}</div></div>
   <div class="sec"><h3>ふだんの地域</h3><p class="small muted" style="margin:0 0 6px">施設帳では、ふだんはこの地域の店が先に出ます。空のときは自宅の住所から決めます。</p>
   <div class="two"><select data-act="setarea" data-k="pref" aria-label="都道府県"><option value="">（自宅の住所から）</option>${PREFS.map(x=>`<option ${(s.area||{}).pref===x?'selected':''}>${x}</option>`).join('')}</select><input data-act="setarea" data-k="city" value="${h((s.area||{}).city||'')}" placeholder="市区町村（例：静岡市）" aria-label="市区町村"></div></div>
+  <div class="sec"><h3>トップの入口の上のライン</h3><div class="choose">${[['r','#E0452B','赤'],['bee','var(--bee)','枠と同じ色'],['ink','#1E1B14','黒'],['b','#3B82D6','青'],['g','#2E9B4F','緑'],['rb','linear-gradient(90deg,#E0452B,#F08A00,#D9B300,#2E9B4F,#2D6CDF,#B94FC8)','にじ'],['none','transparent','なし']].map(([k,c,t])=>r('gline',k,s.gline||'r',`<span class="sw" style="background:${c};width:22px;height:8px;border-radius:4px;display:inline-block;border:1px solid var(--line)"></span>${t}`)).join('')}</div></div>
   <div class="sec"><h3>着せかえ（枠の色）</h3><p class="small muted" style="margin:0 0 6px">押すとすぐ変わります。気分で変えてください。</p><div class="choose kise">${[['bee','#F6C915','きいろ'],['aka','#D93A2B','あか'],['ao','#2D62C8','あお'],['kuro','#1E1B14','くろ'],['midori','#2E8B4F','みどり'],['orange','#F08A00','オレンジ'],['murasaki','#6B4FC8','むらさき'],['sakura','#F4A7B9','さくら'],['sora','#8CCBF0','そら'],['wakaba','#A8D672','わかば']].map(([k,c,t])=>r('kise',k,s.kise,`<span class="sw" style="background:${c}"></span>${t}`)).join('')}</div>
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>
@@ -1334,7 +1346,7 @@ function render(){
   const root=document.documentElement;
   root.classList.toggle('f2',S.set.font==2); root.classList.toggle('f3',S.set.font==3||(S.set.mode==='elder'&&S.set.font==1));
   if(S.set.theme) root.setAttribute('data-theme',S.set.theme); else root.removeAttribute('data-theme');
-  root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
+  root.setAttribute('data-gline',S.set.gline||'r'); root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
   const r=cur();
   if(r==='home'&&!IN_FRAME) {}
   $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','','TOPへ'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['people','📇','人物帳'],['memo','✏️','メモ一覧']].map(([g,e,t])=>(g==='home'?`<button class="tb-top" data-go="home" aria-label="トップ画面へ" ${r==='home'?'aria-current="page"':''}><span class="topbtn">TOPへ</span></button>`:`<button data-go="${g}" ${r.split('/')[0]===g.split('/')[0]?'aria-current="page"':''}><span>${e}</span>${t}</button>`)).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
@@ -1346,6 +1358,7 @@ function after(r){
   const dm=$('#daymemo'); if(dm){ let tm; dm.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{const s=cur().split('/')[1]; S.daymemo[s]=dm.value; if(!dm.value.trim()) delete S.daymemo[s]; save();},400);}); }
   const pq=$('#pq'); if(pq) pq.addEventListener('input',()=>{UI.pQ=pq.value;$('#plist').innerHTML=peopleList();});
   const plq=$('#plq'); if(plq) plq.addEventListener('input',()=>{UI.plQ=plq.value;$('#pllist').innerHTML=placeList();});
+  const tmo=$('#ev-tmode'); if(tmo) tmo.addEventListener('change',()=>{ const v=$('#ev-tmode input:checked').value; $('#ev-times').hidden=v!=='set'; });
   const pla=$('#plarea'); if(pla) pla.addEventListener('change',()=>{UI.plArea=pla.value; UI.plNear=null; render();});
   const pad_=$('#pl-addr'); if(pad_) pad_.addEventListener('input',()=>{ const pr=prefOf(pad_.value), ct=cityOf(pad_.value); if(pr) $('#pl-pref').value=pr; if(ct) $('#pl-city').value=ct; $('[name=lat]').value=''; $('[name=lon]').value=''; $('#pl-pos').textContent='住所を入れると、登録するときに位置を自動で調べます'; });
   const mq=$('#mq'); if(mq) mq.addEventListener('input',()=>{UI.memoQ=mq.value;$('#mlist').innerHTML=memoList();});
@@ -1496,7 +1509,7 @@ const FORMS={
   event:(f,fd)=>{
     const id=f.dataset.id; const e=id?S.events.find(x=>x.id===id):{id:uid()};
     const tm=k=>fd.get(k+'_h')?fd.get(k+'_h')+':'+fd.get(k+'_m'):'';
-    Object.assign(e,{title:fd.get('title').trim(),date:fd.get('date'),time:tm('time'),etime:tm('time')?tm('etime'):'',cat:fd.get('cat')||'other',rep:fd.get('rep')||'',placeId:fd.get('placeId')||'',place:fd.get('place').trim(),people:fd.getAll('people'),memo:fd.get('memo').trim()});
+    Object.assign(e,{title:fd.get('title').trim(),date:fd.get('date'),time:fd.get('tmode')==='set'?tm('time'):'',etime:fd.get('tmode')==='set'&&tm('time')?tm('etime'):'',tmode:fd.get('tmode')==='unknown'?'unknown':'',cat:fd.get('cat')||'other',rep:fd.get('rep')||'',placeId:fd.get('placeId')||'',place:fd.get('place').trim(),people:fd.getAll('people'),memo:fd.get('memo').trim()});
     if(!id) S.events.push(e); save(); toast('予定を登録しました'); stack=['home']; go('day/'+e.date,true);
   },
   person:(f,fd)=>{

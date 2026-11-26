@@ -85,7 +85,7 @@ const PLACE_GENRE={
 function genresOf(b){ const d=PLACE_GENRE[b]||{}; const all=Object.values(d).flat(); const OLD=['カフェ','本','病院','ゴルフ','市役所','霊園','清掃','水道・電気']; const add=((S.set.genres||{})[b]||[]).filter(g=>!all.includes(g)&&!OLD.includes(g)); const o={...d}; if(add.length) o['自分で足したもの']=add; return o; }
 function fresh(){
   return {v:1,
-    set:{mode:'normal',font:1,kise:'bee',theme:'',grid:ROOTS.slice(0,9),off:{},cn:true,
+    set:{mode:'normal',font:1,kise:'bee',theme:'',grid:ROOTS.slice(0,9),gline:'r',off:{},cn:true,
       home:{addr:'',tel:'',telName:''},area:{pref:'',city:''},me:{name:'',kana:'',bday:'',blood:'',addr:'',tel:'',allergy:'',sick:'',med:'',contact:'',contactTel:'',note:''},
       wx:{name:'東京',lat:35.68,lon:139.77},evcats:EVCATS.map(c=>({...c})),
       pcats:[{id:'c1',name:'家族',color:0},{id:'c2',name:'親せき',color:1},{id:'c3',name:'友人',color:3},{id:'c4',name:'仕事',color:5},{id:'c5',name:'ご近所',color:7},{id:'other',name:'その他',color:9}],
@@ -188,11 +188,11 @@ function occurs(e,s){
 }
 function itemsOn(s,catFilter){
   const out=[];
-  for(const e of S.events){ if(occurs(e,s)&&(!catFilter||e.cat===catFilter)) out.push({k:'ev',e,allday:!e.time,time:e.time||'',color:evCat(e.cat).color}); }
+  for(const e of S.events){ if(occurs(e,s)&&(!catFilter||e.cat===catFilter)) out.push({k:'ev',e,allday:!e.time,unk:!e.time&&e.tmode==='unknown',time:e.time||'',color:evCat(e.cat).color}); }
   if(!catFilter||catFilter==='home'){
     for(const p of S.people){ if(p.bday&&p.bday.slice(5)===s.slice(5)){ const a=age(p.bday,s); out.push({k:'bd',p,allday:true,time:'',color:'#D6457A',age:a}); } }
   }
-  out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||a.time.localeCompare(b.time));
+  out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||(!!a.unk-!!b.unk)||a.time.localeCompare(b.time));
   return out;
 }
 const REP_LABEL={'':'','w':'毎週','m':'毎月','y':'毎年'};
