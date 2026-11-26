@@ -67,7 +67,7 @@ function vHome(){
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
   <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
-  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
+  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんから</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
