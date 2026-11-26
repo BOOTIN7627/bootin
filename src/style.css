@@ -399,3 +399,19 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .quick{grid-template-rows:repeat(3,minmax(0,1fr));height:auto;min-height:0}
 .qb{width:auto;height:100%;max-width:100%;min-height:0;justify-self:center;overflow:hidden}
 .wxrow .otayori small{white-space:nowrap}
+/* トップの天気枠の「時間ごとの天気」ボタンと、1時間ごとの一覧 */
+.wxrow .wx{flex-direction:column;align-items:stretch;gap:5px}
+.wxrow .wxb{height:auto;flex:1}
+.wxh{background:#2D62C8;color:#fff;border:0;border-radius:999px;padding:5px 8px;font-weight:900;font-size:.8rem;white-space:nowrap}
+.hlist{display:grid;gap:2px}
+.hday{font-weight:900;margin:8px 0 2px;padding:3px 8px;background:var(--t-wx,#EAF5FD);border-radius:8px}
+.hrow{display:grid;grid-template-columns:2.6em 1.7em minmax(0,1fr) 2.9em 4.3em 2.6em;align-items:center;gap:4px;padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.hrow.now{background:var(--soft);border-radius:8px;font-weight:700}
+.hrow .hh{font-weight:900}
+.hrow .hi{font-size:1.3rem}
+.hrow .hw{font-size:.75rem;line-height:1.15;overflow:hidden}
+.hrow .ht{text-align:right}
+.hrow .hp{font-size:.85rem;display:flex;flex-direction:column;line-height:1.15}
+.hrow .hp.wet{color:#1565E8;font-weight:900}
+.hrow .hp small{font-size:.72rem;color:var(--sub)}
+.hrow .hv{font-size:.8rem;color:var(--sub)}

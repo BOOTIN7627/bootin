@@ -18,7 +18,7 @@ function routeView(r){
     case 'pledit': return vPlEdit(arg);
     case 'memo': return vMemo();
     case 'tools': return vTools();
-    case 'weather': return vWeather();
+    case 'weather': return vWeather(arg);
     case 'otayori': return vOtayori();
     case 'search': return vSearch(arg);
     case 'settings': return vSettings();
@@ -53,7 +53,7 @@ function render(){
 }
 function after(r){
   tick();
-  if(r==='home'||r==='weather'){ const c=S.cache.wx; if(!(c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon&&Date.now()-c.at<30*60e3)&&!(S.cache.wxErr&&Date.now()-S.cache.wxErr<60e3)){ loadWx().then(d=>{ if(cur()===r) render(); }); } }
+  if(r==='home'||r.startsWith('weather')){ const c=S.cache.wx; if(!(c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon&&Date.now()-c.at<30*60e3)&&!(S.cache.wxErr&&Date.now()-S.cache.wxErr<60e3)){ loadWx().then(d=>{ if(cur()===r) render(); }); } }
   const dm=$('#daymemo'); if(dm){ let tm; dm.addEventListener('input',()=>{clearTimeout(tm);tm=setTimeout(()=>{const s=cur().split('/')[1]; S.daymemo[s]=dm.value; if(!dm.value.trim()) delete S.daymemo[s]; save();},400);}); }
   const pq=$('#pq'); if(pq) pq.addEventListener('input',()=>{UI.pQ=pq.value;$('#plist').innerHTML=peopleList();});
   const plq=$('#plq'); if(plq) plq.addEventListener('input',()=>{UI.plQ=plq.value;$('#pllist').innerHTML=placeList();});

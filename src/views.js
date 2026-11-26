@@ -66,7 +66,7 @@ function vHome(){
     <button class="qb q-photo" data-act="open" data-id="NEWS・知識/NEWS"><span class="em">📰</span><span>NEWS</span></button></div></div>`}
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
-  <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
+  <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button><button class="wxh" data-go="weather/h">⏱️ 時間ごとの天気 ›</button></div>
   <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんより</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
@@ -446,14 +446,14 @@ async function loadWx(force){
   const c=S.cache.wx; if(!force&&c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon&&Date.now()-c.at<30*60e3) return c.data;
   if(wxLoading) return null; wxLoading=true;
   try{
-    const u=`https://api.open-meteo.com/v1/forecast?latitude=${S.set.wx.lat}&longitude=${S.set.wx.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone=auto&forecast_days=7`;
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${S.set.wx.lat}&longitude=${S.set.wx.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone=auto&forecast_days=7`;
     const r=await fetch(u); if(!r.ok) throw 0; const d=await r.json();
     S.cache.wx={at:Date.now(),lat:S.set.wx.lat,lon:S.set.wx.lon,data:d}; save(); return d;
   }catch(e){ S.cache.wxErr=Date.now(); return null; } finally{ wxLoading=false; }
 }
 function uvText(u){return u>=11?'極端に強い':u>=8?'非常に強い':u>=6?'強い':u>=3?'中くらい':'弱い';}
 function heatText(t){return t>=35?'危険（運動は原則中止）':t>=31?'厳重警戒':t>=28?'警戒':t>=25?'注意':'';}
-function vWeather(){
+function vWeather(mode){
   const c=S.cache.wx; const d=c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon?c.data:null;
   let body='';
   if(!d) body=`<div class="empty">${S.cache.wxErr&&!wxLoading?'天気を読み込めませんでした。電波のある所でもう一度開いてください。<br><span class="small">（この試作の見本画面では、天気が出ないことがあります）</span>':'天気を読み込んでいます…'}</div>`;
@@ -462,11 +462,17 @@ function vWeather(){
     let st=d.hourly.time.findIndex(x=>x.slice(0,13)>=cu.time.slice(0,13)); if(st<0) st=0;
     for(let i=st;i<st+24&&i<d.hourly.time.length;i+=3) hrs.push(i);
     const ht=heatText(d.daily.temperature_2m_max[0]);
+    const H=d.hourly; let hl='', lastDay='';
+    for(let i=st;i<st+(mode==='h'?48:24)&&i<H.time.length;i++){ const tt=H.time[i], dd=tt.slice(0,10);
+      if(dd!==lastDay){ lastDay=dd; hl+=`<div class="hday">${dd===today()?'今日　':dd===ymd(new Date(Date.now()+864e5))?'明日　':''}${+dd.slice(5,7)}/${+dd.slice(8)}（${WD[parseD(dd).getDay()]}）</div>`; }
+      const pp=H.precipitation_probability[i], pr=H.precipitation?H.precipitation[i]:null, ws=H.wind_speed_10m?H.wind_speed_10m[i]:null;
+      hl+=`<div class="hrow ${i===st?'now':''}"><span class="hh">${i===st?'今':+tt.slice(11,13)+'時'}</span><span class="hi">${wxt(H.weather_code[i])[0]}</span><span class="hw">${h(wxt(H.weather_code[i])[1])}</span><b class="ht">${Math.round(H.temperature_2m[i])}℃</b><span class="hp ${pp>=50?'wet':''}">☔${pp??'-'}%${pr?`<small>${pr}mm</small>`:''}</span><span class="hv">${ws==null?'':'風'+Math.round(ws/3.6)}</span></div>`; }
+    const hourSec=`<div class="sec" id="wx-hours"><h3>1時間ごと${mode==='h'?'（2日分）':'（24時間）'}</h3><p class="small muted" style="margin:0 0 6px">☔は雨の確率、mmは1時間の雨の量、風は風の強さ（m/s）です。</p><div class="hlist">${hl}</div></div>`;
     body=`<div class="sec" style="display:flex;gap:14px;align-items:center"><span style="font-size:3.2rem">${wxt(cu.weather_code)[0]}</span><div><b style="font-size:2rem;font-family:var(--f-disp)">${Math.round(cu.temperature_2m)}℃</b> ${h(wxt(cu.weather_code)[1])}<div class="small muted">体感 ${Math.round(cu.apparent_temperature)}℃・湿度 ${cu.relative_humidity_2m}%・風 ${Math.round(cu.wind_speed_10m/3.6)}m/s</div></div></div>
-    <div class="sec"><h3>3時間ごと</h3><div class="hours">${hrs.map(i=>`<div><div class="small">${+d.hourly.time[i].slice(11,13)}時</div><div style="font-size:1.4rem">${wxt(d.hourly.weather_code[i])[0]}</div><b>${Math.round(d.hourly.temperature_2m[i])}℃</b><div class="small muted">☔${d.hourly.precipitation_probability[i]??'-'}%</div></div>`).join('')}</div></div>
+    ${mode==='h'?hourSec:''}<div class="sec"><h3>3時間ごと</h3>${mode==='h'?'':`<button class="btn plain" data-go="weather/h" style="margin-bottom:6px">⏱️ 1時間ごとの天気を見る</button>`}<div class="hours">${hrs.map(i=>`<div><div class="small">${+d.hourly.time[i].slice(11,13)}時</div><div style="font-size:1.4rem">${wxt(d.hourly.weather_code[i])[0]}</div><b>${Math.round(d.hourly.temperature_2m[i])}℃</b><div class="small muted">☔${d.hourly.precipitation_probability[i]??'-'}%</div></div>`).join('')}</div></div>
     <div class="sec"><h3>今日の目安</h3><dl class="kv"><dt>紫外線</dt><dd>${uvText(d.daily.uv_index_max[0])}（${Math.round(d.daily.uv_index_max[0])}）</dd>${ht?`<dt>熱中症</dt><dd>${ht}</dd>`:''}<dt>花粉</dt><dd class="muted small">準備中</dd></dl></div>
     <div class="sec"><h3>1週間</h3>${d.daily.time.map((t,i)=>`<div class="wxday"><span class="${dayClass(t)}" style="font-weight:700">${+t.slice(5,7)}/${+t.slice(8)}（${WD[parseD(t).getDay()]}）</span><span style="font-size:1.3rem">${wxt(d.daily.weather_code[i])[0]}</span><span>${h(wxt(d.daily.weather_code[i])[1])} <span class="small muted">☔${d.daily.precipitation_probability_max[i]??'-'}%</span></span><span style="font-variant-numeric:tabular-nums"><b style="color:var(--sun)">${Math.round(d.daily.temperature_2m_max[i])}</b> / <b style="color:var(--sat)">${Math.round(d.daily.temperature_2m_min[i])}</b></span></div>`).join('')}</div>
-    <p class="small muted">天気のデータ：Open-Meteo（無料）</p>`;
+    ${mode==='h'?'':hourSec}<p class="small muted">天気のデータ：Open-Meteo（無料）</p>`;
   }
   return sub('天気',`<div class="f"><label for="wx-city">場所：${h(S.set.wx.name)}</label><select id="wx-city">${CITIES.map(([n])=>`<option ${S.set.wx.name===n?'selected':''}>${n}</option>`).join('')}${CITIES.some(c=>c[0]===S.set.wx.name)?'':`<option selected>${h(S.set.wx.name)}</option>`}</select></div>
   <div class="btns"><button class="btn plain" data-act="wxhere">📍 今いる場所にする</button><button class="btn plain" data-act="wxreload">↻ 読み直す</button></div>${body}`,{crumb:'NEWS・知識 › NEWS'});
