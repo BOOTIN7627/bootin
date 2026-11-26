@@ -44,7 +44,7 @@ function medTop(){
   const todo=ds.filter(d=>!taken(t,d.key)&&d.time<=addMin(hm,90));
   const low=(S.meds||[]).filter(lowStock);
   const rest=ds.filter(d=>!taken(t,d.key)).length;
-  return `<div class="sec"><h2>💊 お薬 <button class="more" data-go="meds">お薬の一覧 ›</button></h2>
+  return `<div class="sec t-med"><h2>💊 お薬 <button class="more" data-go="meds">お薬の一覧 ›</button></h2>
    ${todo.length?`<div class="evs">${todo.map(d=>doseBtn(d,t)).join('')}</div>`:`<p class="small muted" style="margin:0">${rest?`次は ${ds.find(d=>!taken(t,d.key)).time}（${h(ds.find(d=>!taken(t,d.key)).med.name)}）`:(ds.length?'今日の分はすべて飲みました ✓':'')}</p>`}
    ${low.map(m=>`<p class="small" style="margin:6px 0 0;color:var(--warn);font-weight:700">⚠ ${h(m.name)}が残り${h(m.left)}${h(m.unit||'')}です</p>`).join('')}</div>`;
 }

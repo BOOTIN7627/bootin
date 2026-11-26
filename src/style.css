@@ -310,3 +310,14 @@ html.f3 .hd .brand span{display:none}
 .tabbar button.tb-top .topbtn{font-size:.85rem;padding:9px 10px;min-height:0;line-height:1.1}
 .tabbar button.tb-top[aria-current="page"]{background:none}
 .sn.topsn{justify-content:flex-start}
+
+/* トップの枠のごく薄い色（隣同士で同じ色にならない並び） */
+:root{--t-wx:#EEF7FC;--t-ot:#FDF0F3;--t-fav:#FEF3E6;--t-med:#F4F0FB;--t-today:#EEF7EE;--t-cal:#FFFBE3}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--t-wx:#1D2A31;--t-ot:#30222A;--t-fav:#32291D;--t-med:#27223A;--t-today:#1E2D22;--t-cal:#2E2A18}}
+:root[data-theme="dark"]{--t-wx:#1D2A31;--t-ot:#30222A;--t-fav:#32291D;--t-med:#27223A;--t-today:#1E2D22;--t-cal:#2E2A18}
+.wxb{background:var(--t-wx)}
+.otayori{background:var(--t-ot)}
+.sec.t-fav{background:var(--t-fav)}
+.sec.t-med{background:var(--t-med)}
+.sec.t-today{background:var(--t-today)}
+.sec.t-cal{background:var(--t-cal)}

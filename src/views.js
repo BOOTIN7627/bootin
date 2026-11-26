@@ -47,7 +47,7 @@ function vHome(){
     const tag=UI.editGrid?'div':'button';
     return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="lv ${n.lv}"></span><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
   }).join('');
-  const todaySec=`<div class="sec"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>
+  const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
     <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button><button class="btn plain" data-go="cal/${t.slice(0,7)}">📅 カレンダー</button></div></div>`;
   const fav=elder?S.people.filter(p=>p.fav&&p.phones&&p.phones[0]&&p.phones[0].num):[];
@@ -59,7 +59,7 @@ function vHome(){
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
   <div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
   <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button>
-  ${fav.length?`<div class="sec"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
+  ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
   <div class="grid ${elder?'big':''}">${cells}</div>
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
@@ -133,7 +133,7 @@ function topCal(){
   const base=show||t.slice(0,7); const [y,m]=base.split('-').map(Number);
   const prev=ymd(new Date(y,m-2,1)).slice(0,7), next=ymd(new Date(y,m,1)).slice(0,7);
   const body=show?calGrid(show,''):(mode==='from'?calFromToday(''):calGrid(t.slice(0,7),''));
-  return `<div class="sec"><h2>📅 カレンダー <button class="more" data-go="cal/${show||t.slice(0,7)}">大きく見る ›</button></h2>
+  return `<div class="sec t-cal"><h2>📅 カレンダー <button class="more" data-go="cal/${show||t.slice(0,7)}">大きく見る ›</button></h2>
   <div class="chips" style="padding-top:0"><button class="chip" aria-pressed="${!show&&mode==='from'}" data-act="topcal" data-c="from">今日から1か月</button><button class="chip" aria-pressed="${!show&&mode==='month'}" data-act="topcal" data-c="month">今月（${+t.slice(5,7)}月）</button></div>
   ${calNav(show?`${y}年${m}月`:(mode==='from'?'今日から1か月':`${y}年${m}月`),`data-act="topym" data-ym="${prev}"`,`data-act="topym" data-ym="${next}"`,show?`data-act="topym" data-ym=""`:'')}
   <div data-swipe="top" data-prev="${prev}" data-next="${next}">${body}</div>
