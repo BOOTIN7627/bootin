@@ -669,7 +669,7 @@ function vNode(id){
       ${items.length?`<div class="sec"><h3>この中に入る予定のもの</h3><ul class="plan">${items.map(([t,c,w])=>`<li>${WHEN[w]?`<span class="when ${WHEN[w][0]}">${WHEN[w][1]}</span>`:''}<span>${h(t)}</span></li>`).join('')}</ul></div>`:''}
       <div class="btns"><button class="btn plain" data-act="qmemo">✏️ ここに欲しいことをメモ</button></div>`,{crumb:crumbOf(id)});
   }
-  const kids=n.kids.filter(k=>!isOff(k)); const hidden=n.kids.length-kids.length;
+  const kids=n.kids.filter(k=>!isOff(k)).sort((a,b)=>hasImpl(b)-hasImpl(a)); const hidden=n.kids.length-kids.length;
   return sub(n.name,`<div class="list">${kids.map(k=>{const kn=NODES[k];const ok=hasImpl(k);
       return `<button class="row" data-act="open" data-id="${h(k)}"><span class="em">${emojiOf(k)}</span><span class="t"><b>${h(kn.name)}</b><span>${kn.kids.length?kn.kids.map(x=>NODES[x].name).join('・'):(kn.items||[]).slice(0,2).map(x=>x[0]).join('・')}</span></span>${ok?'<span class="badge ok">使える</span>':'<span class="badge wait">準備中</span>'}<span class="go">›</span></button>`;}).join('')}</div>
     ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}`,{crumb:crumbOf(id)});
