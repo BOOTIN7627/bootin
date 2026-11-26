@@ -426,6 +426,11 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .laundry .t span{font-size:.85rem;color:var(--sub)}
 .wet15{border-color:#1565E8!important;background:#E3F0FF!important}
 @keyframes lBlink{50%{box-shadow:0 0 0 5px rgba(21,101,232,.25)}}
+.laundry.rain{background:#FFE5E2;border-color:#D32F2F;animation:lBlinkR 1.2s ease-in-out 4}
+.laundry.rain b{color:#B71C1C;font-size:1.15rem}
+.laundry.sun{background:#FFF0DC;border-color:#E07A00;animation:none}
+.laundry.sun b{color:#A04F00}
+@keyframes lBlinkR{50%{box-shadow:0 0 0 6px rgba(211,47,47,.3)}}
 
 /* オープニング（約6秒）
    0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
@@ -1186,7 +1191,7 @@ async function loadWx(force){
   const c=S.cache.wx; if(!force&&c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon&&Date.now()-c.at<30*60e3) return c.data;
   if(wxLoading) return null; wxLoading=true;
   try{
-    const u=`https://api.open-meteo.com/v1/forecast?latitude=${S.set.wx.lat}&longitude=${S.set.wx.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&minutely_15=precipitation&forecast_minutely_15=16&timezone=auto&forecast_days=7`;
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${S.set.wx.lat}&longitude=${S.set.wx.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunset&minutely_15=precipitation&forecast_minutely_15=16&timezone=auto&forecast_days=7`;
     const r=await fetch(u); if(!r.ok) throw 0; const d=await r.json();
     S.cache.wx={at:Date.now(),lat:S.set.wx.lat,lon:S.set.wx.lon,data:d}; save(); return d;
   }catch(e){ S.cache.wxErr=Date.now(); return null; } finally{ wxLoading=false; }
@@ -1204,9 +1209,13 @@ function rainSoon(d){
   return null;
 }
 function laundryBar(){
-  if(S.set.laundry===false) return ''; const hr=new Date().getHours(); if(hr<6||hr>=20) return '';
-  const w=S.cache.wx&&S.cache.wx.data; const r=rainSoon(w); if(!r) return '';
-  return `<button class="laundry" data-go="weather/h"><span class="em">👕☔</span><span class="t"><b>洗濯物を取り込んで！</b><span>${r.now?'今、雨が降っています':`${h(r.at)}ごろから雨の予報${r.p!=null?`（${r.p}%）`:''}`}</span></span><span class="go">›</span></button>`;
+  if(S.set.laundry===false) return ''; const w=S.cache.wx&&S.cache.wx.data; const nd=new Date(); const hr=nd.getHours();
+  const r=hr>=6&&hr<20?rainSoon(w):null;
+  if(r) return `<button class="laundry rain" data-go="weather/h"><span class="em">☔👕</span><span class="t"><b>雨危険、洗濯物取り込め！</b><span>${r.now?'今、雨が降っています':`${h(r.at)}ごろから雨の予報${r.p!=null?`（${r.p}%）`:''}`}</span></span><span class="go">›</span></button>`;
+  const ss=w&&w.daily&&w.daily.sunset&&w.daily.time[0]===today()?w.daily.sunset[0]:null;
+  if(ss){ const [H,M]=ss.slice(11,16).split(':').map(Number); const m=hr*60+nd.getMinutes(), s=H*60+M;
+    if(m>=s-30&&m<=s+90) return `<button class="laundry sun" data-go="weather"><span class="em">🌇👕</span><span class="t"><b>日の入り、洗濯物取り込め！</b><span>今日の日の入り ${H}:${String(M).padStart(2,'0')}（${h(S.set.wx.name)}）</span></span><span class="go">›</span></button>`; }
+  return '';
 }
 function vWeather(mode){
   const c=S.cache.wx; const d=c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon?c.data:null;
@@ -1228,7 +1237,7 @@ function vWeather(mode){
     const hourSec=m15+`<div class="sec" id="wx-hours"><h3>1時間ごと${mode==='h'?'（2日分）':'（24時間）'}</h3><p class="small muted" style="margin:0 0 6px">☔は雨の確率、mmは1時間の雨の量、風は風の強さ（m/s）です。</p><div class="hlist">${hl}</div></div>`;
     body=`<div class="sec" style="display:flex;gap:14px;align-items:center"><span style="font-size:3.2rem">${wxt(cu.weather_code)[0]}</span><div><b style="font-size:2rem;font-family:var(--f-disp)">${Math.round(cu.temperature_2m)}℃</b> ${h(wxt(cu.weather_code)[1])}<div class="small muted">体感 ${Math.round(cu.apparent_temperature)}℃・湿度 ${cu.relative_humidity_2m}%・風 ${Math.round(cu.wind_speed_10m/3.6)}m/s</div></div></div>
     ${mode==='h'?hourSec:''}<div class="sec"><h3>3時間ごと</h3>${mode==='h'?'':`<button class="btn plain" data-go="weather/h" style="margin-bottom:6px">⏱️ 1時間ごとの天気を見る</button>`}<div class="hours">${hrs.map(i=>`<div><div class="small">${+d.hourly.time[i].slice(11,13)}時</div><div style="font-size:1.4rem">${wxt(d.hourly.weather_code[i])[0]}</div><b>${Math.round(d.hourly.temperature_2m[i])}℃</b><div class="small muted">☔${d.hourly.precipitation_probability[i]??'-'}%</div></div>`).join('')}</div></div>
-    <div class="sec"><h3>今日の目安</h3><dl class="kv"><dt>紫外線</dt><dd>${uvText(d.daily.uv_index_max[0])}（${Math.round(d.daily.uv_index_max[0])}）</dd>${ht?`<dt>熱中症</dt><dd>${ht}</dd>`:''}<dt>花粉</dt><dd class="muted small">準備中</dd></dl></div>
+    <div class="sec"><h3>今日の目安</h3><dl class="kv">${d.daily.sunset?`<dt>日の入り</dt><dd>${+d.daily.sunset[0].slice(11,13)}:${d.daily.sunset[0].slice(14,16)}</dd>`:''}<dt>紫外線</dt><dd>${uvText(d.daily.uv_index_max[0])}（${Math.round(d.daily.uv_index_max[0])}）</dd>${ht?`<dt>熱中症</dt><dd>${ht}</dd>`:''}<dt>花粉</dt><dd class="muted small">準備中</dd></dl></div>
     <div class="sec"><h3>1週間</h3>${d.daily.time.map((t,i)=>`<div class="wxday"><span class="${dayClass(t)}" style="font-weight:700">${+t.slice(5,7)}/${+t.slice(8)}（${WD[parseD(t).getDay()]}）</span><span style="font-size:1.3rem">${wxt(d.daily.weather_code[i])[0]}</span><span>${h(wxt(d.daily.weather_code[i])[1])} <span class="small muted">☔${d.daily.precipitation_probability_max[i]??'-'}%</span></span><span style="font-variant-numeric:tabular-nums"><b style="color:var(--sun)">${Math.round(d.daily.temperature_2m_max[i])}</b> / <b style="color:var(--sat)">${Math.round(d.daily.temperature_2m_min[i])}</b></span></div>`).join('')}</div>
     ${mode==='h'?'':hourSec}<p class="small muted">天気のデータ：Open-Meteo（無料）</p>`;
   }
@@ -1282,7 +1291,7 @@ function vSettings(){
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>
     <div class="choose" style="margin-top:8px">${r('theme','',s.theme,'明るさ：スマホに合わせる')}${r('theme','light',s.theme,'明るい')}${r('theme','dark',s.theme,'暗い')}</div></div>
-  <div class="sec"><h3>洗濯物のお知らせ</h3><label class="ck"><input type="checkbox" data-act="setlaundry" ${s.laundry!==false?'checked':''}> 雨が降りそうなとき、トップに「洗濯物を取り込んで！」を出す（朝6時〜夜8時）</label><p class="small muted" style="margin:4px 0 0">これから3時間の天気（15分ごとの雨の量と1時間ごとの雨の確率50%以上）で判断します。アプリを開いたときに出ます。</p></div>
+  <div class="sec"><h3>洗濯物のお知らせ</h3><label class="ck"><input type="checkbox" data-act="setlaundry" ${s.laundry!==false?'checked':''}> トップに洗濯物のお知らせを出す</label><p class="small muted" style="margin:4px 0 0">・雨が降りそうなとき（朝6時〜夜8時）：赤い「雨危険、洗濯物取り込め！」。これから3時間の天気（15分ごとの雨の量と、1時間ごとの雨の確率50%以上）で判断します。<br>・日の入りの30分前から1時間半後まで：オレンジの「日の入り、洗濯物取り込め！」。日の入りの時刻は天気の場所に合わせて毎日自動で変わります。<br>アプリを開いたときに出ます。</p></div>
   <div class="sec"><h3>暦</h3><label class="ck"><input type="checkbox" data-act="setcn" ${s.cn?'checked':''}> 中国の祝日・行事も出す（春節・中秋節など）</label></div>
   <div class="list">
     <button class="row" data-go="otasukeset"><span class="em">🆘</span><span class="t"><b>おたすけボタンの準備</b><span>${s.home.addr?'自宅：'+h(s.home.addr):'自宅の住所と家族の電話を入れておきます'}</span></span><span class="go">›</span></button>
