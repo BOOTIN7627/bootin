@@ -376,6 +376,25 @@ html.f3 .hd .brand span{display:none}
 
 button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cursor:pointer}
 
+/* トップ：9つの入口（正方形3×3）＋右に青枠の3つ（丸） */
+.topnav{display:grid;grid-template-columns:3fr 1fr;gap:8px;margin-top:10px;align-items:start}
+.topnav .grid.compact.sq{margin-top:0;gap:6px}
+.grid.compact.sq .cell{aspect-ratio:1/1;min-height:0;padding:8px 2px 4px;border-radius:12px}
+.grid.compact.sq .cell .em{font-size:1.5rem}
+.grid.compact.sq .cell .nm{font-size:.72rem;line-height:1.15}
+.quick{display:grid;grid-template-rows:repeat(3,1fr);gap:6px;height:100%}
+.qb{border:0;border-radius:50%;aspect-ratio:1/1;width:100%;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#fff;font-weight:900;font-size:.68rem;line-height:1.1;box-shadow:0 3px 0 rgba(0,0,0,.35);padding:4px;text-align:center}
+.qb .em{font-size:1.35rem;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
+.q-cal{background:#2D62C8}.q-day{background:#D93A2B}.q-photo{background:#2E8B4F}
+/* 天気とお便りを横に並べてスクロールを短く */
+.wxrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.wxrow .wx,.wxrow .otayori{margin-top:0}
+.wxrow .wxb{height:100%;padding:8px 10px}
+.wxrow .otayori{padding:6px 8px;gap:6px}
+.wxrow .otayori img{width:30px}
+.wxrow .otayori b{font-size:.85rem;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wxrow .wxb .t span{font-size:.75rem}
+
 /* オープニング（約6秒）
    0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
    2.9s 隅からエンちん＋ギザギザ吹き出し / 3.6s バシッ → サングラスが飛び、縮んでしょんぼり
@@ -731,11 +750,14 @@ function vHome(){
     <button class="ib help" data-act="otasuke">🆘 おたすけ</button></div>
   <button class="clock" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
-  <div class="grid ${elder?'big':(UI.editGrid?'':'compact')}">${cells}</div>
+  ${elder||UI.editGrid?`<div class="grid ${elder?'big':''}">${cells}</div>`:`<div class="topnav"><div class="grid compact sq">${cells}</div>
+    <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
+    <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
+    <button class="qb q-photo" data-act="open" data-id="設定・機能/写真管理"><span class="em">📷</span><span>写真管理</span></button></div></div>`}
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
-  <div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
-  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button>
+  <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
+  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;

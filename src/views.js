@@ -60,11 +60,14 @@ function vHome(){
     <button class="ib help" data-act="otasuke">🆘 おたすけ</button></div>
   <button class="clock" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
-  <div class="grid ${elder?'big':(UI.editGrid?'':'compact')}">${cells}</div>
+  ${elder||UI.editGrid?`<div class="grid ${elder?'big':''}">${cells}</div>`:`<div class="topnav"><div class="grid compact sq">${cells}</div>
+    <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
+    <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
+    <button class="qb q-photo" data-act="open" data-id="設定・機能/写真管理"><span class="em">📷</span><span>写真管理</span></button></div></div>`}
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
-  <div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
-  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button>
+  <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
+  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;

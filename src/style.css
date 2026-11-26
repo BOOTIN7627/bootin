@@ -372,3 +372,22 @@ html.f3 .hd .brand span{display:none}
 .tabbar button.tb-menu{font-weight:900}
 
 button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cursor:pointer}
+
+/* トップ：9つの入口（正方形3×3）＋右に青枠の3つ（丸） */
+.topnav{display:grid;grid-template-columns:3fr 1fr;gap:8px;margin-top:10px;align-items:start}
+.topnav .grid.compact.sq{margin-top:0;gap:6px}
+.grid.compact.sq .cell{aspect-ratio:1/1;min-height:0;padding:8px 2px 4px;border-radius:12px}
+.grid.compact.sq .cell .em{font-size:1.5rem}
+.grid.compact.sq .cell .nm{font-size:.72rem;line-height:1.15}
+.quick{display:grid;grid-template-rows:repeat(3,1fr);gap:6px;height:100%}
+.qb{border:0;border-radius:50%;aspect-ratio:1/1;width:100%;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#fff;font-weight:900;font-size:.68rem;line-height:1.1;box-shadow:0 3px 0 rgba(0,0,0,.35);padding:4px;text-align:center}
+.qb .em{font-size:1.35rem;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
+.q-cal{background:#2D62C8}.q-day{background:#D93A2B}.q-photo{background:#2E8B4F}
+/* 天気とお便りを横に並べてスクロールを短く */
+.wxrow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.wxrow .wx,.wxrow .otayori{margin-top:0}
+.wxrow .wxb{height:100%;padding:8px 10px}
+.wxrow .otayori{padding:6px 8px;gap:6px}
+.wxrow .otayori img{width:30px}
+.wxrow .otayori b{font-size:.85rem;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.wxrow .wxb .t span{font-size:.75rem}
