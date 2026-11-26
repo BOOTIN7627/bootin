@@ -272,7 +272,7 @@ function vPCats(){
 }
 
 /* ---------- 施設帳 ---------- */
-const BIG_EMOJI={'食事':'🍽️','買い物':'🛒','医療':'🏥','介護':'🤝','運動':'🏃','公共':'🏛️','寺社':'⛩️','業者':'🔧','美容':'💇','その他':'📍'};
+const BIG_EMOJI={'食事':'🍽️','買い物':'🛒','医療':'🏥','介護':'🤝','運動':'🏃','遊び・趣味':'🎤','公共':'🏛️','寺社':'⛩️','業者':'🔧','美容':'💇','車・交通':'🚗','学び・子ども':'🎒','その他':'📍'};
 function stars(sc){ sc=+sc||0; if(!sc) return '<span class="muted small">点数なし</span>'; if(sc>=10) return '<span class="stars"><span class="ten">★</span></span> <span class="small">10点</span>'; return `<span class="stars">${'★'.repeat(Math.floor(sc/5))}${'☆'.repeat(sc%5)}</span> <span class="small">${sc}点</span>`; }
 function placeRow(p){ const b=(p.big||[])[0]||'その他';
   return `<button class="row" data-go="place/${p.id}"><span class="em">${BIG_EMOJI[b]||'📍'}</span><span class="t"><b>${h(p.name)}</b><span>${h([(p.genre||[]).join('・'),p.addr].filter(Boolean).join('　'))}</span></span>${p.silver?'<span class="badge ok">シルバー割</span>':''}<span class="go">›</span></button>`; }
@@ -280,12 +280,17 @@ function vPlaces(){
   const chips=[''].concat(PLACE_BIG).map(b=>`<button class="chip" aria-pressed="${UI.plBig===b}" data-act="plbig" data-c="${b}">${b?BIG_EMOJI[b]+' '+b:'すべて'}</button>`).join('');
   return sub('施設帳',`<p class="small muted" style="margin:0 0 6px">お店・病院・役所などの場所は、ここに1回だけ登録します。予定やほかの機能からも呼び出せます。</p>
   <input class="search" id="plq" type="search" placeholder="名前・ジャンル・住所で探す" value="${h(UI.plQ)}">
-  <div class="chips">${chips}</div><div id="pllist">${placeList()}</div>
+  <div class="chips">${chips}</div>${UI.plBig?plGenreChips():''}<div id="pllist">${placeList()}</div>
   <div class="btns"><button class="btn" data-go="pledit/new">＋ 場所を登録</button></div>`,{crumb:'店・利用施設'});
+}
+function plGenreChips(){
+  const used=[...new Set(S.places.filter(p=>(p.big||[]).includes(UI.plBig)).flatMap(p=>p.genre||[]))];
+  if(!used.length) return '';
+  return `<div class="chips" style="padding-top:0"><span class="small muted">細かく：</span>${['',...used].map(g=>`<button class="chip" aria-pressed="${(UI.plG||'')===g}" data-act="plg" data-c="${h(g)}">${g?h(g):'すべて'}</button>`).join('')}</div>`;
 }
 function placeList(){
   const q=UI.plQ.trim();
-  const list=S.places.filter(p=>(!UI.plBig||(p.big||[]).includes(UI.plBig))&&(!q||[p.name,(p.genre||[]).join(' '),p.addr].join(' ').includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
+  const list=S.places.filter(p=>(!UI.plBig||(p.big||[]).includes(UI.plBig))&&(!UI.plG||(p.genre||[]).includes(UI.plG))&&(!q||[p.name,(p.genre||[]).join(' '),p.addr].join(' ').includes(q))).sort((a,b)=>a.name.localeCompare(b.name,'ja'));
   if(!S.places.length) return `<div class="empty">${BOO_IMG}まだ場所が登録されていません。<br>よく行くお店やかかりつけの病院から入れてみよう。<div class="btns"><button class="btn plain" data-act="sample">見本の人とお店を入れてみる</button></div></div>`;
   return list.length?`<div class="list">${list.map(placeRow).join('')}</div>`:'<div class="empty">見つかりませんでした。</div>';
 }
@@ -312,18 +317,27 @@ function vPlace(id){
   ${logBox('place',p)}
   <div class="btns"><button class="btn plain" data-go="pledit/${p.id}">✎ 登録内容を直す</button><button class="btn plain" data-act="evat" data-id="${p.id}">＋ ここで予定</button></div>`,{crumb:'店・利用施設 › 施設帳'});
 }
-function genreChips(bigs,sel){
-  const all=[...new Set(bigs.flatMap(b=>S.set.genres[b]||[]).concat(sel))];
-  return all.length?all.map(g=>`<label><input type="checkbox" name="genre" value="${h(g)}" ${sel.includes(g)?'checked':''}>${h(g)}</label>`).join(''):'<span class="small muted">先に大分類を選ぶと、ジャンルが出ます</span>';
+function genreChips(bigs,sel,q){
+  q=(q||'').trim(); const seen=new Set();
+  const bl=q?PLACE_BIG.filter(b=>Object.values(genresOf(b)).flat().some(g=>g.includes(q))):bigs;
+  const chip=(g,b)=>{seen.add(g); return `<label><input type="checkbox" name="genre" value="${h(g)}" data-big="${h(b)}" ${sel.includes(g)?'checked':''}>${h(g)}</label>`;};
+  let out=bl.map(b=>{
+    const groups=Object.entries(genresOf(b)).map(([gn,gs])=>{const v=gs.filter(g=>!q||g.includes(q)&&!seen.has(g)); if(!v.length) return ''; return `${gn?`<div class="gsub">${h(gn)}</div>`:''}<div class="choose">${v.map(g=>chip(g,b)).join('')}</div>`;}).join('');
+    return groups?`<div class="gbox"><div class="gbig">${BIG_EMOJI[b]||'📍'} ${h(b)}</div>${groups}</div>`:'';}).join('');
+  const rest=sel.filter(g=>!seen.has(g));
+  if(rest.length) out+=`<div class="gbox"><div class="gbig">選んでいるもの</div><div class="choose">${rest.map(g=>chip(g,'')).join('')}</div></div>`;
+  if(!out) out=q?`<span class="small muted">「${h(q)}」は見つかりません。右の「足す」で新しく作れます。</span>`:'<span class="small muted">先に上の「大きなジャンル」を選ぶと、細かいジャンルが出ます。</span>';
+  return out;
 }
 function vPlEdit(id){
   const isNew=id==='new'; const p=isNew?{name:'',big:[],genre:[],addr:'',tel:'',hp:'',hours:'',score:0,often:false,want:false,silver:false}:S.places.find(x=>x.id===id);
   if(!p) return sub('施設帳','<p>見つかりませんでした。</p>');
   return sub(isNew?'場所を登録':'登録内容を直す',`<form data-form="place" data-id="${isNew?'':p.id}">
   <div class="f"><label for="pl-name">名前</label><input id="pl-name" name="name" required value="${h(p.name)}" placeholder="例：〇〇歯科、△△スーパー"></div>
-  <div class="f"><span class="lb">大分類（いくつでも）</span><div class="choose" id="pl-big">${PLACE_BIG.map(b=>`<label><input type="checkbox" name="big" value="${b}" ${(p.big||[]).includes(b)?'checked':''}>${BIG_EMOJI[b]} ${b}</label>`).join('')}</div></div>
-  <div class="f"><span class="lb">ジャンル</span><div class="choose" id="pl-genre">${genreChips(p.big||[],p.genre||[])}</div>
-    <div style="display:flex;gap:6px"><input id="pl-newg" placeholder="ジャンルを足す（例：うなぎ）" style="flex:1;min-width:0;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:var(--card)"><button type="button" class="mini" data-act="addgenre">足す</button></div></div>
+  <div class="f"><span class="lb">① 大きなジャンル（いくつでも）</span><div class="choose" id="pl-big">${PLACE_BIG.map(b=>`<label><input type="checkbox" name="big" value="${b}" ${(p.big||[]).includes(b)?'checked':''}>${BIG_EMOJI[b]} ${b}</label>`).join('')}</div></div>
+  <div class="f"><span class="lb">② 細かいジャンル</span>
+    <div style="display:flex;gap:6px;margin-bottom:6px"><input id="pl-newg" type="search" placeholder="🔍 探す・足す（例：飲み屋、うなぎ）" style="flex:1;min-width:0;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:var(--card)"><button type="button" class="mini" data-act="addgenre">足す</button></div>
+    <div id="pl-genre">${genreChips(p.big||[],p.genre||[])}</div></div>
   <div class="f"><label for="pl-addr">住所（MAP・NAVIに使います）</label><input id="pl-addr" name="addr" value="${h(p.addr||'')}"></div>
   <div class="two"><div class="f"><label for="pl-tel">電話</label><input id="pl-tel" type="tel" name="tel" value="${h(p.tel||'')}"></div><div class="f"><label for="pl-score">点数（10点満点）</label><select id="pl-score" name="score">${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${+p.score===n?'selected':''}>${n?n+'点':'なし'}</option>`).join('')}</select></div></div>
   <div class="f"><label for="pl-hours">営業時間・休み</label><input id="pl-hours" name="hours" value="${h(p.hours||'')}" placeholder="例：9:00〜18:00　木曜休み"></div>

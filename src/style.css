@@ -298,3 +298,8 @@ html.f3 .hd .brand span{display:none}
 .calnav .c b{font-size:1.05rem;line-height:1.2}
 .calnav .todayb{border:2px solid var(--ink);background:var(--card);border-radius:999px;padding:2px 10px;font-size:.85rem;font-weight:700}
 [data-swipe]{touch-action:pan-y}
+
+.gbox{border:2px solid var(--line);border-radius:14px;padding:8px 10px;margin:0 0 8px;background:var(--card)}
+.gbig{font-weight:900;margin:0 0 4px}
+.gsub{font-size:.85rem;color:var(--muted,#7A7363);font-weight:700;margin:6px 0 3px}
+.gbox .choose label{padding:4px 10px}

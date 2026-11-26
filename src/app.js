@@ -61,7 +61,12 @@ function after(r){
   const sq=$('#sq'); if(sq&&!sq.value) try{sq.focus();}catch(e){}
   const wc=$('#wx-city'); if(wc) wc.addEventListener('change',()=>{const c=CITIES.find(x=>x[0]===wc.value); if(c){S.set.wx={name:c[0],lat:c[1],lon:c[2]}; S.cache.wxErr=0; save(); render(); loadWx(true).then(()=>render());}});
   const pf=$('#ph-file'); if(pf) pf.addEventListener('change',async()=>{const f=pf.files[0]; if(!f) return; try{const d=await readPhoto(f,320); $('#ph-data').value=d; $('#ph-prev').innerHTML=face({photo:d},72);}catch(e){toast('写真を読み込めませんでした');}});
-  const big=$('#pl-big'); if(big) big.addEventListener('change',()=>{const bigs=$$('#pl-big input:checked').map(x=>x.value); const sel=$$('#pl-genre input:checked').map(x=>x.value); $('#pl-genre').innerHTML=genreChips(bigs,sel);});
+  const big=$('#pl-big'); if(big){
+    const regen=()=>{const bigs=$$('#pl-big input:checked').map(x=>x.value); const sel=[...new Set($$('#pl-genre input:checked').map(x=>x.value))]; $('#pl-genre').innerHTML=genreChips(bigs,sel,$('#pl-newg').value);};
+    big.addEventListener('change',regen); $('#pl-newg').addEventListener('input',regen);
+    $('#pl-newg').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); ACTS.addgenre(); } });
+    $('#pl-genre').addEventListener('change',e=>{ const t=e.target; if(t.checked&&t.dataset.big){ const b=$(`#pl-big input[value="${t.dataset.big}"]`); if(b&&!b.checked) b.checked=true; } });
+  }
   const imf=$('#imp-file'); if(imf) imf.addEventListener('change',()=>{const f=imf.files[0]; if(!f) return; const fr=new FileReader(); fr.onload=()=>doImport(fr.result); fr.readAsText(f);});
   medAfter();
   $$('details.tree[data-red]').forEach(d=>d.addEventListener('toggle',()=>{d.open?UI.openReds.add(d.dataset.red):UI.openReds.delete(d.dataset.red);}));
@@ -128,7 +133,7 @@ const ACTS={
   daycat:(el,d)=>{UI.dayCat=d.c; render();},
   calcat:(el,d)=>{UI.calCat=d.c; render();},
   pcat:(el,d)=>{UI.pCat=d.c; render();},
-  plbig:(el,d)=>{UI.plBig=d.c; render();},
+  plbig:(el,d)=>{UI.plG='';UI.plBig=d.c; render();},
   shoptab:(el,d)=>{UI.shopTab=d.c; render();},
   memosrc:(el,d)=>{UI.memoSrc=d.c; render();},
   tooltab:(el,d)=>{UI.toolTab=d.c; render();},
@@ -140,7 +145,11 @@ const ACTS={
   delpcat:(el,d)=>{ const c=S.set.pcats[+d.i]; if(!c||c.id==='other') return; S.set.pcats.splice(+d.i,1); S.people.forEach(p=>{p.cats=(p.cats||[]).filter(x=>x!==c.id);}); save(); render(); },
   evwith:(el,d)=>{ go('evnew/'+today()); setTimeout(()=>{const c=$(`input[name=people][value="${d.id}"]`); if(c) c.checked=true;},0); },
   evat:(el,d)=>{ go('evnew/'+today()); setTimeout(()=>{const s=$('#ev-pid'); if(s) s.value=d.id;},0); },
-  addgenre:()=>{ const inp=$('#pl-newg'); const v=inp.value.trim(); if(!v) return; const bigs=$$('#pl-big input:checked').map(x=>x.value); const b=bigs[0]||'その他'; S.set.genres[b]=S.set.genres[b]||[]; if(!S.set.genres[b].includes(v)) S.set.genres[b].push(v); save(); const sel=$$('#pl-genre input:checked').map(x=>x.value).concat(v); $('#pl-genre').innerHTML=genreChips(bigs.length?bigs:['その他'],sel); inp.value=''; },
+  addgenre:()=>{ const inp=$('#pl-newg'); const v=inp.value.trim(); if(!v) return; let bigs=$$('#pl-big input:checked').map(x=>x.value); if(!bigs.length){ const o=$('#pl-big input[value="その他"]'); if(o) o.checked=true; bigs=['その他']; }
+    const exists=PLACE_BIG.some(b=>Object.values(genresOf(b)).flat().includes(v));
+    if(!exists){ const b=bigs[0]; S.set.genres[b]=S.set.genres[b]||[]; S.set.genres[b].push(v); save(); toast('「'+v+'」を「'+b+'」に足しました'); }
+    const sel=[...new Set($$('#pl-genre input:checked').map(x=>x.value).concat(v))]; inp.value=''; $('#pl-genre').innerHTML=genreChips(bigs,sel); },
+  plg:(el,d)=>{ UI.plG=d.c; render(); },
   qmemo:()=>quickMemo(),
   otasuke:()=>otasuke(),
   tmadd:(el,d)=>{ if(T.timerRun) T.timerEnd+=(+d.s)*1000; else T.timerLeft+=(+d.s)*1000; render(); },
@@ -197,7 +206,7 @@ const FORMS={
   },
   place:(f,fd)=>{
     const id=f.dataset.id; const p=id?S.places.find(x=>x.id===id):{id:uid(),log:[]};
-    Object.assign(p,{name:fd.get('name').trim(),big:fd.getAll('big'),genre:fd.getAll('genre'),addr:fd.get('addr').trim(),tel:fd.get('tel').trim(),hp:fd.get('hp').trim(),hours:fd.get('hours').trim(),score:+fd.get('score')||0,often:!!fd.get('often'),want:!!fd.get('want'),silver:!!fd.get('silver')});
+    Object.assign(p,{name:fd.get('name').trim(),big:fd.getAll('big'),genre:[...new Set(fd.getAll('genre'))],addr:fd.get('addr').trim(),tel:fd.get('tel').trim(),hp:fd.get('hp').trim(),hours:fd.get('hours').trim(),score:+fd.get('score')||0,often:!!fd.get('often'),want:!!fd.get('want'),silver:!!fd.get('silver')});
     if(!p.big.length) p.big=['その他'];
     if(!id) S.places.push(p); save(); toast('登録しました'); go('place/'+p.id,true);
   },
