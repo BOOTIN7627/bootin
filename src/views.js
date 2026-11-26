@@ -31,6 +31,9 @@ function sayBoo(text){return `<div class="say">${BOO_IMG}<div class="b">${text}<
 /* ---------- トップ画面 ---------- */
 const WXT={0:['☀️','晴れ'],1:['🌤️','晴れ'],2:['⛅','くもり時々晴れ'],3:['☁️','くもり'],45:['🌫️','きり'],48:['🌫️','きり'],51:['🌦️','小雨'],53:['🌦️','小雨'],55:['🌧️','雨'],56:['🌧️','冷たい雨'],57:['🌧️','冷たい雨'],61:['🌧️','雨'],63:['🌧️','雨'],65:['🌧️','強い雨'],66:['🌧️','冷たい雨'],67:['🌧️','冷たい雨'],71:['🌨️','雪'],73:['🌨️','雪'],75:['❄️','大雪'],77:['🌨️','雪'],80:['🌦️','にわか雨'],81:['🌧️','にわか雨'],82:['⛈️','激しい雨'],85:['🌨️','にわか雪'],86:['❄️','大雪'],95:['⛈️','雷雨'],96:['⛈️','雷雨'],99:['⛈️','雷雨']};
 const wxt=c=>WXT[c]||['🌡️',''];
+function menuCells(){
+  return S.set.grid.slice(0,9).filter(id=>NODES[id]&&!isOff(id)).map(id=>`<button class="cell" data-act="open" data-id="${h(id)}"><span class="em">${emojiOf(id)}</span><span class="nm">${h(NODES[id].name)}</span></button>`).join('');
+}
 function vHome(){
   const t=today(); const l=lunar(t); const elder=S.set.mode==='elder';
   const items=itemsOn(t).slice(0,4);
@@ -57,13 +60,13 @@ function vHome(){
     <button class="ib help" data-act="otasuke">🆘 おたすけ</button></div>
   <button class="clock" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
+  <div class="grid ${elder?'big':(UI.editGrid?'':'compact')}">${cells}</div>
+  <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
+    <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
   <div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
   <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんからのお便り</small><b>${h(ot.t)}</b></span><span class="go">›</span></button>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
-  <div class="grid ${elder?'big':''}">${cells}</div>
-  <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
-    <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
 }
 function evRow(it,s,compact){

@@ -48,7 +48,7 @@ function render(){
   root.setAttribute('data-gline',S.set.gline||'r'); root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
   const r=cur();
   if(r==='home'&&!IN_FRAME) {}
-  $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','','TOPへ'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['people','📇','人物帳'],['memo','✏️','メモ一覧']].map(([g,e,t])=>(g==='home'?`<button class="tb-top" data-go="home" aria-label="トップ画面へ" ${r==='home'?'aria-current="page"':''}><span class="topbtn">TOPへ</span></button>`:`<button data-go="${g}" ${r.split('/')[0]===g.split('/')[0]?'aria-current="page"':''}><span>${e}</span>${t}</button>`)).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
+  $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','','TOPへ'],['@menu','','MENU'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['memo','✏️','メモ一覧']].map(([g,e,t])=>(g==='@menu'?`<button class="tb-menu" data-act="menu" aria-label="MENU（9つの入口）"><span class="mn">▦</span>MENU</button>`:g==='home'?`<button class="tb-top" data-go="home" aria-label="トップ画面へ" ${r==='home'?'aria-current="page"':''}><span class="topbtn">TOPへ</span></button>`:`<button data-go="${g}" ${r.split('/')[0]===g.split('/')[0]?'aria-current="page"':''}><span>${e}</span>${t}</button>`)).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
   after(r);
 }
 function after(r){
@@ -154,6 +154,9 @@ const ACTS={
     if(!exists){ const b=bigs[0]; S.set.genres[b]=S.set.genres[b]||[]; S.set.genres[b].push(v); save(); toast('「'+v+'」を「'+b+'」に足しました'); }
     const sel=[...new Set($$('#pl-genre input:checked').map(x=>x.value).concat(v))]; inp.value=''; $('#pl-genre').innerHTML=genreChips(bigs,sel); },
   plg:(el,d)=>{ UI.plG=d.c; render(); },
+  menu:()=>{ const bg=sheet('MENU',`<div class="grid menu">${menuCells()}</div>
+    <div class="btns" style="margin-top:10px"><button class="btn plain" data-go="search/">🔍 探す</button><button class="btn plain" data-go="people">📇 人物帳</button><button class="btn plain" data-go="places">🏢 施設帳</button><button class="btn plain" data-go="settings">⚙️ 設定</button></div>`);
+    bg.querySelectorAll('[data-act=open],[data-go]').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>bg.remove(),0))); },
   plall:()=>{ UI.plArea=''; render(); },
   plnear:async()=>{ if(UI.plNear){UI.plNear=null; UI.plArea='home'; render(); return;}
     if(!navigator.geolocation){ toast('この画面では今いる場所が使えません'); return; }

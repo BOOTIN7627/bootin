@@ -357,3 +357,16 @@ html.f3 .hd .brand span{display:none}
 .grid .cell:not(.empty)::before{content:"";position:absolute;left:0;right:0;top:0;height:9px;background:var(--gline)}
 :root[data-gline="none"] .grid .cell::before{display:none}
 .ev .unk{font-size:.8rem;line-height:1.2;color:var(--warn);font-weight:900}
+
+/* トップの入口：時計のすぐ下に小さめの3×3 */
+.grid.compact{gap:8px;margin-top:10px}
+.grid.compact .cell,.grid.menu .cell{aspect-ratio:auto;min-height:72px;border-radius:14px;padding:10px 4px 6px;gap:3px}
+.grid.compact .cell .em,.grid.menu .cell .em{font-size:1.6rem}
+.grid.compact .cell .nm,.grid.menu .cell .nm{font-size:.82rem;line-height:1.2}
+.grid.compact .cell::before{height:6px}
+.grid.menu{margin-top:4px}
+.grid.menu .cell{min-height:92px}
+.grid.menu .cell .em{font-size:2rem}
+.grid.menu .cell .nm{font-size:.92rem}
+.tabbar button.tb-menu .mn{display:inline-flex;align-items:center;justify-content:center;background:var(--bee);color:var(--beeInk);border:2px solid var(--ink);border-radius:8px;width:30px;height:24px;font-size:1rem;line-height:1;margin-bottom:2px}
+.tabbar button.tb-menu{font-weight:900}
