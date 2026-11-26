@@ -119,6 +119,7 @@ document.addEventListener('change',ev=>{
   if(el.dataset.act==='sethr'){ S.set[el.dataset.k]=+el.value; if(+S.set.hFrom>+S.set.hTo){const a=S.set.hFrom;S.set.hFrom=S.set.hTo;S.set.hTo=a;} save(); render(); }
   if(el.dataset.act==='setarea'){ S.set.area=S.set.area||{pref:'',city:''}; S.set.area[el.dataset.k]=el.value.trim(); save(); }
   if(el.dataset.act==='setcn'){ S.set.cn=el.checked; save(); }
+  if(el.dataset.act==='setlaundry'){ S.set.laundry=el.checked; save(); }
   if(el.dataset.act==='feat'){ const id=el.dataset.id; if(el.checked) delete S.set.off[id]; else S.set.off[id]=true; save(); }
 });
 document.addEventListener('submit',async ev=>{

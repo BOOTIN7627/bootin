@@ -66,7 +66,7 @@ function vHome(){
     <button class="qb q-photo" data-act="open" data-id="NEWS・知識/NEWS"><span class="em">📰</span><span>NEWS</span></button></div></div>`}
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
-  <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button><button class="wxh" data-go="weather/h">⏱️ 時間ごとの天気 ›</button></div>
+  ${laundryBar()}<div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button><button class="wxh" data-go="weather/h">⏱️ 時間ごとの天気 ›</button></div>
   <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんより</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
   ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
@@ -446,13 +446,28 @@ async function loadWx(force){
   const c=S.cache.wx; if(!force&&c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon&&Date.now()-c.at<30*60e3) return c.data;
   if(wxLoading) return null; wxLoading=true;
   try{
-    const u=`https://api.open-meteo.com/v1/forecast?latitude=${S.set.wx.lat}&longitude=${S.set.wx.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&timezone=auto&forecast_days=7`;
+    const u=`https://api.open-meteo.com/v1/forecast?latitude=${S.set.wx.lat}&longitude=${S.set.wx.lon}&current=temperature_2m,apparent_temperature,relative_humidity_2m,weather_code,wind_speed_10m&hourly=temperature_2m,weather_code,precipitation_probability,precipitation,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max&minutely_15=precipitation&forecast_minutely_15=16&timezone=auto&forecast_days=7`;
     const r=await fetch(u); if(!r.ok) throw 0; const d=await r.json();
     S.cache.wx={at:Date.now(),lat:S.set.wx.lat,lon:S.set.wx.lon,data:d}; save(); return d;
   }catch(e){ S.cache.wxErr=Date.now(); return null; } finally{ wxLoading=false; }
 }
 function uvText(u){return u>=11?'極端に強い':u>=8?'非常に強い':u>=6?'強い':u>=3?'中くらい':'弱い';}
 function heatText(t){return t>=35?'危険（運動は原則中止）':t>=31?'厳重警戒':t>=28?'警戒':t>=25?'注意':'';}
+/* 洗濯物：これから3時間に雨が降りそうか（15分ごとの雨量＋1時間ごとの雨の確率） */
+function rainSoon(d){
+  if(!d||!d.current||!d.hourly) return null; const now=d.current.time.slice(0,16);
+  if([51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].includes(d.current.weather_code)) return {now:true};
+  const M=d.minutely_15;
+  if(M&&M.time) for(let i=0;i<M.time.length;i++){ const t=M.time[i]; if(t<now) continue; if((M.precipitation[i]||0)>=0.1) return {at:t.slice(11,16).replace(/^0/,''),mm:M.precipitation[i]}; }
+  const H=d.hourly; let st=H.time.findIndex(x=>x.slice(0,13)>=now.slice(0,13)); if(st<0) return null;
+  for(let i=st;i<st+3&&i<H.time.length;i++){ const p=H.precipitation_probability[i]||0, mm=H.precipitation?H.precipitation[i]||0:0; if(p>=50||mm>=0.2) return {at:+H.time[i].slice(11,13)+'時',p}; }
+  return null;
+}
+function laundryBar(){
+  if(S.set.laundry===false) return ''; const hr=new Date().getHours(); if(hr<6||hr>=20) return '';
+  const w=S.cache.wx&&S.cache.wx.data; const r=rainSoon(w); if(!r) return '';
+  return `<button class="laundry" data-go="weather/h"><span class="em">👕☔</span><span class="t"><b>洗濯物を取り込んで！</b><span>${r.now?'今、雨が降っています':`${h(r.at)}ごろから雨の予報${r.p!=null?`（${r.p}%）`:''}`}</span></span><span class="go">›</span></button>`;
+}
 function vWeather(mode){
   const c=S.cache.wx; const d=c&&c.lat===S.set.wx.lat&&c.lon===S.set.wx.lon?c.data:null;
   let body='';
@@ -467,7 +482,10 @@ function vWeather(mode){
       if(dd!==lastDay){ lastDay=dd; hl+=`<div class="hday">${dd===today()?'今日　':dd===ymd(new Date(Date.now()+864e5))?'明日　':''}${+dd.slice(5,7)}/${+dd.slice(8)}（${WD[parseD(dd).getDay()]}）</div>`; }
       const pp=H.precipitation_probability[i], pr=H.precipitation?H.precipitation[i]:null, ws=H.wind_speed_10m?H.wind_speed_10m[i]:null;
       hl+=`<div class="hrow ${i===st?'now':''}"><span class="hh">${i===st?'今':+tt.slice(11,13)+'時'}</span><span class="hi">${wxt(H.weather_code[i])[0]}</span><span class="hw">${h(wxt(H.weather_code[i])[1])}</span><b class="ht">${Math.round(H.temperature_2m[i])}℃</b><span class="hp ${pp>=50?'wet':''}">☔${pp??'-'}%${pr?`<small>${pr}mm</small>`:''}</span><span class="hv">${ws==null?'':'風'+Math.round(ws/3.6)}</span></div>`; }
-    const hourSec=`<div class="sec" id="wx-hours"><h3>1時間ごと${mode==='h'?'（2日分）':'（24時間）'}</h3><p class="small muted" style="margin:0 0 6px">☔は雨の確率、mmは1時間の雨の量、風は風の強さ（m/s）です。</p><div class="hlist">${hl}</div></div>`;
+    const M=d.minutely_15; let m15='';
+    if(mode==='h'&&M&&M.time){ const now=cu.time.slice(0,16); const ix=M.time.map((t,i)=>i).filter(i=>M.time[i]>=now).slice(0,12);
+      if(ix.length) m15=`<div class="sec"><h3>これから3時間の雨（15分ごと）</h3><div class="hours">${ix.map(i=>{const mm=M.precipitation[i]||0; return `<div class="${mm>=0.1?'wet15':''}"><div class="small">${M.time[i].slice(11,16).replace(/^0/,'')}</div><div style="font-size:1.3rem">${mm>=0.1?'☔':'－'}</div><b class="small">${mm>=0.1?mm+'mm':'なし'}</b></div>`;}).join('')}</div></div>`; }
+    const hourSec=m15+`<div class="sec" id="wx-hours"><h3>1時間ごと${mode==='h'?'（2日分）':'（24時間）'}</h3><p class="small muted" style="margin:0 0 6px">☔は雨の確率、mmは1時間の雨の量、風は風の強さ（m/s）です。</p><div class="hlist">${hl}</div></div>`;
     body=`<div class="sec" style="display:flex;gap:14px;align-items:center"><span style="font-size:3.2rem">${wxt(cu.weather_code)[0]}</span><div><b style="font-size:2rem;font-family:var(--f-disp)">${Math.round(cu.temperature_2m)}℃</b> ${h(wxt(cu.weather_code)[1])}<div class="small muted">体感 ${Math.round(cu.apparent_temperature)}℃・湿度 ${cu.relative_humidity_2m}%・風 ${Math.round(cu.wind_speed_10m/3.6)}m/s</div></div></div>
     ${mode==='h'?hourSec:''}<div class="sec"><h3>3時間ごと</h3>${mode==='h'?'':`<button class="btn plain" data-go="weather/h" style="margin-bottom:6px">⏱️ 1時間ごとの天気を見る</button>`}<div class="hours">${hrs.map(i=>`<div><div class="small">${+d.hourly.time[i].slice(11,13)}時</div><div style="font-size:1.4rem">${wxt(d.hourly.weather_code[i])[0]}</div><b>${Math.round(d.hourly.temperature_2m[i])}℃</b><div class="small muted">☔${d.hourly.precipitation_probability[i]??'-'}%</div></div>`).join('')}</div></div>
     <div class="sec"><h3>今日の目安</h3><dl class="kv"><dt>紫外線</dt><dd>${uvText(d.daily.uv_index_max[0])}（${Math.round(d.daily.uv_index_max[0])}）</dd>${ht?`<dt>熱中症</dt><dd>${ht}</dd>`:''}<dt>花粉</dt><dd class="muted small">準備中</dd></dl></div>
@@ -524,6 +542,7 @@ function vSettings(){
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>
     <div class="choose" style="margin-top:8px">${r('theme','',s.theme,'明るさ：スマホに合わせる')}${r('theme','light',s.theme,'明るい')}${r('theme','dark',s.theme,'暗い')}</div></div>
+  <div class="sec"><h3>洗濯物のお知らせ</h3><label class="ck"><input type="checkbox" data-act="setlaundry" ${s.laundry!==false?'checked':''}> 雨が降りそうなとき、トップに「洗濯物を取り込んで！」を出す（朝6時〜夜8時）</label><p class="small muted" style="margin:4px 0 0">これから3時間の天気（15分ごとの雨の量と1時間ごとの雨の確率50%以上）で判断します。アプリを開いたときに出ます。</p></div>
   <div class="sec"><h3>暦</h3><label class="ck"><input type="checkbox" data-act="setcn" ${s.cn?'checked':''}> 中国の祝日・行事も出す（春節・中秋節など）</label></div>
   <div class="list">
     <button class="row" data-go="otasukeset"><span class="em">🆘</span><span class="t"><b>おたすけボタンの準備</b><span>${s.home.addr?'自宅：'+h(s.home.addr):'自宅の住所と家族の電話を入れておきます'}</span></span><span class="go">›</span></button>
