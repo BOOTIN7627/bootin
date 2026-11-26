@@ -17,7 +17,7 @@ window.addEventListener('popstate',()=>{ if(IN_FRAME) return; const r=decodeURI(
 
 function openNode(id){
   const im=implOf(id);
-  const R={cal:'cal/'+today().slice(0,7),people:'people',places:'places',shops:'shops',memo:'memo',tools:'tools',search:'search/',settings:'settings',data:'data',weather:'weather',otayori:'otayori'};
+  const R={cal:'cal/'+today().slice(0,7),people:'people',places:'places',shops:'shops',memo:'memo',tools:'tools',search:'search/',settings:'settings',data:'data',weather:'weather',otayori:'otayori',meds:'meds'};
   go(im?R[im]:'node/'+id);
 }
 
