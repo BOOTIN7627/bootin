@@ -169,7 +169,7 @@ function vCal(ym){
   ${calNav(`${m}月`,`data-go-r="cal/${prev}"`,`data-go-r="cal/${next}"`,ym!==t.slice(0,7)?`data-go-r="cal/${t.slice(0,7)}"`:'')}
   <div class="chips">${chips}</div>
   <div data-swipe="big" data-prev="${prev}" data-next="${next}">${calGrid(ym,UI.calCat)}</div>
-  <p class="small muted">左右に指でスライドしても月が変わります。日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol">■祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
+  <p class="small muted">左右に指でスライドしても月が変わります。日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol"><span style="display:inline-block;width:1.1em;height:1.1em;border-radius:50%;background:rgba(229,57,53,.2);vertical-align:-3px;margin-right:2px"></span>祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
   <div class="btns"><button class="btn" data-go="evnew/${ym===t.slice(0,7)?t:ym+'-01'}">＋ 予定を入れる</button></div>`);
 }
 

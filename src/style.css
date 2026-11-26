@@ -2,7 +2,7 @@
 :root{
   --paper:#FBF8EE; --card:#FFFFFF; --ink:#1E1B14; --sub:#6B6450; --line:#E6DFC8; --soft:#F3EEDC;
   --bee:#F6C915; --beeInk:#1E1B14; --accent:#2D6CDF; --ok:#2E8B57; --warn:#C0392B;
-  --hol:#E06A00; --sun:#D32F2F; --sat:#1F3A93;
+  --hol:#D32F2F; --sun:#D32F2F; --sat:#1565E8;
   --shadow:0 2px 0 rgba(30,27,20,.10);
   --f-disp:"Zen Maru Gothic","Hiragino Maru Gothic ProN","BIZ UDPGothic",sans-serif;
   --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
@@ -11,11 +11,11 @@
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --paper:#17150F; --card:#221F17; --ink:#F3EEDD; --sub:#B3AA90; --line:#3A3527; --soft:#2B271D;
-  --accent:#7FA8F5; --ok:#5BC48A; --warn:#F07B6E; --hol:#FF9A3C; --sun:#FF6B6B; --sat:#8FA8FF;
+  --accent:#7FA8F5; --ok:#5BC48A; --warn:#F07B6E; --hol:#FF6B6B; --sun:#FF6B6B; --sat:#8FB4FF;
   --shadow:none; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#17150F; --card:#221F17; --ink:#F3EEDD; --sub:#B3AA90; --line:#3A3527; --soft:#2B271D;
-  --accent:#7FA8F5; --ok:#5BC48A; --warn:#F07B6E; --hol:#FF9A3C; --sun:#FF6B6B; --sat:#8FA8FF;
+  --accent:#7FA8F5; --ok:#5BC48A; --warn:#F07B6E; --hol:#FF6B6B; --sun:#FF6B6B; --sat:#8FB4FF;
   --shadow:none; color-scheme:dark}
 :root[data-kise="sakura"]{--bee:#F4A7B9}
 :root[data-kise="sora"]{--bee:#8CCBF0}
@@ -160,6 +160,8 @@ a{color:var(--accent)}
 .cal .e{font-size:.62rem;line-height:1.25;border-radius:3px;padding:0 2px;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .cal .mo{font-size:.6rem;color:var(--sub);font-weight:700}
 .c-sun{color:var(--sun)}.c-sat{color:var(--sat)}.c-hol{color:var(--hol)}
+/* 祝日は日の丸のように、数字の後ろにうすい赤の丸 */
+.cal .n.c-hol{display:inline-flex;align-items:center;justify-content:center;align-self:flex-start;min-width:1.75em;height:1.75em;padding:0 .2em;border-radius:999px;background:rgba(229,57,53,.2)}
 
 /* 人・施設のカード */
 .face{flex:none;border-radius:50%;overflow:hidden;background:var(--soft);display:block;border:2px solid var(--line)}
