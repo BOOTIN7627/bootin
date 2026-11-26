@@ -16,12 +16,13 @@ head=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="
 open('pwa/index.html','w').write(head+body+'</body></html>')
 json.dump({"name":"BOOTIN","short_name":"BOOTIN","start_url":"./?app=2","scope":"./","display":"standalone","background_color":"#FBF8EE","theme_color":"#F6C915","lang":"ja",
  "id":"./?app=2","icons":[{"src":"icon4-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon4-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icon4-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]},open('pwa/manifest.webmanifest','w'),ensure_ascii=False)
-ver=str(int(os.path.getmtime('app.js')))
+import time
+ver=str(int(time.time()))
 open('pwa/sw.js','w').write(f"""const C='bootin-{ver}';
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon4-192.png','icon4-512.png'])));self.skipWaiting();}});
 self.addEventListener('activate',e=>{{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));self.clients.claim();}});
 self.addEventListener('fetch',e=>{{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==location.origin)return;
-e.respondWith(fetch(e.request).then(r=>{{const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp));return r;}}).catch(()=>caches.match(e.request).then(r=>r||caches.match('index.html'))));}});
+e.respondWith(fetch(e.request.url,{{cache:'no-cache',credentials:'same-origin'}}).then(r=>{{const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp));return r;}}).catch(()=>caches.match(e.request).then(r=>r||caches.match('index.html'))));}});
 """)
 for f in ['icon-192.png','icon-512.png']: shutil.copy(f,'pwa/'+f.replace('icon-','icon4-'))
 for f in ['icon-192.png','icon-512.png']:
