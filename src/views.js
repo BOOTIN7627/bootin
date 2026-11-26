@@ -63,7 +63,7 @@ function vHome(){
   ${elder||UI.editGrid?`<div class="grid ${elder?'big':''}">${cells}</div>`:`<div class="topnav"><div class="grid compact sq">${cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
     <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
-    <button class="qb q-photo" data-act="open" data-id="設定・機能/写真管理"><span class="em">📷</span><span>写真管理</span></button></div></div>`}
+    <button class="qb q-photo" data-act="open" data-id="NEWS・知識/NEWS"><span class="em">📰</span><span>NEWS</span></button></div></div>`}
   <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
   <div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button></div>
