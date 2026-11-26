@@ -384,7 +384,7 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .op-bg.op-out{opacity:0;transition:opacity .25s}
 .op-burst{position:absolute;left:50%;top:50%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(rgba(255,255,255,.4) 0 9deg,transparent 9deg 18deg);border-radius:50%;animation:opSpin 10s linear infinite}
 .op-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:opFlash .35s 3.6s ease-out}
-.op-booWrap{position:absolute;left:50%;top:50%;z-index:2;width:var(--sz);margin-left:calc(var(--sz) / -2);transform-origin:50% 60%;
+.op-booWrap{position:absolute;left:50%;top:40%;z-index:2;width:var(--sz);margin-left:calc(var(--sz) / -2);transform-origin:50% 60%;
   animation:opGrow 1.9s .1s both, opShrink .5s 3.65s cubic-bezier(.3,1.5,.5,1) forwards, opMoji 1.1s 4.2s ease-in-out 4}
 .op-boo{position:relative;width:100%;aspect-ratio:218/210}
 .op-boo img,.op-boo .op-arms{position:absolute;inset:0;width:100%;height:100%}
@@ -395,22 +395,25 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .op-name{display:inline-block;background:#1E1B14;color:#fff;font:900 .9rem var(--f-disp);border-radius:999px;padding:2px 10px;letter-spacing:.06em;white-space:nowrap}
 .op-nBoo{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);opacity:0;animation:opShow .3s 4.0s forwards}
 .op-say{position:absolute;background:#fff;color:#1E1B14;border:3px solid #1E1B14;border-radius:18px;padding:8px 14px;font:900 1.2rem var(--f-disp);white-space:nowrap;opacity:0;box-shadow:0 4px 0 #1E1B14;z-index:3}
-.op-s1{left:50%;top:9%;transform:translateX(-50%);font-size:1.4rem;animation:opPopC .35s 1.9s both, opHide .01s 3.0s forwards}
+.op-s1{left:50%;top:22%;transform:translateX(-50%);font-size:1.4rem;animation:opPopC .35s 1.9s both, opHide .01s 3.0s forwards}
+.op-s1::after{content:"";position:absolute;left:46%;top:100%;border:12px solid transparent;border-top:16px solid #1E1B14}
+.op-s3{left:58%;top:36%;font-size:1.1rem;animation:opPop .35s 4.3s both}
+.op-s3::after{content:"";position:absolute;left:14%;top:100%;border:9px solid transparent;border-top:12px solid #1E1B14}
 /* エンちん：右下の隅から */
-.op-en{position:absolute;right:-50vw;bottom:15%;width:min(30vw,150px);text-align:center;z-index:4;animation:opEn .45s 2.9s cubic-bezier(.2,1.3,.4,1) forwards, opSwat .45s 3.35s ease-in both}
+.op-en{position:absolute;right:-50vw;top:5%;width:min(30vw,150px);text-align:center;z-index:4;animation:opEn .45s 2.9s cubic-bezier(.2,1.3,.4,1) forwards, opSwat .45s 3.35s ease-in both}
 .op-en img{width:100%;display:block}
-.op-jag{position:absolute;right:0;bottom:92%;width:min(66vw,290px);aspect-ratio:2.1;opacity:0;animation:opPop .3s 3.05s both, opHide .2s 4.3s forwards;
+.op-jag{position:absolute;right:88%;top:20%;width:min(64vw,290px);aspect-ratio:2.1;opacity:0;animation:opPop .3s 3.05s both, opHide .3s 6.0s forwards;
   filter:drop-shadow(2px 0 0 #1E1B14) drop-shadow(-2px 0 0 #1E1B14) drop-shadow(0 2px 0 #1E1B14) drop-shadow(0 -2px 0 #1E1B14) drop-shadow(4px 4px 0 #1E1B14)}
 .op-jagIn{position:absolute;inset:0;background:#fff;
   clip-path:polygon(50% 0,58% 14%,72% 2%,74% 18%,92% 10%,86% 28%,100% 32%,88% 46%,100% 60%,84% 64%,92% 82%,74% 76%,70% 96%,58% 80%,48% 100%,40% 80%,24% 94%,24% 76%,6% 84%,14% 64%,0 56%,14% 44%,2% 28%,20% 28%,14% 10%,32% 18%,36% 2%)}
 .op-jag span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 1rem var(--f-disp);color:#C0392B;transform:rotate(-4deg);text-align:center;padding:0 12%;white-space:nowrap}
 /* トンじい：しょんぼりの左ななめ後ろ、遠くに小さく */
-.op-ton{position:absolute;left:3%;top:36%;width:min(24vw,110px);text-align:center;opacity:0;z-index:1;animation:opTon .5s 4.4s ease-out forwards}
+.op-ton{position:absolute;left:2%;top:40%;width:min(24vw,110px);text-align:center;opacity:0;z-index:1;animation:opTon .5s 5.0s ease-out forwards}
 .op-ton img{width:100%;display:block;filter:saturate(.9)}
-.op-sTon{left:0;bottom:104%;font-size:.95rem;padding:5px 10px;opacity:0;animation:opPop .3s 4.9s both}
+.op-sTon{left:0;bottom:104%;font-size:.95rem;padding:5px 10px;opacity:0;animation:opPop .3s 5.4s both}
 .op-pow{position:absolute;left:50%;top:26%;transform:translateX(-50%);font:900 3rem var(--f-disp);color:#E0452B;-webkit-text-stroke:2px #fff;opacity:0;z-index:5;animation:opPopC .3s 3.55s both, opHide .2s 4.2s forwards}
 /* ロゴ：漫画の効果文字のように */
-.op-logo{position:absolute;left:0;right:0;top:7%;text-align:center;opacity:0;z-index:6;animation:opLogo .5s 3.8s cubic-bezier(.2,1.8,.4,1) both}
+.op-logo{position:absolute;left:0;right:0;bottom:12%;text-align:center;opacity:0;z-index:6;animation:opLogo .5s 3.8s cubic-bezier(.2,1.8,.4,1) both}
 .op-logo span{display:inline-block;font:900 clamp(3.6rem,24vw,7.5rem)/1 var(--f-disp);letter-spacing:.02em;font-style:italic;color:#FFE14D;transform:rotate(-7deg) skewX(-8deg);
   -webkit-text-stroke:3px #1E1B14;paint-order:stroke fill;
   text-shadow:4px 4px 0 #E0452B,8px 8px 0 #1E1B14,-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff}
@@ -427,7 +430,7 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 @keyframes opMoji{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
 @keyframes opFly{to{transform:translate(-180%,-300%) rotate(-600deg);opacity:0}}
 @keyframes opEn{to{right:4%}}
-@keyframes opSwat{0%,100%{transform:none}50%{transform:translate(-60%,-30%) rotate(-35deg)}}
+@keyframes opSwat{0%,100%{transform:none}50%{transform:translate(-75%,70%) rotate(-40deg)}}
 @keyframes opTon{from{opacity:0;transform:translateY(20px)}to{opacity:.95;transform:none}}
 @keyframes opPop{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:scale(1)}}
 @keyframes opPopC{0%{opacity:0;transform:translateX(-50%) scale(.4)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
@@ -1396,6 +1399,7 @@ function playOpening(){
     <div class="op-booWrap"><div class="op-boo"><img class="op-b1" src="${OP_BOO}" alt="ぶーちん">${arms}<img class="op-b2" src="${OP_SAD}" alt="">${shades}<span class="op-sweat">💧</span></div>
       <span class="op-name op-nBoo">ぶーちん</span></div>
     <div class="op-say op-s1">何でもオレに任せな！</div>
+    <div class="op-say op-s3">しょんぼり…</div>
     <div class="op-en"><div class="op-jag"><div class="op-jagIn"></div><span>何調子に乗ってんの！</span></div><img src="${OP_EN}" alt=""><span class="op-name">エンちん</span></div>
     <div class="op-pow">バシッ</div>
     <div class="op-logo" aria-label="BOOTIN"><span>BOOTIN</span></div>

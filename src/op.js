@@ -13,6 +13,7 @@ function playOpening(){
     <div class="op-booWrap"><div class="op-boo"><img class="op-b1" src="${OP_BOO}" alt="ぶーちん">${arms}<img class="op-b2" src="${OP_SAD}" alt="">${shades}<span class="op-sweat">💧</span></div>
       <span class="op-name op-nBoo">ぶーちん</span></div>
     <div class="op-say op-s1">何でもオレに任せな！</div>
+    <div class="op-say op-s3">しょんぼり…</div>
     <div class="op-en"><div class="op-jag"><div class="op-jagIn"></div><span>何調子に乗ってんの！</span></div><img src="${OP_EN}" alt=""><span class="op-name">エンちん</span></div>
     <div class="op-pow">バシッ</div>
     <div class="op-logo" aria-label="BOOTIN"><span>BOOTIN</span></div>
