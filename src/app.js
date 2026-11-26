@@ -45,7 +45,7 @@ function render(){
   const root=document.documentElement;
   root.classList.toggle('f2',S.set.font==2); root.classList.toggle('f3',S.set.font==3||(S.set.mode==='elder'&&S.set.font==1));
   if(S.set.theme) root.setAttribute('data-theme',S.set.theme); else root.removeAttribute('data-theme');
-  root.setAttribute('data-kise',S.set.kise||'bee');
+  root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
   const r=cur();
   if(r==='home'&&!IN_FRAME) {}
   $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','','TOPへ'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['people','📇','人物帳'],['memo','✏️','メモ一覧']].map(([g,e,t])=>(g==='home'?`<button class="tb-top" data-go="home" aria-label="トップ画面へ" ${r==='home'?'aria-current="page"':''}><span class="topbtn">TOPへ</span></button>`:`<button data-go="${g}" ${r.split('/')[0]===g.split('/')[0]?'aria-current="page"':''}><span>${e}</span>${t}</button>`)).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
