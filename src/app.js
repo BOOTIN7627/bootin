@@ -37,7 +37,7 @@ function sideNav(){
   const r=cur(); const reds=ROOTS.filter(x=>!isOff(x));
   const it=(go,em,t,act)=>`<button class="sn ${act?'on':''}" ${go.startsWith('@')?`data-act="${go.slice(1)}"`:`data-go="${go}"`}><span>${em}</span>${h(t)}</button>`;
   return `<aside class="side"><div class="brand"><img src="${BOO_F}" alt="">BOOTIN</div>
-  ${it('home','🏠','トップ',r==='home')}${it('cal/'+today().slice(0,7),'📅','カレンダー',r.startsWith('cal'))}${it('day/'+today(),'🗓️','今日の1日カード',r.startsWith('day'))}
+  ${r==='home'?it('home','🏠','トップ',true):`<button class="sn topsn" data-go="home"><span class="topbtn">TOPへ</span></button>`}${it('cal/'+today().slice(0,7),'📅','カレンダー',r.startsWith('cal'))}${it('day/'+today(),'🗓️','今日の1日カード',r.startsWith('day'))}
   <div class="sn-h">入口</div>${reds.map(id=>`<button class="sn ${r==='node/'+id?'on':''}" data-act="open" data-id="${h(id)}"><span>${RED_EMOJI[id]}</span>${h(id)}</button>`).join('')}
   <div class="sn-h">いつでも</div>${it('memo','✏️','さっとメモ',r==='memo')}${it('search/','🔍','探す',r.startsWith('search'))}${it('tools','🧰','便利道具',r==='tools')}${it('@otasuke','🆘','おたすけ')}</aside>`;
 }
@@ -48,7 +48,7 @@ function render(){
   root.setAttribute('data-kise',S.set.kise||'bee');
   const r=cur();
   if(r==='home'&&!IN_FRAME) {}
-  $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','🏠','トップ'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['people','📇','人物帳'],['memo','✏️','メモ一覧']].map(([g,e,t])=>`<button data-go="${g}" ${(g==='home'?r==='home':r.split('/')[0]===g.split('/')[0])?'aria-current="page"':''}><span>${e}</span>${t}</button>`).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
+  $('#app').innerHTML=`<div class="shell">${sideNav()}<main class="wrap ${r==='home'?'home':''}">${routeView(r)}</main></div><nav class="tabbar" aria-label="移動">${r==='home'?'':`<button data-act="back"><span>←</span>もどる</button>`}${[['home','','TOPへ'],['day/'+today(),'🗓️','1日カード'],['cal/'+today().slice(0,7),'📅','カレンダー'],['people','📇','人物帳'],['memo','✏️','メモ一覧']].map(([g,e,t])=>(g==='home'?`<button class="tb-top" data-go="home" aria-label="トップ画面へ" ${r==='home'?'aria-current="page"':''}><span class="topbtn">TOPへ</span></button>`:`<button data-go="${g}" ${r.split('/')[0]===g.split('/')[0]?'aria-current="page"':''}><span>${e}</span>${t}</button>`)).join('')}</nav><button class="fab" data-act="qmemo" aria-label="さっとメモ">✏️ メモ</button>`;
   after(r);
 }
 function after(r){

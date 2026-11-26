@@ -23,7 +23,7 @@ function openNode(id){
 
 const BOO_IMG=`<img src="${BOO_F}" alt="ぶーちん">`;
 function sub(title,body,opt={}){
-  return `<div class="hd"><button class="ib" data-act="back" aria-label="もどる">← もどる</button><div class="grow"><h1>${h(title)}</h1>${opt.crumb?`<div class="small muted">${opt.crumb}</div>`:''}</div><button class="ib ghost" data-go="home" aria-label="トップへ">🏠</button></div>${body}`;
+  return `<div class="hd"><button class="ib" data-act="back" aria-label="もどる">← もどる</button><div class="grow"><h1>${h(title)}</h1>${opt.crumb?`<div class="small muted">${opt.crumb}</div>`:''}</div><button class="topbtn" data-go="home" aria-label="トップ画面へ">TOPへ</button></div>${body}`;
 }
 function crumbOf(id){ const parts=[]; let n=NODES[NODES[id]?.parent]; while(n){parts.unshift(n.name); n=NODES[n.parent];} return parts.map(h).join(' › '); }
 function sayBoo(text){return `<div class="say">${BOO_IMG}<div class="b">${text}</div></div>`;}
