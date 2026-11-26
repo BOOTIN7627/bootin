@@ -38,7 +38,7 @@ function vHome(){
   const t=today(); const l=lunar(t); const elder=S.set.mode==='elder';
   const items=itemsOn(t).slice(0,4);
   const w=S.cache.wx&&S.cache.wx.data;
-  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span>最高${Math.round(w.daily.temperature_2m_max[0])}℃ 最低${Math.round(w.daily.temperature_2m_min[0])}℃</span></span>`
+  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
     :`<span class="big">🌤️</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>天気</b><span>押すと天気を見ます</span></span>`;
   const ot=OTAYORI[0];
   let grid=S.set.grid.slice(0,9); while(grid.length<9) grid.push('');
