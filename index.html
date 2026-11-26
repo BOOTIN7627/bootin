@@ -431,6 +431,9 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .laundry.sun{background:#FFF0DC;border-color:#E07A00;animation:none}
 .laundry.sun b{color:#A04F00}
 @keyframes lBlinkR{50%{box-shadow:0 0 0 6px rgba(211,47,47,.3)}}
+/* 天気の「最新情報に更新」ボタン：濃く大きく */
+.wxrl{background:#1E1B14;color:#fff;border-color:#1E1B14;font-weight:900;display:inline-flex;align-items:center;gap:6px}
+.wxrl .rl{font-size:1.6rem;line-height:1}
 
 /* オープニング（約6秒）
    0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
@@ -1242,7 +1245,7 @@ function vWeather(mode){
     ${mode==='h'?'':hourSec}<p class="small muted">天気のデータ：Open-Meteo（無料）</p>`;
   }
   return sub('天気',`<div class="f"><label for="wx-city">場所：${h(S.set.wx.name)}</label><select id="wx-city">${CITIES.map(([n])=>`<option ${S.set.wx.name===n?'selected':''}>${n}</option>`).join('')}${CITIES.some(c=>c[0]===S.set.wx.name)?'':`<option selected>${h(S.set.wx.name)}</option>`}</select></div>
-  <div class="btns"><button class="btn plain" data-act="wxhere">📍 今いる場所にする</button><button class="btn plain" data-act="wxreload">最新情報に更新 🔄</button></div>${body}`,{crumb:'NEWS・知識 › NEWS'});
+  <div class="btns"><button class="btn plain" data-act="wxhere">📍 今いる場所にする</button><button class="btn wxrl" data-act="wxreload">最新情報に更新 <span class="rl" aria-hidden="true">🔄</span></button></div>${body}`,{crumb:'NEWS・知識 › NEWS'});
 }
 
 /* ---------- お便り ---------- */

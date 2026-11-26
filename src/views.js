@@ -497,7 +497,7 @@ function vWeather(mode){
     ${mode==='h'?'':hourSec}<p class="small muted">天気のデータ：Open-Meteo（無料）</p>`;
   }
   return sub('天気',`<div class="f"><label for="wx-city">場所：${h(S.set.wx.name)}</label><select id="wx-city">${CITIES.map(([n])=>`<option ${S.set.wx.name===n?'selected':''}>${n}</option>`).join('')}${CITIES.some(c=>c[0]===S.set.wx.name)?'':`<option selected>${h(S.set.wx.name)}</option>`}</select></div>
-  <div class="btns"><button class="btn plain" data-act="wxhere">📍 今いる場所にする</button><button class="btn plain" data-act="wxreload">最新情報に更新 🔄</button></div>${body}`,{crumb:'NEWS・知識 › NEWS'});
+  <div class="btns"><button class="btn plain" data-act="wxhere">📍 今いる場所にする</button><button class="btn wxrl" data-act="wxreload">最新情報に更新 <span class="rl" aria-hidden="true">🔄</span></button></div>${body}`,{crumb:'NEWS・知識 › NEWS'});
 }
 
 /* ---------- お便り ---------- */
