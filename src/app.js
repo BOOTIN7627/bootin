@@ -81,8 +81,21 @@ function tick(){
 }
 setInterval(tick,250);
 
+/* 左右に指でスライドして月を変える */
+let swX=0,swY=0,swT=null;
+document.addEventListener('touchstart',ev=>{const t=ev.target.closest('[data-swipe]'); swT=t; if(!t) return; swX=ev.touches[0].clientX; swY=ev.touches[0].clientY;},{passive:true});
+document.addEventListener('touchend',ev=>{ if(!swT) return; const t=swT; swT=null;
+  const dx=ev.changedTouches[0].clientX-swX, dy=ev.changedTouches[0].clientY-swY;
+  if(Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.5) return;
+  const ym=dx<0?t.dataset.next:t.dataset.prev;
+  swipeBlock=Date.now();
+  if(t.dataset.swipe==='big') go('cal/'+ym,true); else { UI.topYm=ym; render(); }
+},{passive:true});
+let swipeBlock=0;
+
 /* 押したとき */
 document.addEventListener('click',async ev=>{
+  if(Date.now()-swipeBlock<400){ ev.preventDefault(); return; }
   const g=ev.target.closest('[data-go],[data-go-r]');
   if(g&&!ev.target.closest('a')){ ev.preventDefault(); if(g.dataset.goR) go(g.dataset.goR,true); else go(g.dataset.go); return; }
   const el=ev.target.closest('[data-act]'); if(!el) return;
@@ -157,7 +170,8 @@ const ACTS={
   sample:()=>{ addSample(); toast('見本を入れました'); render(); },
   unsample:()=>{ S.people=S.people.filter(p=>!p.sample); S.places=S.places.filter(p=>!p.sample); S.events=S.events.filter(p=>!p.sample); S.memos=S.memos.filter(p=>!p.sample); S.meds=(S.meds||[]).filter(p=>!p.sample); save(); toast('見本を削除しました'); render(); },
   wipe:()=>{ if(UI.confirm!=='wipe'){UI.confirm='wipe'; render(); return;} S=fresh(); save(); UI.confirm=''; toast('すべて削除しました'); stack=['home']; go('home',true); },
-  topcal:(el,d)=>{S.set.topCal=d.c; save(); render();},
+  topcal:(el,d)=>{S.set.topCal=d.c; UI.topYm=''; save(); render();},
+  topym:(el,d)=>{UI.topYm=d.ym; render();},
   closesheet:()=>{ const s=$('.sheet-bg'); if(s) s.remove(); },
   qphoto:async()=>{},
 };

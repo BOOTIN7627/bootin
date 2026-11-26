@@ -128,11 +128,20 @@ function calFromToday(cat){
   return calCells(start,5,cat,d=>{const s=ymd(d); if(s<t) return 'past'; return d.getMonth()!==n.getMonth()?'nx':'';});
 }
 function topCal(){
-  const mode=S.set.topCal||'from'; const t=today();
-  return `<div class="sec"><h2>📅 カレンダー <button class="more" data-go="cal/${t.slice(0,7)}">大きく見る ›</button></h2>
-  <div class="chips" style="padding-top:0"><button class="chip" aria-pressed="${mode==='from'}" data-act="topcal" data-c="from">今日から1か月</button><button class="chip" aria-pressed="${mode==='month'}" data-act="topcal" data-c="month">今月（${+t.slice(5,7)}月）</button></div>
-  ${mode==='from'?calFromToday(''):calGrid(t.slice(0,7),'')}
-  ${mode==='from'?`<p class="small muted" style="margin:4px 0 0">色の付いた日は来月です。</p>`:''}</div>`;
+  const mode=S.set.topCal||'from'; const t=today(); const ym=UI.topYm||'';
+  const show=ym&&ym!==t.slice(0,7)?ym:'';
+  const base=show||t.slice(0,7); const [y,m]=base.split('-').map(Number);
+  const prev=ymd(new Date(y,m-2,1)).slice(0,7), next=ymd(new Date(y,m,1)).slice(0,7);
+  const body=show?calGrid(show,''):(mode==='from'?calFromToday(''):calGrid(t.slice(0,7),''));
+  return `<div class="sec"><h2>📅 カレンダー <button class="more" data-go="cal/${show||t.slice(0,7)}">大きく見る ›</button></h2>
+  <div class="chips" style="padding-top:0"><button class="chip" aria-pressed="${!show&&mode==='from'}" data-act="topcal" data-c="from">今日から1か月</button><button class="chip" aria-pressed="${!show&&mode==='month'}" data-act="topcal" data-c="month">今月（${+t.slice(5,7)}月）</button></div>
+  ${calNav(show?`${y}年${m}月`:(mode==='from'?'今日から1か月':`${y}年${m}月`),`data-act="topym" data-ym="${prev}"`,`data-act="topym" data-ym="${next}"`,show?`data-act="topym" data-ym=""`:'')}
+  <div data-swipe="top" data-prev="${prev}" data-next="${next}">${body}</div>
+  ${!show&&mode==='from'?`<p class="small muted" style="margin:4px 0 0">色の付いた日は来月です。</p>`:''}</div>`;
+}
+/* 前の月・次の月・今日 のボタン（左右に指でスライドしても動く） */
+function calNav(title,pa,na,ta){
+  return `<div class="calnav"><button class="btn plain" ${pa} aria-label="前の月">◀ 前の月</button><div class="c"><b>${title}</b>${ta?`<button class="todayb" ${ta}>今日へ</button>`:''}</div><button class="btn plain" ${na} aria-label="次の月">次の月 ▶</button></div>`;
 }
 function calCells(start,weeks,cat,cls){
   const t=today(); let cells='';
@@ -150,11 +159,12 @@ function vCal(ym){
   const prev=ymd(new Date(y,m-2,1)).slice(0,7), next=ymd(new Date(y,m,1)).slice(0,7); const t=today();
   const chips=[{id:'',name:'総合'}].concat(S.set.evcats).map(c=>`<button class="chip" aria-pressed="${UI.calCat===c.id}" data-act="calcat" data-c="${c.id}">${c.color?`<span class="dot" style="background:${c.color}"></span>`:''}${h(c.name)}</button>`).join('');
   return sub('カレンダー',`
-  <div class="dayhd"><button class="arrow" data-go-r="cal/${prev}" aria-label="前の月">◀</button><div class="c"><b>${y}年${m}月</b><span class="small muted">${wareki(ym+'-01')}</span></div><button class="arrow" data-go-r="cal/${next}" aria-label="次の月">▶</button></div>
+  <div class="c" style="text-align:center"><b style="font-size:1.4rem">${y}年${m}月</b> <span class="small muted">${wareki(ym+'-01')}</span></div>
+  ${calNav(`${m}月`,`data-go-r="cal/${prev}"`,`data-go-r="cal/${next}"`,ym!==t.slice(0,7)?`data-go-r="cal/${t.slice(0,7)}"`:'')}
   <div class="chips">${chips}</div>
-  ${calGrid(ym,UI.calCat)}
-  <p class="small muted">日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol">■祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
-  <div class="btns"><button class="btn" data-go="evnew/${ym===t.slice(0,7)?t:ym+'-01'}">＋ 予定を入れる</button>${ym!==t.slice(0,7)?`<button class="btn plain" data-go-r="cal/${t.slice(0,7)}">今月へ</button>`:''}</div>`);
+  <div data-swipe="big" data-prev="${prev}" data-next="${next}">${calGrid(ym,UI.calCat)}</div>
+  <p class="small muted">左右に指でスライドしても月が変わります。日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol">■祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
+  <div class="btns"><button class="btn" data-go="evnew/${ym===t.slice(0,7)?t:ym+'-01'}">＋ 予定を入れる</button></div>`);
 }
 
 /* ---------- 予定を入れる ---------- */
