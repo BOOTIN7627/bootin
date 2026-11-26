@@ -241,7 +241,7 @@ details.tree>summary::-webkit-details-marker{display:none}
 .calc-d{background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:8px 12px;text-align:right;font-size:2rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-height:3.2rem}
 .wxday{display:grid;grid-template-columns:4.5em 2em 1fr auto;gap:6px;align-items:center;padding:6px 0;border-top:1.5px solid var(--line)}
 .hours{display:flex;gap:8px;overflow-x:auto;padding:4px 0}
-.hours div{flex:none;text-align:center;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:4px 8px;min-width:58px}
+.hours>div{flex:none;text-align:center;background:var(--card);border:1.5px solid var(--line);border-radius:10px;padding:4px 8px;min-width:58px}
 .mecard{border:3px solid var(--warn);border-radius:16px;padding:12px 14px;background:var(--card)}
 .mecard h3{margin:0 0 6px;color:var(--warn);font-family:var(--f-disp)}
 .empty{text-align:center;color:var(--sub);padding:18px 8px}
@@ -432,3 +432,4 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .wxrl{background:#1E1B14;color:#fff;border-color:#1E1B14;font-weight:900;display:inline-flex;align-items:center;gap:6px}
 .wxrl .rl{font-size:1.6rem;line-height:1}
 .wxb .wxpl{font-style:normal;font-weight:900;font-size:.95rem;color:var(--ink);background:rgba(255,255,255,.75);border-radius:999px;padding:0 8px;align-self:flex-start;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.wxmore{width:100%;margin-top:8px;background:#2D62C8;color:#fff;border-color:#2D62C8;font-weight:900}
