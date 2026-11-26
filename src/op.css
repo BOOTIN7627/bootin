@@ -1,33 +1,60 @@
 
-/* オープニング */
-.op-bg{position:fixed;inset:0;z-index:100;background:var(--bee);display:flex;align-items:center;justify-content:center;overflow:hidden;animation:opIn .25s ease-out}
+/* オープニング（約6秒）
+   0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
+   2.9s 隅からエンちん＋ギザギザ吹き出し / 3.6s バシッ → サングラスが飛び、縮んでしょんぼり
+   3.8s BOOTINロゴがバーン / 4.4s 左奥にトンじい「だから言ったの」 */
+.op-bg{position:fixed;inset:0;z-index:100;background:var(--bee);overflow:hidden;animation:opIn .2s ease-out;--sz:min(64vw,62vh,330px)}
 .op-bg.op-out{opacity:0;transition:opacity .25s}
-.op-stage{position:relative;width:min(92vw,420px);height:min(92vw,420px)}
-.op-burst{position:absolute;inset:-40%;background:repeating-conic-gradient(rgba(255,255,255,.35) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:opSpin 8s linear infinite, opFade 1s ease-out both}
-.op-boo{position:absolute;left:16%;bottom:8%;width:68%;aspect-ratio:218/210;animation:opBan .6s cubic-bezier(.2,1.6,.4,1) both, opHit .35s 2.7s ease-in-out both, opMoji 1.2s 3.4s ease-in-out 3 both}
-.op-boo img{position:absolute;inset:0;width:100%;height:100%}
-.op-b2{opacity:0;animation:opShow .01s 3.1s forwards}
-.op-b1{animation:opHide .01s 3.1s forwards}
-.op-shades{position:absolute;left:26%;top:33%;width:46%;transform-origin:50% 50%;animation:opFly 1s 2.85s cubic-bezier(.3,.2,.5,1) forwards}
-.op-pow{position:absolute;left:30%;top:-10%;font:900 2rem var(--f-disp);color:#E0452B;-webkit-text-stroke:1px #fff;opacity:0;animation:opPop .4s 2.75s both, opHide .2s 3.7s forwards}
-.op-sweat{position:absolute;right:12%;top:18%;font-size:1.4rem;opacity:0;animation:opShow .3s 3.6s forwards}
-.op-en{position:absolute;right:-60%;top:-4%;width:42%;animation:opEn .5s 2.0s cubic-bezier(.2,1.3,.4,1) forwards, opEnHit .4s 2.6s ease-in both}
-.op-say{position:absolute;background:#fff;color:#1E1B14;border:3px solid #1E1B14;border-radius:18px;padding:8px 14px;font:900 1.15rem var(--f-disp);white-space:nowrap;opacity:0;box-shadow:0 4px 0 #1E1B14}
-.op-s1{left:2%;top:0;animation:opPop .4s .5s both, opHide .01s 2.1s forwards}
-.op-s2{left:0;top:-14%;animation:opPop .4s 2.3s both, opHide .01s 3.4s forwards}
-.op-s3{left:0;top:14%;animation:opPop .4s 3.6s both}
-.op-logo{position:absolute;left:0;right:0;bottom:-18%;text-align:center;font:900 2.2rem var(--f-disp);color:var(--beeInk);letter-spacing:.08em;opacity:0;animation:opPop .5s 4.6s both}
-.op-close{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:#111;color:#fff;border:0;border-radius:999px;padding:10px 20px;font-weight:900}
+.op-burst{position:absolute;left:50%;top:50%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(rgba(255,255,255,.4) 0 9deg,transparent 9deg 18deg);border-radius:50%;animation:opSpin 10s linear infinite}
+.op-flash{position:absolute;inset:0;background:#fff;opacity:0;animation:opFlash .35s 3.6s ease-out}
+.op-booWrap{position:absolute;left:50%;top:50%;z-index:2;width:var(--sz);margin-left:calc(var(--sz) / -2);transform-origin:50% 60%;
+  animation:opGrow 1.9s .1s both, opShrink .5s 3.65s cubic-bezier(.3,1.5,.5,1) forwards, opMoji 1.1s 4.2s ease-in-out 4}
+.op-boo{position:relative;width:100%;aspect-ratio:218/210}
+.op-boo img,.op-boo .op-arms{position:absolute;inset:0;width:100%;height:100%}
+.op-b2{opacity:0;animation:opShow .01s 3.7s forwards}
+.op-b1,.op-arms{animation:opHide .01s 3.7s forwards}
+.op-shades{position:absolute;left:26%;top:33%;width:46%;animation:opFly .9s 3.62s cubic-bezier(.3,.2,.5,1) forwards}
+.op-sweat{position:absolute;right:16%;top:20%;font-size:1.3rem;opacity:0;animation:opShow .3s 4.1s forwards}
+.op-name{display:inline-block;background:#1E1B14;color:#fff;font:900 .9rem var(--f-disp);border-radius:999px;padding:2px 10px;letter-spacing:.06em;white-space:nowrap}
+.op-nBoo{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);opacity:0;animation:opShow .3s 4.0s forwards}
+.op-say{position:absolute;background:#fff;color:#1E1B14;border:3px solid #1E1B14;border-radius:18px;padding:8px 14px;font:900 1.2rem var(--f-disp);white-space:nowrap;opacity:0;box-shadow:0 4px 0 #1E1B14;z-index:3}
+.op-s1{left:50%;top:9%;transform:translateX(-50%);font-size:1.4rem;animation:opPopC .35s 1.9s both, opHide .01s 3.0s forwards}
+/* エンちん：右下の隅から */
+.op-en{position:absolute;right:-50vw;bottom:15%;width:min(30vw,150px);text-align:center;z-index:4;animation:opEn .45s 2.9s cubic-bezier(.2,1.3,.4,1) forwards, opSwat .45s 3.35s ease-in both}
+.op-en img{width:100%;display:block}
+.op-jag{position:absolute;right:0;bottom:92%;width:min(66vw,290px);aspect-ratio:2.1;opacity:0;animation:opPop .3s 3.05s both, opHide .2s 4.3s forwards;
+  filter:drop-shadow(2px 0 0 #1E1B14) drop-shadow(-2px 0 0 #1E1B14) drop-shadow(0 2px 0 #1E1B14) drop-shadow(0 -2px 0 #1E1B14) drop-shadow(4px 4px 0 #1E1B14)}
+.op-jagIn{position:absolute;inset:0;background:#fff;
+  clip-path:polygon(50% 0,58% 14%,72% 2%,74% 18%,92% 10%,86% 28%,100% 32%,88% 46%,100% 60%,84% 64%,92% 82%,74% 76%,70% 96%,58% 80%,48% 100%,40% 80%,24% 94%,24% 76%,6% 84%,14% 64%,0 56%,14% 44%,2% 28%,20% 28%,14% 10%,32% 18%,36% 2%)}
+.op-jag span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 1rem var(--f-disp);color:#C0392B;transform:rotate(-4deg);text-align:center;padding:0 12%;white-space:nowrap}
+/* トンじい：しょんぼりの左ななめ後ろ、遠くに小さく */
+.op-ton{position:absolute;left:3%;top:36%;width:min(24vw,110px);text-align:center;opacity:0;z-index:1;animation:opTon .5s 4.4s ease-out forwards}
+.op-ton img{width:100%;display:block;filter:saturate(.9)}
+.op-sTon{left:0;bottom:104%;font-size:.95rem;padding:5px 10px;opacity:0;animation:opPop .3s 4.9s both}
+.op-pow{position:absolute;left:50%;top:26%;transform:translateX(-50%);font:900 3rem var(--f-disp);color:#E0452B;-webkit-text-stroke:2px #fff;opacity:0;z-index:5;animation:opPopC .3s 3.55s both, opHide .2s 4.2s forwards}
+/* ロゴ：漫画の効果文字のように */
+.op-logo{position:absolute;left:0;right:0;top:7%;text-align:center;opacity:0;z-index:6;animation:opLogo .5s 3.8s cubic-bezier(.2,1.8,.4,1) both}
+.op-logo span{display:inline-block;font:900 clamp(3.6rem,24vw,7.5rem)/1 var(--f-disp);letter-spacing:.02em;font-style:italic;color:#FFE14D;transform:rotate(-7deg) skewX(-8deg);
+  -webkit-text-stroke:3px #1E1B14;paint-order:stroke fill;
+  text-shadow:4px 4px 0 #E0452B,8px 8px 0 #1E1B14,-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff}
+.op-close{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#111;color:#fff;border:0;border-radius:999px;padding:10px 20px;font-weight:900;z-index:7}
 @keyframes opIn{from{opacity:0}to{opacity:1}}
 @keyframes opSpin{to{transform:rotate(360deg)}}
-@keyframes opFade{from{opacity:0}to{opacity:1}}
-@keyframes opBan{0%{transform:scale(.1) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
-@keyframes opHit{0%,100%{transform:translate(0,0)}40%{transform:translate(0,10px) scale(1,.92)}}
+@keyframes opFlash{0%{opacity:.9}100%{opacity:0}}
+@keyframes opGrow{
+  0%{transform:scale(.06)}
+  10%{transform:scale(.06)} 16%{transform:scale(.34) translateY(-3%)} 22%{transform:scale(.3)}
+  44%{transform:scale(.3)} 50%{transform:scale(.72) translateY(-3%)} 56%{transform:scale(.66)}
+  78%{transform:scale(.66)} 85%{transform:scale(1.65) translateY(-2%)} 92%,100%{transform:scale(1.5)}}
+@keyframes opShrink{from{transform:scale(1.5)}to{transform:scale(1)}}
 @keyframes opMoji{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
-@keyframes opFly{to{transform:translate(-160%,-260%) rotate(-540deg);opacity:0}}
+@keyframes opFly{to{transform:translate(-180%,-300%) rotate(-600deg);opacity:0}}
 @keyframes opEn{to{right:4%}}
-@keyframes opEnHit{0%,100%{transform:none}50%{transform:translate(-55%,30%) rotate(-30deg)}}
-@keyframes opPop{0%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
+@keyframes opSwat{0%,100%{transform:none}50%{transform:translate(-60%,-30%) rotate(-35deg)}}
+@keyframes opTon{from{opacity:0;transform:translateY(20px)}to{opacity:.95;transform:none}}
+@keyframes opPop{0%{opacity:0;transform:scale(.4)}100%{opacity:1;transform:scale(1)}}
+@keyframes opPopC{0%{opacity:0;transform:translateX(-50%) scale(.4)}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+@keyframes opLogo{0%{opacity:0;transform:scale(3)}100%{opacity:1;transform:scale(1)}}
 @keyframes opShow{to{opacity:1}}
 @keyframes opHide{to{opacity:0}}
 @media (prefers-reduced-motion: reduce){.op-bg *{animation-duration:.01s!important;animation-delay:0s!important}}
