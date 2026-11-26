@@ -20,6 +20,12 @@
 :root[data-kise="sakura"]{--bee:#F4A7B9}
 :root[data-kise="sora"]{--bee:#8CCBF0}
 :root[data-kise="wakaba"]{--bee:#A8D672}
+:root[data-kise="aka"]{--bee:#D93A2B;--beeInk:#FFFFFF}
+:root[data-kise="ao"]{--bee:#2D62C8;--beeInk:#FFFFFF}
+:root[data-kise="kuro"]{--bee:#1E1B14;--beeInk:#FFFFFF}
+:root[data-kise="midori"]{--bee:#2E8B4F;--beeInk:#FFFFFF}
+:root[data-kise="orange"]{--bee:#F08A00;--beeInk:#1E1B14}
+:root[data-kise="murasaki"]{--bee:#6B4FC8;--beeInk:#FFFFFF}
 html{font-size:var(--fs);-webkit-text-size-adjust:100%}
 html.f2{--fs:19px} html.f3{--fs:22px}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.6;margin:0}
@@ -321,3 +327,7 @@ html.f3 .hd .brand span{display:none}
 .sec.t-med{background:var(--t-med)}
 .sec.t-today{background:var(--t-today)}
 .sec.t-cal{background:var(--t-cal)}
+
+@media (prefers-color-scheme: dark){:root[data-kise="kuro"]:not([data-theme="light"]){--bee:#000000;--beeInk:#FFFFFF}}
+:root[data-theme="dark"][data-kise="kuro"]{--bee:#000000}
+.kise label .sw{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);display:inline-block}

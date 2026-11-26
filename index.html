@@ -23,6 +23,12 @@
 :root[data-kise="sakura"]{--bee:#F4A7B9}
 :root[data-kise="sora"]{--bee:#8CCBF0}
 :root[data-kise="wakaba"]{--bee:#A8D672}
+:root[data-kise="aka"]{--bee:#D93A2B;--beeInk:#FFFFFF}
+:root[data-kise="ao"]{--bee:#2D62C8;--beeInk:#FFFFFF}
+:root[data-kise="kuro"]{--bee:#1E1B14;--beeInk:#FFFFFF}
+:root[data-kise="midori"]{--bee:#2E8B4F;--beeInk:#FFFFFF}
+:root[data-kise="orange"]{--bee:#F08A00;--beeInk:#1E1B14}
+:root[data-kise="murasaki"]{--bee:#6B4FC8;--beeInk:#FFFFFF}
 html{font-size:var(--fs);-webkit-text-size-adjust:100%}
 html.f2{--fs:19px} html.f3{--fs:22px}
 body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.6;margin:0}
@@ -324,6 +330,10 @@ html.f3 .hd .brand span{display:none}
 .sec.t-med{background:var(--t-med)}
 .sec.t-today{background:var(--t-today)}
 .sec.t-cal{background:var(--t-cal)}
+
+@media (prefers-color-scheme: dark){:root[data-kise="kuro"]:not([data-theme="light"]){--bee:#000000;--beeInk:#FFFFFF}}
+:root[data-theme="dark"][data-kise="kuro"]{--bee:#000000}
+.kise label .sw{width:18px;height:18px;border-radius:50%;border:2px solid var(--ink);display:inline-block}
 </style>
 <div id="app"></div>
 <script>
@@ -1024,7 +1034,7 @@ function vSettings(){
   <div class="sec"><h3>予定の時刻</h3><div class="choose">${r('minStep',15,+s.minStep,'15分きざみ')}${r('minStep',10,+s.minStep,'10分きざみ')}${r('minStep',5,+s.minStep,'5分きざみ')}${r('minStep',1,+s.minStep,'1分きざみ')}</div>
     <div class="f"><span class="lb">よく使う時間帯（この外は「早朝・深夜」にまとめます）</span><span class="tsel"><select data-act="sethr" data-k="hFrom" aria-label="から">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hFrom===i?'selected':''}>${i}時</option>`).join('')}</select>から<select data-act="sethr" data-k="hTo" aria-label="まで">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hTo===i?'selected':''}>${i}時</option>`).join('')}</select>まで</span></div></div>
   <div class="sec"><h3>文字の大きさ</h3><div class="choose">${r('font',1,s.font,'ふつう')}${r('font',2,s.font,'大きめ')}${r('font',3,s.font,'とても大きい')}</div></div>
-  <div class="sec"><h3>着せかえ（色合い）</h3><div class="choose">${r('kise','bee',s.kise,'🟡 きいろ')}${r('kise','sakura',s.kise,'🌸 さくら')}${r('kise','sora',s.kise,'🔵 そら')}${r('kise','wakaba',s.kise,'🌿 わかば')}</div>
+  <div class="sec"><h3>着せかえ（枠の色）</h3><p class="small muted" style="margin:0 0 6px">押すとすぐ変わります。気分で変えてください。</p><div class="choose kise">${[['bee','#F6C915','きいろ'],['aka','#D93A2B','あか'],['ao','#2D62C8','あお'],['kuro','#1E1B14','くろ'],['midori','#2E8B4F','みどり'],['orange','#F08A00','オレンジ'],['murasaki','#6B4FC8','むらさき'],['sakura','#F4A7B9','さくら'],['sora','#8CCBF0','そら'],['wakaba','#A8D672','わかば']].map(([k,c,t])=>r('kise',k,s.kise,`<span class="sw" style="background:${c}"></span>${t}`)).join('')}</div>
     <div class="choose" style="margin-top:8px">${r('theme','',s.theme,'明るさ：スマホに合わせる')}${r('theme','light',s.theme,'明るい')}${r('theme','dark',s.theme,'暗い')}</div></div>
   <div class="sec"><h3>暦</h3><label class="ck"><input type="checkbox" data-act="setcn" ${s.cn?'checked':''}> 中国の祝日・行事も出す（春節・中秋節など）</label></div>
   <div class="list">
