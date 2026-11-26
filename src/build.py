@@ -10,12 +10,12 @@ open('bootin-art.html','w').write('<title>BOOTIN 試作版</title>\n<meta name="
 # pwa
 os.makedirs('pwa',exist_ok=True)
 head=f'''<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>BOOTIN</title><meta name="theme-color" content="#F6C915"><link rel="manifest" href="manifest.webmanifest">
+<title>BOOTIN</title><meta name="theme-color" content="#F6C915"><link rel="manifest" href="manifest.webmanifest?v=2">
 <link rel="icon" href="icon2-192.png"><link rel="apple-touch-icon" href="icon2-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="BOOTIN">
 {fonts}<style>:root{{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}}[hidden]{{display:none!important}}img{{max-width:100%}}</style></head><body>'''
 open('pwa/index.html','w').write(head+body+'</body></html>')
-json.dump({"name":"BOOTIN","short_name":"BOOTIN","start_url":"./","scope":"./","display":"standalone","background_color":"#FBF8EE","theme_color":"#F6C915","lang":"ja",
- "id":"./","icons":[{"src":"icon2-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon2-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icon2-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]},open('pwa/manifest.webmanifest','w'),ensure_ascii=False)
+json.dump({"name":"BOOTIN","short_name":"BOOTIN","start_url":"./?app=2","scope":"./","display":"standalone","background_color":"#FBF8EE","theme_color":"#F6C915","lang":"ja",
+ "id":"./?app=2","icons":[{"src":"icon2-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon2-512.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"icon2-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}]},open('pwa/manifest.webmanifest','w'),ensure_ascii=False)
 ver=str(int(os.path.getmtime('app.js')))
 open('pwa/sw.js','w').write(f"""const C='bootin-{ver}';
 self.addEventListener('install',e=>{{e.waitUntil(caches.open(C).then(c=>c.addAll(['./','index.html','manifest.webmanifest','icon2-192.png','icon2-512.png'])));self.skipWaiting();}});
