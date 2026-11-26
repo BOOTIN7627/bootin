@@ -434,6 +434,7 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 /* 天気の「最新情報に更新」ボタン：濃く大きく */
 .wxrl{background:#1E1B14;color:#fff;border-color:#1E1B14;font-weight:900;display:inline-flex;align-items:center;gap:6px}
 .wxrl .rl{font-size:1.6rem;line-height:1}
+.wxb .wxpl{font-style:normal;font-weight:900;font-size:.95rem;color:var(--ink);background:rgba(255,255,255,.75);border-radius:999px;padding:0 8px;align-self:flex-start;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 
 /* オープニング（約6秒）
    0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
@@ -786,8 +787,8 @@ function vHome(){
   const t=today(); const l=lunar(t); const elder=S.set.mode==='elder';
   const items=itemsOn(t).slice(0,4);
   const w=S.cache.wx&&S.cache.wx.data;
-  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span>${h(S.set.wx.name)}　最高${Math.round(w.daily.temperature_2m_max[0])}℃ 最低${Math.round(w.daily.temperature_2m_min[0])}℃</span></span>`
-    :`<span class="big">🌤️</span><span class="t"><b>天気</b><span>押すと${h(S.set.wx.name)}の天気を見ます</span></span>`;
+  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span>最高${Math.round(w.daily.temperature_2m_max[0])}℃ 最低${Math.round(w.daily.temperature_2m_min[0])}℃</span></span>`
+    :`<span class="big">🌤️</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>天気</b><span>押すと天気を見ます</span></span>`;
   const ot=OTAYORI[0];
   let grid=S.set.grid.slice(0,9); while(grid.length<9) grid.push('');
   const show=elder?grid.slice(0,6):grid;
