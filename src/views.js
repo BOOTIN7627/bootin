@@ -55,7 +55,7 @@ function vHome(){
     <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button><button class="btn plain" data-go="cal/${t.slice(0,7)}">📅 カレンダー</button></div></div>`;
   const fav=elder?S.people.filter(p=>p.fav&&p.phones&&p.phones[0]&&p.phones[0].num):[];
   return `
-  <div class="hcol1"><div class="hd"><div class="brand grow"><img src="${BOO_F}" alt=""><span>BOOTIN</span></div>
+  <div class="hcol1"><div class="hd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
     <button class="ib ghost" data-go="search/" aria-label="探す">🔍 探す</button>
     <button class="ib help" data-act="otasuke">🆘 おたすけ</button></div>
   <button class="clock" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>

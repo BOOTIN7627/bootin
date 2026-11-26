@@ -1,0 +1,33 @@
+
+/* オープニング */
+.op-bg{position:fixed;inset:0;z-index:100;background:var(--bee);display:flex;align-items:center;justify-content:center;overflow:hidden;animation:opIn .25s ease-out}
+.op-bg.op-out{opacity:0;transition:opacity .25s}
+.op-stage{position:relative;width:min(92vw,420px);height:min(92vw,420px)}
+.op-burst{position:absolute;inset:-40%;background:repeating-conic-gradient(rgba(255,255,255,.35) 0 10deg,transparent 10deg 20deg);border-radius:50%;animation:opSpin 8s linear infinite, opFade 1s ease-out both}
+.op-boo{position:absolute;left:16%;bottom:8%;width:68%;aspect-ratio:218/210;animation:opBan .6s cubic-bezier(.2,1.6,.4,1) both, opHit .35s 2.7s ease-in-out both, opMoji 1.2s 3.4s ease-in-out 3 both}
+.op-boo img{position:absolute;inset:0;width:100%;height:100%}
+.op-b2{opacity:0;animation:opShow .01s 3.1s forwards}
+.op-b1{animation:opHide .01s 3.1s forwards}
+.op-shades{position:absolute;left:26%;top:33%;width:46%;transform-origin:50% 50%;animation:opFly 1s 2.85s cubic-bezier(.3,.2,.5,1) forwards}
+.op-pow{position:absolute;left:30%;top:-10%;font:900 2rem var(--f-disp);color:#E0452B;-webkit-text-stroke:1px #fff;opacity:0;animation:opPop .4s 2.75s both, opHide .2s 3.7s forwards}
+.op-sweat{position:absolute;right:12%;top:18%;font-size:1.4rem;opacity:0;animation:opShow .3s 3.6s forwards}
+.op-en{position:absolute;right:-60%;top:-4%;width:42%;animation:opEn .5s 2.0s cubic-bezier(.2,1.3,.4,1) forwards, opEnHit .4s 2.6s ease-in both}
+.op-say{position:absolute;background:#fff;color:#1E1B14;border:3px solid #1E1B14;border-radius:18px;padding:8px 14px;font:900 1.15rem var(--f-disp);white-space:nowrap;opacity:0;box-shadow:0 4px 0 #1E1B14}
+.op-s1{left:2%;top:0;animation:opPop .4s .5s both, opHide .01s 2.1s forwards}
+.op-s2{left:0;top:-14%;animation:opPop .4s 2.3s both, opHide .01s 3.4s forwards}
+.op-s3{left:0;top:14%;animation:opPop .4s 3.6s both}
+.op-logo{position:absolute;left:0;right:0;bottom:-18%;text-align:center;font:900 2.2rem var(--f-disp);color:var(--beeInk);letter-spacing:.08em;opacity:0;animation:opPop .5s 4.6s both}
+.op-close{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));background:#111;color:#fff;border:0;border-radius:999px;padding:10px 20px;font-weight:900}
+@keyframes opIn{from{opacity:0}to{opacity:1}}
+@keyframes opSpin{to{transform:rotate(360deg)}}
+@keyframes opFade{from{opacity:0}to{opacity:1}}
+@keyframes opBan{0%{transform:scale(.1) rotate(-20deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes opHit{0%,100%{transform:translate(0,0)}40%{transform:translate(0,10px) scale(1,.92)}}
+@keyframes opMoji{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg)}75%{transform:rotate(4deg)}}
+@keyframes opFly{to{transform:translate(-160%,-260%) rotate(-540deg);opacity:0}}
+@keyframes opEn{to{right:4%}}
+@keyframes opEnHit{0%,100%{transform:none}50%{transform:translate(-55%,30%) rotate(-30deg)}}
+@keyframes opPop{0%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
+@keyframes opShow{to{opacity:1}}
+@keyframes opHide{to{opacity:0}}
+@media (prefers-reduced-motion: reduce){.op-bg *{animation-duration:.01s!important;animation-delay:0s!important}}

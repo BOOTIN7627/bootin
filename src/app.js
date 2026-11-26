@@ -36,7 +36,7 @@ function routeView(r){
 function sideNav(){
   const r=cur(); const reds=ROOTS.filter(x=>!isOff(x));
   const it=(go,em,t,act)=>`<button class="sn ${act?'on':''}" ${go.startsWith('@')?`data-act="${go.slice(1)}"`:`data-go="${go}"`}><span>${em}</span>${h(t)}</button>`;
-  return `<aside class="side"><div class="brand"><img src="${BOO_F}" alt="">BOOTIN</div>
+  return `<aside class="side"><button class="brand" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt="">BOOTIN</button>
   ${r==='home'?it('home','🏠','トップ',true):`<button class="sn topsn" data-go="home"><span class="topbtn">TOPへ</span></button>`}${it('cal/'+today().slice(0,7),'📅','カレンダー',r.startsWith('cal'))}${it('day/'+today(),'🗓️','今日の1日カード',r.startsWith('day'))}
   <div class="sn-h">入口</div>${reds.map(id=>`<button class="sn ${r==='node/'+id?'on':''}" data-act="open" data-id="${h(id)}"><span>${RED_EMOJI[id]}</span>${h(id)}</button>`).join('')}
   <div class="sn-h">いつでも</div>${it('memo','✏️','さっとメモ',r==='memo')}${it('search/','🔍','探す',r.startsWith('search'))}${it('tools','🧰','便利道具',r==='tools')}${it('@otasuke','🆘','おたすけ')}</aside>`;
@@ -154,6 +154,7 @@ const ACTS={
     if(!exists){ const b=bigs[0]; S.set.genres[b]=S.set.genres[b]||[]; S.set.genres[b].push(v); save(); toast('「'+v+'」を「'+b+'」に足しました'); }
     const sel=[...new Set($$('#pl-genre input:checked').map(x=>x.value).concat(v))]; inp.value=''; $('#pl-genre').innerHTML=genreChips(bigs,sel); },
   plg:(el,d)=>{ UI.plG=d.c; render(); },
+  opening:()=>playOpening(),
   menu:()=>{ const bg=sheet('MENU',`<div class="grid menu">${menuCells()}</div>
     <div class="btns" style="margin-top:10px"><button class="btn plain" data-go="search/">🔍 探す</button><button class="btn plain" data-go="people">📇 人物帳</button><button class="btn plain" data-go="places">🏢 施設帳</button><button class="btn plain" data-go="settings">⚙️ 設定</button></div>`);
     bg.querySelectorAll('[data-act=open],[data-go]').forEach(b=>b.addEventListener('click',()=>setTimeout(()=>bg.remove(),0))); },
