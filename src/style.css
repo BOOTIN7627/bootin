@@ -463,3 +463,6 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .gd summary{font-weight:900;font-size:1.02rem;cursor:pointer}
 .gd details p{margin:6px 0 2px;line-height:1.6}
 .wxb .hilo i{font-style:normal;display:inline-block;white-space:nowrap}
+.wxb .wxlbl{font-size:.72rem;font-weight:900;color:var(--sub);line-height:1.1;margin-top:2px}
+.gdcatch{font-weight:900;font-size:1.05rem;background:#FFF7D6;border:2px solid #E0B800;border-radius:12px;padding:8px 12px;margin:0 0 8px;text-align:center}
+.gdcatch b{font-family:var(--f-disp);font-size:1.2rem}

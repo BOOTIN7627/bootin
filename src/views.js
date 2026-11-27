@@ -38,7 +38,7 @@ function vHome(){
   const t=today(); const l=lunar(t); const elder=S.set.mode==='elder';
   const items=itemsOn(t).slice(0,4);
   const w=S.cache.wx&&S.cache.wx.data;
-  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
+  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><small class="wxlbl">気温</small><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
     :`<span class="big">🌤️</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>天気</b><span>押すと天気を見ます</span></span>`;
   const ot=OTAYORI[0];
   let grid=S.set.grid.slice(0,9); while(grid.length<9) grid.push('');
@@ -530,7 +530,7 @@ function vSearch(q){
 function vSettings(){
   const s=S.set; const r=(name,val,cur,label)=>`<label><input type="radio" name="${name}" value="${val}" ${cur===val?'checked':''} data-act="setr">${label}</label>`;
   return sub('設定',`
-  <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
+  <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>万能ライフサポートアプリ「BOOTIN」の細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
   <div class="list">
     <button class="row" data-act="gotoedit"><span class="em">⇄</span><span class="t"><b>トップの9マスを変える</b><span>赤・青・黄の枠から自由に選んで置けます</span></span><span class="go">›</span></button>
     <button class="row" data-go="features"><span class="em">🔌</span><span class="t"><b>機能のオン・オフ</b><span>使わない機能を表示しないようにできます（いつでも戻せます）</span></span><span class="go">›</span></button>

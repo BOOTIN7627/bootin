@@ -46,7 +46,7 @@ function vGuide(){
   const q=(UI.gQ||'').trim();
   const secs=GUIDE.map(([em,t,items])=>{ const it=items.filter(([a,b])=>!q||(t+a+b).includes(q)); if(!it.length) return '';
     return `<div class="sec gd"><h3>${em} ${h(t)}</h3>${it.map(([a,b])=>`<details ${q?'open':''}><summary>${h(a)}</summary><p>${h(b)}</p></details>`).join('')}</div>`; }).join('');
-  return sub('使い方の説明',`<p class="small muted" style="margin:0 0 6px">知りたい項目を押すと説明が開きます。言葉で探すこともできます。</p>
+  return sub('使い方の説明',`<div class="gdcatch">万能ライフサポートアプリ<b>「BOOTIN」</b>の使い方</div><p class="small muted" style="margin:0 0 6px">知りたい項目を押すと説明が開きます。言葉で探すこともできます。</p>
   <input class="search" id="gq" type="search" placeholder="🔍 例：洗濯物、祝日、場所" value="${h(UI.gQ||'')}">
   <div id="glist">${secs||'<div class="empty">見つかりませんでした</div>'}</div>`,{crumb:'設定・機能'});
 }

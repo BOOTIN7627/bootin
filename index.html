@@ -466,6 +466,9 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .gd summary{font-weight:900;font-size:1.02rem;cursor:pointer}
 .gd details p{margin:6px 0 2px;line-height:1.6}
 .wxb .hilo i{font-style:normal;display:inline-block;white-space:nowrap}
+.wxb .wxlbl{font-size:.72rem;font-weight:900;color:var(--sub);line-height:1.1;margin-top:2px}
+.gdcatch{font-weight:900;font-size:1.05rem;background:#FFF7D6;border:2px solid #E0B800;border-radius:12px;padding:8px 12px;margin:0 0 8px;text-align:center}
+.gdcatch b{font-family:var(--f-disp);font-size:1.2rem}
 
 /* オープニング（約6秒）
    0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
@@ -818,7 +821,7 @@ function vHome(){
   const t=today(); const l=lunar(t); const elder=S.set.mode==='elder';
   const items=itemsOn(t).slice(0,4);
   const w=S.cache.wx&&S.cache.wx.data;
-  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
+  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><small class="wxlbl">気温</small><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
     :`<span class="big">🌤️</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>天気</b><span>押すと天気を見ます</span></span>`;
   const ot=OTAYORI[0];
   let grid=S.set.grid.slice(0,9); while(grid.length<9) grid.push('');
@@ -1310,7 +1313,7 @@ function vSearch(q){
 function vSettings(){
   const s=S.set; const r=(name,val,cur,label)=>`<label><input type="radio" name="${name}" value="${val}" ${cur===val?'checked':''} data-act="setr">${label}</label>`;
   return sub('設定',`
-  <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
+  <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>万能ライフサポートアプリ「BOOTIN」の細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
   <div class="list">
     <button class="row" data-act="gotoedit"><span class="em">⇄</span><span class="t"><b>トップの9マスを変える</b><span>赤・青・黄の枠から自由に選んで置けます</span></span><span class="go">›</span></button>
     <button class="row" data-go="features"><span class="em">🔌</span><span class="t"><b>機能のオン・オフ</b><span>使わない機能を表示しないようにできます（いつでも戻せます）</span></span><span class="go">›</span></button>
@@ -1716,7 +1719,7 @@ function vGuide(){
   const q=(UI.gQ||'').trim();
   const secs=GUIDE.map(([em,t,items])=>{ const it=items.filter(([a,b])=>!q||(t+a+b).includes(q)); if(!it.length) return '';
     return `<div class="sec gd"><h3>${em} ${h(t)}</h3>${it.map(([a,b])=>`<details ${q?'open':''}><summary>${h(a)}</summary><p>${h(b)}</p></details>`).join('')}</div>`; }).join('');
-  return sub('使い方の説明',`<p class="small muted" style="margin:0 0 6px">知りたい項目を押すと説明が開きます。言葉で探すこともできます。</p>
+  return sub('使い方の説明',`<div class="gdcatch">万能ライフサポートアプリ<b>「BOOTIN」</b>の使い方</div><p class="small muted" style="margin:0 0 6px">知りたい項目を押すと説明が開きます。言葉で探すこともできます。</p>
   <input class="search" id="gq" type="search" placeholder="🔍 例：洗濯物、祝日、場所" value="${h(UI.gQ||'')}">
   <div id="glist">${secs||'<div class="empty">見つかりませんでした</div>'}</div>`,{crumb:'設定・機能'});
 }
