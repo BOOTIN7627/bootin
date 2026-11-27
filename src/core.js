@@ -17,7 +17,7 @@ const IMPL={
   '設定・機能/マイルームの設定/データと見やすさ':'data',
   'NEWS・知識/NEWS/天気の詳細':'weather','生活管理/天気・防災/天気':'weather','生活管理/天気・防災/防災情報':'bosai',
   'おたのしみ/ぶーちん劇場/劇場':'otayori',
-  '私と家族/マイプロフィール/マイプロフィール':'profile','生活管理/日常管理/地域コミュニティ':'chiiki','生活管理/家計管理/家計管理':'kakei','私と家族/家族のプロフィール/学生の子':'school','おたのしみ/ゲーム/はじめのゲーム':'brain','NEWS・知識/辞書/辞書':'dict','私と家族/マイプロフィール/もしものとき':'me'
+  '私と家族/マイプロフィール/マイプロフィール':'profile','生活管理/日常管理/地域コミュニティ':'chiiki','生活管理/家計管理/家計管理':'kakei','私と家族/家族のプロフィール/子育て':'kids','私と家族/家族のプロフィール/学生の子':'school','おたのしみ/ゲーム/はじめのゲーム':'brain','NEWS・知識/辞書/辞書':'dict','私と家族/マイプロフィール/もしものとき':'me'
 };
 /* 外せない土台 */
 const LOCKED=new Set(['設定・機能','設定・機能/トップ画面の設定','設定・機能/トップ画面の設定/出すものと見た目','設定・機能/マイルームの設定','設定・機能/マイルームの設定/データと見やすさ','設定・機能/その他の機能','設定・機能/その他の機能/聞く・探す','設定・機能/その他の機能/さっとメモ（メモの一元管理）','おたのしみ','おたのしみ/ぶーちん劇場','おたのしみ/ぶーちん劇場/劇場']);
@@ -197,6 +197,7 @@ function itemsOn(s,catFilter){
     const mb=S.set.me&&S.set.me.bday; if(/^\d{4}-\d\d-\d\d$/.test(mb||'')&&mb.slice(5)===s.slice(5)&&mb<=s) out.push({k:'an',a:{name:'あなたの誕生日',me:true},allday:true,time:'',color:'#D6457A',yrs:age(mb,s)});
     for(const a of (S.annivs||[])){ if(a.date&&a.date.slice(5)===s.slice(5)&&a.date<=s){ const y=+s.slice(0,4)-+a.date.slice(0,4); out.push({k:'an',a,allday:true,time:'',color:'#C07A00',yrs:a.date.startsWith('0000')||y<=0?null:y}); } }
   }
+  if(!catFilter||catFilter==='kids') out.push(...kidItemsOn(s));
   out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||(!!a.unk-!!b.unk)||a.time.localeCompare(b.time));
   return out;
 }

@@ -12,7 +12,7 @@ const num=v=>v===''||v==null||isNaN(+v)?null:+v;
 function lineChart(series,opt={}){
   const all=series.flatMap(s=>s.pts); if(all.length<1) return '';
   const W=320,H=opt.h||120,L=34,R=8,T=10,B=20;
-  const xs=[...new Set(all.map(p=>p[0]))].sort(); const xi=d=>xs.length<2?(W-L-R)/2:(xs.indexOf(d)/(xs.length-1))*(W-L-R);
+  const xs=[...new Set(all.map(p=>p[0]))].sort(); const x0=dnum(xs[0]), x1=dnum(xs[xs.length-1]); const xi=d=>x1===x0?(W-L-R)/2:((dnum(d)-x0)/(x1-x0))*(W-L-R);
   let lo=Math.min(...all.map(p=>p[1])),hi=Math.max(...all.map(p=>p[1])); if(lo===hi){lo-=1;hi+=1;} const pd=(hi-lo)*.12; lo-=pd; hi+=pd;
   const y=v=>T+(1-(v-lo)/(hi-lo))*(H-T-B);
   const fmt=v=>Math.abs(hi-lo)<10?v.toFixed(1):Math.round(v);

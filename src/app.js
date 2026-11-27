@@ -32,6 +32,7 @@ function routeView(r){
     case 'profile': return vProfile();
     case 'health': return vHealth();
     case 'todo': return vTodo();
+    case 'kids': return vKids(arg);
     case 'kakei': return vKakei(arg);
     case 'chiiki': return vChiiki();
     case 'toban': return vToban();
@@ -94,6 +95,7 @@ function after(r){
   const imf=$('#imp-file'); if(imf) imf.addEventListener('change',()=>{const f=imf.files[0]; if(!f) return; const fr=new FileReader(); fr.onload=()=>doImport(fr.result); fr.readAsText(f);});
   const hd=$('#hl-date'); if(hd) hd.addEventListener('change',()=>{UI.hDate=hd.value; render();});
   const dw=$('#dict-w'); if(dw) dw.addEventListener('input',()=>{UI.dictW=dw.value.trim(); $$('a[data-dict]').forEach(a=>{a.href=UI.dictW?a.dataset.dict+encodeURIComponent(UI.dictW):'#'; a.querySelector('.t span').textContent=UI.dictW||'言葉を入れてから押します';});});
+  kidsAfter();
   medAfter();
   $$('details.tree[data-red]').forEach(d=>d.addEventListener('toggle',()=>{d.open?UI.openReds.add(d.dataset.red):UI.openReds.delete(d.dataset.red);}));
 }
