@@ -71,9 +71,10 @@ function wxComment(d){
   if(hi>=31) s.push('暑さが厳しいので、水分をこまめにとってください。'); if(lo<=0) s.push('朝は氷点下。道路の凍結に気をつけて。');
   return s.join('');
 }
+function teruMood(d){ try{ const p=d.daily.precipitation_probability_max[0]||0, c=d.current.weather_code; if(c>=51||p>=60) return 'sad'; if(c<=1) return 'joy'; if(d.daily.temperature_2m_max[0]>=31) return 'ang'; }catch(e){} return 'n'; }
 function wxBosaiSec(d){
   const b=bosaiNow(); const ov=b&&b.ov; const cm=wxComment(d);
-  let html=`<div class="sec wxcm"><h3>🎙️ 今日の天気のひとこと</h3><p style="margin:0">${h(cm)}</p>${ov&&ov.text?`<details style="margin-top:8px"><summary><b>${h(ov.office||'気象台')}の解説を読む</b></summary><p class="small" style="white-space:pre-wrap;margin:6px 0 0">${h(ov.text)}</p><p class="small muted" style="margin:4px 0 0">${h((ov.time||'').slice(0,16).replace('T',' '))} 発表</p></details>`:''}</div>`;
+  let html=`<div class="sec wxcm"><h3>🎙️ 今日の天気のひとこと</h3><div class="wxteru"><button data-go="chara/teru" aria-label="てるぼうの紹介"><img src="${charaImg('teru',teruMood(d))}" alt=""><span>天気の係<br>てるぼう</span></button><p style="margin:0">${h(cm)}</p></div>${ov&&ov.text?`<details style="margin-top:8px"><summary><b>${h(ov.office||'気象台')}の解説を読む</b></summary><p class="small" style="white-space:pre-wrap;margin:6px 0 0">${h(ov.text)}</p><p class="small muted" style="margin:4px 0 0">${h((ov.time||'').slice(0,16).replace('T',' '))} 発表</p></details>`:''}</div>`;
   const wl=b&&b.warn?b.warn.list:[];
   html+=`<button class="row bosairow" data-go="bosai"><span class="em">🛟</span><span class="t"><b>防災情報（警報・地震・台風）</b><span>${wl.length?h(wl.map(x=>x.name).join('・')):(b&&b.warn?'今、警報・注意報は出ていません':'押すと警報・地震・台風を見ます')}</span></span><span class="go">›</span></button>`;
   return html;
