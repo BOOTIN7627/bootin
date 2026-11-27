@@ -493,7 +493,11 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .htbl .hh{font-weight:700;color:var(--sub)}.htbl em{grid-column:2/-1;font-style:normal;color:var(--sub);font-size:.8rem}
 .hcks{display:flex;flex-wrap:wrap;gap:6px}.hcks span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.88rem}
 .hcks i{font-style:normal;font-weight:700;margin-left:4px}.hcks i.up{color:#D32F2F}.hcks i.dn{color:#1565C0}
-.hck1{margin:0 0 10px}.hadd summary{cursor:pointer;font-weight:700;color:var(--accent);padding:6px 0}
+.hck1{margin:0 0 10px}
+.ikrow{padding:8px 0;border-bottom:1px dashed var(--line)}.ikrep{display:flex;gap:8px;align-items:flex-start;background:var(--soft);border-radius:12px;padding:8px;margin-top:6px}
+.ikrep img{width:34px;height:34px;flex:none}.ikrep b{display:block;font-size:.8rem;color:var(--sub)}
+.ikrow textarea{width:100%;margin-top:6px;padding:8px;border:2px solid var(--line);border-radius:10px;font:inherit;background:var(--card)}
+.row.room{opacity:.75}.hadd summary{cursor:pointer;font-weight:700;color:var(--accent);padding:6px 0}
 .t-stu .stuh{font-size:.95rem;margin:10px 0 4px}
 .ttday{display:flex;flex-wrap:wrap;gap:4px}.ttday span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.9rem}.ttday b{color:var(--accent);margin-right:4px}
 .todo{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
@@ -1384,7 +1388,9 @@ function vSettings(){
     <button class="row" data-go="data"><span class="em">💾</span><span class="t"><b>データ（書き出し・読み込み・見本）</b><span>スマホの中に保存しているデータの管理</span></span><span class="go">›</span></button>
     <button class="row" data-go="install"><span class="em">📲</span><span class="t"><b>ホーム画面に置く方法</b><span>アプリのように1回押しで開けます</span></span><span class="go">›</span></button>
   </div>
-  <p class="small muted">BOOTIN 試作版 ${VERSION}</p>`,{crumb:'設定・機能'});
+  <p class="small muted">BOOTIN 試作版 ${VERSION}</p>
+  <div class="sec"><h3>ご意見・ご要望</h3><div class="list"><button class="row" data-go="iken"><span class="em">📮</span><span class="t"><b>ぶーちんへのご意見・ご要望</b><span>使いにくいところ、ほしい機能を送れます。返事も届きます</span></span><span class="go">›</span></button>
+    <button class="row room" data-go="room"><span class="em">🐷</span><span class="t"><b>ぶーちんの部屋</b><span>合言葉で入る部屋です</span></span><span class="go">🔒</span></button></div></div>`,{crumb:'設定・機能'});
 }
 function vFeatures(){
   const sw=(id,cls)=>{const n=NODES[id];const lock=LOCKED.has(id);const on=!S.set.off[id]||lock;
@@ -1744,6 +1750,9 @@ const GUIDE=[
   ['時間割・テスト','時間割は「直す」で書き込みます。今日の時間割はトップにも出ます。テストの点、部活・塾・進路のメモも書けます。'],
   ['脳トレ','かんたんな計算を10問。全部正解したときの一番早い時間が残ります。'],
   ['辞書','言葉を入れて、国語・英和・中国語・漢字などの無料の辞書サイトを開きます。']]],
+ ['📮','ご意見・ご要望',[
+  ['送る','「設定 → ご意見・ご要望」から、使いにくいところや、ほしい機能を送れます。作っている人に届きます。'],
+  ['返事','返事は同じ画面の「送ったものと、ぶーちんからの返事」に出ます。「返事を見る」を押すと新しくなります。']]],
  ['🌤️','天気',[
   ['トップの天気の枠','いちばん上に「📍静岡」のように、どこの天気かを出しています。枠か「時間ごとの天気」を押すと詳しい天気が開きます。'],
   ['場所を変える','天気の画面の「場所」で町を選ぶか、「📍 今いる場所にする」を押します。防災情報や日の入りの時刻も、この場所に合わせて変わります。'],
@@ -1820,6 +1829,8 @@ function routeView(r){
     case 'profile': return vProfile();
     case 'health': return vHealth();
     case 'todo': return vTodo();
+    case 'iken': return vIken();
+    case 'room': return vRoom();
     case 'school': return vSchool();
     case 'brain': return vBrain();
     case 'dict': return vDict();
@@ -2118,11 +2129,6 @@ function addSample(){
   save();
 }
 
-/* はじめ */
-load();
-if(!IN_FRAME){ const r=decodeURI(location.hash.slice(1)); if(r&&r!=='home') stack=['home',r]; try{history.replaceState(null,'','#'+cur());}catch(e){} }
-render();
-if('serviceWorker' in navigator && !IN_FRAME && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}); }
 
 /* ===== ゴミ出しの日 =====
    S.gomi=[{id,name,em,mode:'week'|'nth',days:[0-6],nth:[1-5]}]
@@ -2474,6 +2480,60 @@ function modeSec(){
     <p class="small muted" style="margin:4px 0 0">高齢者モード：トップを大きな6マスにして「よく電話する人」を上に出します。<br>学生モード：トップを「カレンダー・やること・時間割とテスト・脳トレ・辞書・家族に連絡」の6マスにします。ビジネスの入口は出しません。</p>
     ${s.mode==='student'&&!locked?`<form data-form="pin" class="two" style="margin-top:8px"><div class="f"><label for="pin-set">親の合言葉（4けた・なくてもよい）</label><input id="pin-set" name="pin" inputmode="numeric" maxlength="4" value="${h(s.parentPin||'')}"></div><div class="f" style="align-self:end"><button class="btn plain" type="submit">決める</button></div></form><p class="small muted" style="margin:0">決めておくと、学生モードから戻すときに聞きます。</p>`:''}</div>`;
 }
+
+/* ===== ご意見・ご要望 と ぶーちんの部屋 =====
+   受け渡し場所は Google スプレッドシート＋Apps Script（無料）。FB_URL にその公開アドレスを入れる。
+   合言葉はスクリプトの側だけで確かめる（このファイルは誰でも見られるので、合言葉は書かない）。
+   S.set.fbId＝このスマホの目印（返事を受け取るため） S.fbSeen＝読んだ返事のid */
+const FB_URL='';
+function fbId(){ if(!S.set.fbId){ S.set.fbId='u'+uid()+uid(); save(); } return S.set.fbId; }
+async function fbCall(body){
+  const r=await fetch(FB_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),redirect:'follow'});
+  if(!r.ok) throw new Error('http'); const d=await r.json(); if(d.err) throw new Error(d.err); return d;
+}
+let FB={mine:null,loading:false,err:'',room:null,pass:''};
+function fbLoadMine(){ if(!FB_URL||FB.loading) return; FB.loading=true; FB.at=Date.now();
+  fbCall({a:'mine',uid:fbId()}).then(d=>{FB.mine=d.rows||[];FB.err='';}).catch(()=>{FB.err='読み込めませんでした';}).finally(()=>{FB.loading=false; if(cur()==='iken') render();}); }
+function vIken(){
+  if(!FB_URL) return sub('ご意見・ご要望',`<div class="junbi">${BOO_IMG}<div><span class="stamp">【準備中】</span></div><p>ぶーちんへのご意見・ご要望を送る窓口を、ただいま準備しています。</p></div>`,{crumb:'設定・機能'});
+  if((FB.mine===null||Date.now()-(FB.at||0)>20000)&&!FB.err) fbLoadMine();
+  const me=S.set.me||{};
+  const mine=(FB.mine||[]).slice().reverse();
+  return sub('ご意見・ご要望',`${sayBoo('使ってみて「ここが使いにくい」「こんなのがほしい」と思ったら、なんでも書いて送ってね。作っている人に届くよ。')}
+  <form class="sec" data-form="iken"><div class="f"><label for="ik-n">お名前（ニックネームでも）</label><input id="ik-n" name="name" value="${h(UI.ikName??(me.name||''))}" maxlength="40"></div>
+    <div class="f"><label for="ik-t">ご意見・ご要望</label><textarea id="ik-t" name="text" rows="5" required maxlength="2000" placeholder="例：カレンダーの文字をもう少し大きくしてほしい"></textarea></div>
+    <p class="small muted" style="margin:0 0 6px">暗証番号・カード番号・マイナンバーは書かないでください。</p>
+    <div class="btns"><button class="btn" type="submit" ${UI.ikSending?'disabled':''}>${UI.ikSending?'送っています…':'送る'}</button></div></form>
+  <div class="sec"><h3>送ったものと、ぶーちんからの返事</h3>
+    ${FB.err?`<p class="small" style="color:var(--warn)">${FB.err}</p>`:''}${FB.mine===null&&!FB.err?'<p class="small muted">読み込んでいます…</p>':''}
+    ${mine.map(m=>`<div class="ikrow"><div class="small muted">${h(fmtTs(m.time))}</div><div>${h(m.text)}</div>${m.reply?`<div class="ikrep"><img src="${BOO_F}" alt=""><span><b>ぶーちんより</b>${h(m.reply)}</span></div>`:'<div class="small muted">まだ返事はありません</div>'}</div>`).join('')||(FB.mine?'<p class="small muted" style="margin:0">まだ送っていません。</p>':'')}
+    <div class="btns"><button class="btn plain" data-act="ikreload">返事を見る 🔄</button></div></div>`,{crumb:'設定・機能'});
+}
+function fmtTs(t){ const d=new Date(t); if(isNaN(d)) return ''; return `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${pad(d.getMinutes())}`; }
+function vRoom(){
+  const body=!FB_URL?'<p>受け渡し場所の設定がまだです。</p>'
+   :FB.room===null?`<form class="sec" data-form="room"><h3>🔑 合言葉</h3><div class="f"><input id="rm-p" name="pass" type="password" autocomplete="current-password" aria-label="合言葉" required></div><div class="btns"><button class="btn" type="submit">入る</button></div>${FB.err?`<p class="small" style="color:var(--warn)">${h(FB.err)}</p>`:''}</form>`
+   :`<p class="small muted">届いたご意見 ${FB.room.length}件（新しい順）</p>${FB.room.slice().reverse().map(m=>`<div class="sec ikrow"><div class="small muted">${h(fmtTs(m.time))}　<b>${h(m.name||'名前なし')}</b></div><div style="white-space:pre-wrap">${h(m.text)}</div>
+     <form data-form="rreply" data-id="${h(m.id)}"><textarea name="text" rows="2" placeholder="返事を書く" aria-label="返事">${h(m.reply||'')}</textarea><div class="btns"><button class="btn plain" type="submit">${m.reply?'返事を直す':'返事を送る'}</button></div></form></div>`).join('')}
+     <div class="btns"><button class="btn plain" data-act="roomreload">新しく読み直す 🔄</button><button class="btn plain" data-act="roomout">部屋を出る</button></div>`;
+  return sub('ぶーちんの部屋',`${sayBoo('ここは作っている人だけが入れる部屋だよ。')}${body}`,{crumb:'設定・機能'});
+}
+function roomLoad(){ return fbCall({a:'list',pass:FB.pass}).then(d=>{FB.room=d.rows||[];FB.err='';}).catch(e=>{FB.room=null;FB.err=e.message==='pass'?'合言葉がちがいます':'読み込めませんでした';}).finally(()=>render()); }
+Object.assign(ACTS,{
+  ikreload:()=>{ FB.mine=null; FB.err=''; render(); },
+  roomreload:()=>{ roomLoad(); },
+  roomout:()=>{ FB.room=null; FB.pass=''; render(); }
+});
+FORMS.iken=(f,fd)=>{ const text=String(fd.get('text')||'').trim(); if(!text) return; UI.ikName=String(fd.get('name')||'').trim(); UI.ikSending=true; render();
+  fbCall({a:'send',uid:fbId(),name:UI.ikName,text}).then(()=>{toast('送りました。ありがとう！'); FB.mine=null;}).catch(()=>toast('送れませんでした。電波のよいところでもう一度')).finally(()=>{UI.ikSending=false; render();}); };
+FORMS.room=(f,fd)=>{ FB.pass=String(fd.get('pass')||''); roomLoad(); };
+FORMS.rreply=(f,fd)=>{ const text=String(fd.get('text')||'').trim(); fbCall({a:'reply',pass:FB.pass,id:f.dataset.id,text}).then(()=>{toast('返事を送りました'); roomLoad();}).catch(()=>toast('送れませんでした')); };
+
+/* はじめ */
+load();
+if(!IN_FRAME){ const r=decodeURI(location.hash.slice(1)); if(r&&r!=='home') stack=['home',r]; try{history.replaceState(null,'','#'+cur());}catch(e){} }
+render();
+if('serviceWorker' in navigator && !IN_FRAME && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}); }
 
 </script>
 </body></html>

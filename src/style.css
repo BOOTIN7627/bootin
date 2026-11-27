@@ -490,7 +490,11 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .htbl .hh{font-weight:700;color:var(--sub)}.htbl em{grid-column:2/-1;font-style:normal;color:var(--sub);font-size:.8rem}
 .hcks{display:flex;flex-wrap:wrap;gap:6px}.hcks span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.88rem}
 .hcks i{font-style:normal;font-weight:700;margin-left:4px}.hcks i.up{color:#D32F2F}.hcks i.dn{color:#1565C0}
-.hck1{margin:0 0 10px}.hadd summary{cursor:pointer;font-weight:700;color:var(--accent);padding:6px 0}
+.hck1{margin:0 0 10px}
+.ikrow{padding:8px 0;border-bottom:1px dashed var(--line)}.ikrep{display:flex;gap:8px;align-items:flex-start;background:var(--soft);border-radius:12px;padding:8px;margin-top:6px}
+.ikrep img{width:34px;height:34px;flex:none}.ikrep b{display:block;font-size:.8rem;color:var(--sub)}
+.ikrow textarea{width:100%;margin-top:6px;padding:8px;border:2px solid var(--line);border-radius:10px;font:inherit;background:var(--card)}
+.row.room{opacity:.75}.hadd summary{cursor:pointer;font-weight:700;color:var(--accent);padding:6px 0}
 .t-stu .stuh{font-size:.95rem;margin:10px 0 4px}
 .ttday{display:flex;flex-wrap:wrap;gap:4px}.ttday span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.9rem}.ttday b{color:var(--accent);margin-right:4px}
 .todo{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}

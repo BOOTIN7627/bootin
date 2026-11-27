@@ -32,6 +32,8 @@ function routeView(r){
     case 'profile': return vProfile();
     case 'health': return vHealth();
     case 'todo': return vTodo();
+    case 'iken': return vIken();
+    case 'room': return vRoom();
     case 'school': return vSchool();
     case 'brain': return vBrain();
     case 'dict': return vDict();
@@ -330,8 +332,3 @@ function addSample(){
   save();
 }
 
-/* はじめ */
-load();
-if(!IN_FRAME){ const r=decodeURI(location.hash.slice(1)); if(r&&r!=='home') stack=['home',r]; try{history.replaceState(null,'','#'+cur());}catch(e){} }
-render();
-if('serviceWorker' in navigator && !IN_FRAME && location.protocol==='https:'){ navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}); }

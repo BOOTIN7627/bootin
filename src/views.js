@@ -556,7 +556,9 @@ function vSettings(){
     <button class="row" data-go="data"><span class="em">💾</span><span class="t"><b>データ（書き出し・読み込み・見本）</b><span>スマホの中に保存しているデータの管理</span></span><span class="go">›</span></button>
     <button class="row" data-go="install"><span class="em">📲</span><span class="t"><b>ホーム画面に置く方法</b><span>アプリのように1回押しで開けます</span></span><span class="go">›</span></button>
   </div>
-  <p class="small muted">BOOTIN 試作版 ${VERSION}</p>`,{crumb:'設定・機能'});
+  <p class="small muted">BOOTIN 試作版 ${VERSION}</p>
+  <div class="sec"><h3>ご意見・ご要望</h3><div class="list"><button class="row" data-go="iken"><span class="em">📮</span><span class="t"><b>ぶーちんへのご意見・ご要望</b><span>使いにくいところ、ほしい機能を送れます。返事も届きます</span></span><span class="go">›</span></button>
+    <button class="row room" data-go="room"><span class="em">🐷</span><span class="t"><b>ぶーちんの部屋</b><span>合言葉で入る部屋です</span></span><span class="go">🔒</span></button></div></div>`,{crumb:'設定・機能'});
 }
 function vFeatures(){
   const sw=(id,cls)=>{const n=NODES[id];const lock=LOCKED.has(id);const on=!S.set.off[id]||lock;
