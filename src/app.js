@@ -32,6 +32,8 @@ function routeView(r){
     case 'profile': return vProfile();
     case 'health': return vHealth();
     case 'todo': return vTodo();
+    case 'oshi': return vOshi(arg);
+    case 'trips': return vTrips(arg);
     case 'kids': return vKids(arg);
     case 'kakei': return vKakei(arg);
     case 'chiiki': return vChiiki();
