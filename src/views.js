@@ -18,7 +18,7 @@ window.addEventListener('popstate',()=>{ if(IN_FRAME) return; const r=decodeURI(
 function openNode(id){
   const im=implOf(id);
   const R={cal:'cal/'+today().slice(0,7),people:'people',places:'places',shops:'shops',memo:'memo',tools:'tools',search:'search/',settings:'settings',data:'data',weather:'weather',otayori:'otayori',meds:'meds'};
-  go(im?R[im]:'node/'+id);
+  go(im?(R[im]||im):'node/'+id);
 }
 
 const BOO_IMG=`<img src="${BOO_F}" alt="ぶーちん">`;
@@ -99,7 +99,7 @@ function vNode(id){
   const kids=n.kids.filter(k=>!isOff(k)).sort((a,b)=>hasImpl(b)-hasImpl(a)); const hidden=n.kids.length-kids.length;
   return sub(n.name,`<div class="list">${kids.map(k=>{const kn=NODES[k];const ok=hasImpl(k);
       return `<button class="row" data-act="open" data-id="${h(k)}"><span class="em">${emojiOf(k)}</span><span class="t"><b>${h(kn.name)}</b><span>${kn.kids.length?kn.kids.map(x=>NODES[x].name).join('・'):(kn.items||[]).slice(0,2).map(x=>x[0]).join('・')}</span></span>${ok?'<span class="badge ok">使える</span>':'<span class="badge wait">準備中</span>'}<span class="go">›</span></button>`;}).join('')}</div>
-    ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}`,{crumb:crumbOf(id)});
+    ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}${id==='設定・機能'?`<p class="small muted" style="text-align:center">この画面の版：${BUILD}</p>`:''}`,{crumb:crumbOf(id)});
 }
 
 /* ---------- 1日のカード ---------- */
