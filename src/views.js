@@ -530,7 +530,7 @@ function vSearch(q){
 function vSettings(){
   const s=S.set; const r=(name,val,cur,label)=>`<label><input type="radio" name="${name}" value="${val}" ${cur===val?'checked':''} data-act="setr">${label}</label>`;
   return sub('設定',`
-  <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>万能ライフサポートアプリ「BOOTIN」の細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
+  <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>ライフサポート万能アプリ「BOOTIN」の細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
   <div class="list">
     <button class="row" data-act="gotoedit"><span class="em">⇄</span><span class="t"><b>トップの9マスを変える</b><span>赤・青・黄の枠から自由に選んで置けます</span></span><span class="go">›</span></button>
     <button class="row" data-go="features"><span class="em">🔌</span><span class="t"><b>機能のオン・オフ</b><span>使わない機能を表示しないようにできます（いつでも戻せます）</span></span><span class="go">›</span></button>
