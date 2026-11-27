@@ -467,7 +467,7 @@ function rainSoon(d){
 function laundryBar(){
   if(S.set.laundry===false) return ''; const w=S.cache.wx&&S.cache.wx.data; const nd=new Date(); const hr=nd.getHours();
   const r=hr>=6&&hr<20?rainSoon(w):null;
-  if(r) return `<button class="laundry rain" data-go="weather/h"><img class="lteru" src="${charaImg('teru','sad')}" alt="てるぼう"><span class="t"><b>雨危険、洗濯物取り込んで！</b><span>${r.now?'今、雨が降っています':`${h(r.at)}ごろから雨の予報${r.p!=null?`（${r.p}%）`:''}`}</span></span><span class="go">›</span></button>`;
+  if(r) return `<button class="laundry rain" data-go="weather/h"><img class="lteru" src="${charaImg('teru','sad')}" alt="てるチン"><span class="t"><b>雨危険、洗濯物取り込んで！</b><span>${r.now?'今、雨が降っています':`${h(r.at)}ごろから雨の予報${r.p!=null?`（${r.p}%）`:''}`}</span></span><span class="go">›</span></button>`;
   const ss=w&&w.daily&&w.daily.sunset&&w.daily.time[0]===today()?w.daily.sunset[0]:null;
   if(ss){ const [H,M]=ss.slice(11,16).split(':').map(Number); const m=hr*60+nd.getMinutes(), s=H*60+M;
     if(m>=s-30&&m<=s+90) return `<button class="laundry sun" data-go="weather"><span class="em">🌇👕</span><span class="t"><b>時間です、洗濯物取り込んで！</b><span>今日の日の入り ${H}:${String(M).padStart(2,'0')}（${h(S.set.wx.name)}）</span></span><span class="go">›</span></button>`; }
