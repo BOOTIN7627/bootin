@@ -32,6 +32,9 @@ function routeView(r){
     case 'profile': return vProfile();
     case 'health': return vHealth();
     case 'todo': return vTodo();
+    case 'chiiki': return vChiiki();
+    case 'toban': return vToban();
+    case 'kairan': return vKairan();
     case 'iken': return vIken();
     case 'room': return vRoom();
     case 'school': return vSchool();
