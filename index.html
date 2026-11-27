@@ -590,7 +590,7 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .op-logo span{display:inline-block;font:900 clamp(3.6rem,24vw,7.5rem)/1 var(--f-disp);letter-spacing:.02em;font-style:italic;color:#FFE14D;transform:rotate(-7deg) skewX(-8deg);
   -webkit-text-stroke:3px #1E1B14;paint-order:stroke fill;
   text-shadow:4px 4px 0 #E0452B,8px 8px 0 #1E1B14,-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff}
-.op-close{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#111;color:#fff;border:0;border-radius:999px;padding:10px 20px;font-weight:900;z-index:7}
+.op-close{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#111;color:#fff;border:0;border-radius:999px;padding:10px 20px;font-weight:900;z-index:7;white-space:nowrap}
 @keyframes opIn{from{opacity:0}to{opacity:1}}
 @keyframes opSpin{to{transform:rotate(360deg)}}
 @keyframes opFlash{0%{opacity:.9}100%{opacity:0}}
@@ -628,38 +628,40 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .op-p2 .op-burst{background:repeating-conic-gradient(rgba(255,255,255,.45) 0 9deg,transparent 9deg 18deg)}
 .op-p2 .op-powE{color:#FFE14D;-webkit-text-stroke:2px #5A2EA6}
 
-/* パターン3：アンギエのいたずら（ミント色）
-   1.9s のぞく / 2.9s ヒョイッ・前にドン・ぶーちん奥へびっくり / 3.6s しょんぼり＋ロゴ / 4.4s ファーの一喝・二人並んでしょんぼり */
+/* パターン3：アンギエのいたずら（ミント色）。カットは4つ、セリフは1つにつき2秒以上
+   0s 腕組みで立つ＋「最強伝説」 / 1.8s のぞく / 3.4s ヒョイッ・前にドン・ぶーちん奥へびっくり「アンギエの方が似合うぜ」
+   6.6s ぶーちんしょんぼり「主役はオレなのに…」 / 8.8s ファーの一喝・二人並んでしょんぼり / 10.0s ロゴ */
 .op-p3{background:#7FD6BE}
 .op-p3 .op-burst{background:repeating-conic-gradient(rgba(255,255,255,.45) 0 9deg,transparent 9deg 18deg)}
-.op-p3 .op-flash{animation:opFlash .35s 2.9s ease-out}
-.op-p3 .op-booWrap{animation:opGrow 1.9s .1s both, op3Back .45s 2.9s cubic-bezier(.3,1.3,.5,1) forwards, op3Side .5s 4.4s ease-out forwards}
-.op-p3 .op-b1,.op-p3 .op-arms,.op-p3 .op-shades{animation:opHide .01s 2.9s forwards}
-.op3-bk{opacity:0;animation:opShow .01s 2.9s forwards, opHide .01s 3.6s forwards}
-.op-p3 .op-b2{animation:opShow .01s 3.6s forwards}
-.op-p3 .op-sweat{animation:opShow .3s 3.7s forwards}
-.op-p3 .op-nBoo{animation:opShow .3s 4.6s forwards}
-.op3-peek{position:absolute;left:58%;top:30%;width:min(34vw,170px);z-index:1;opacity:0;transform:rotate(14deg);animation:op3Peek .4s 1.9s ease-out forwards, opHide .01s 2.9s forwards}
-.op3-wild{position:absolute;left:5%;right:5%;bottom:11%;text-align:center;z-index:4;opacity:0;animation:op3Don .35s 2.9s cubic-bezier(.2,1.6,.4,1) both, opHide .2s 4.4s forwards}
-.op3-wild img{width:min(90vw,420px);display:block;margin:0 auto -14px}
-.op3-hyoi{left:30%;top:38%;color:#0E8A6A;-webkit-text-stroke:2px #fff;font-size:2.6rem;transform:translateX(-50%) rotate(-14deg);animation:opPopC .3s 2.9s both, opHide .2s 3.6s forwards}
-.op3-jag1{right:3%;left:auto;top:18%;width:min(58vw,260px);animation:opPop .3s 3.0s both, opHide .2s 3.6s forwards}
-.op3-jag1 span{color:#1E1B14;white-space:normal;line-height:1.35}
-.op3-s2{left:50%;top:14%;transform:translateX(-50%);font-size:1.05rem;animation:opPopC .3s 3.6s both, opHide .2s 4.4s forwards}
-.op3-sad{position:absolute;left:6%;top:38%;width:min(40vw,190px);text-align:center;z-index:3;opacity:0;animation:opTon .4s 4.4s ease-out forwards}
+.op-p3 .op-flash{animation:opFlash .35s 3.4s ease-out}
+.op-p3 .op-booWrap{animation:op3Stand .35s both, op3Back .45s 3.4s cubic-bezier(.3,1.3,.5,1) forwards, op3Side .5s 8.8s ease-out forwards}
+.op-p3 .op-b1,.op-p3 .op-arms,.op-p3 .op-shades{animation:opHide .01s 3.4s forwards}
+.op3-bk{opacity:0;animation:opShow .01s 3.4s forwards, opHide .01s 6.6s forwards}
+.op-p3 .op-b2{animation:opShow .01s 6.6s forwards}
+.op-p3 .op-sweat{animation:opShow .3s 6.7s forwards}
+.op-p3 .op-nBoo{font-size:1.45rem;bottom:-14px;animation:opShow .3s .2s forwards, opHide .01s 3.4s forwards, opShow .3s 9.1s forwards}
+.op-p3 .op-s1{top:calc(env(safe-area-inset-top,0px) + 12%);animation:opPopC .35s .4s both, opHide .2s 3.4s forwards}
+.op3-peek{position:absolute;left:60%;top:34%;width:min(30vw,150px);z-index:1;opacity:0;transform:rotate(14deg);animation:op3Peek .5s 1.8s ease-out forwards, opHide .01s 3.4s forwards}
+.op3-wild{position:absolute;left:5%;right:5%;bottom:11%;text-align:center;z-index:4;opacity:0;animation:op3Don .35s 3.4s cubic-bezier(.2,1.6,.4,1) both, opHide .3s 8.8s forwards}
+.op3-wild img{width:min(90vw,420px,52vh);display:block;margin:0 auto -14px}
+.op3-hyoi{left:30%;top:38%;color:#0E8A6A;-webkit-text-stroke:2px #fff;font-size:2.6rem;transform:translateX(-50%) rotate(-14deg);animation:opPopC .3s 3.4s both, opHide .3s 4.6s forwards}
+.op3-jag1{right:3%;left:auto;top:calc(env(safe-area-inset-top,0px) + 16%);width:min(58vw,260px);animation:opPop .3s 3.6s both, opHide .3s 6.6s forwards}
+.op3-jag1 span{color:#1E1B14}
+.op3-s2{left:50%;top:calc(env(safe-area-inset-top,0px) + 12%);transform:translateX(-50%);font-size:1.15rem;animation:opPopC .3s 6.7s both, opHide .3s 8.8s forwards}
+.op3-sad{position:absolute;left:6%;top:40%;width:min(40vw,190px);text-align:center;z-index:3;opacity:0;animation:opTon .4s 8.8s ease-out forwards}
 .op3-sad img{width:100%;display:block;margin-bottom:-6px}
-.op3-fa{position:absolute;left:3%;top:4%;width:min(24vw,110px);text-align:center;z-index:4;opacity:0;animation:op3Fa .45s 4.4s cubic-bezier(.2,1.3,.4,1) forwards}
+.op3-fa{position:absolute;left:3%;top:calc(env(safe-area-inset-top,0px) + 16%);width:min(24vw,110px);text-align:center;z-index:4;opacity:0;animation:op3Fa .45s 8.8s cubic-bezier(.2,1.3,.4,1) forwards}
 .op3-fa img{width:100%;display:block;margin-bottom:-6px}
-.op3-jag2{left:28%;right:2%;top:2%;width:auto;max-width:330px;animation:opPop .3s 4.7s both}
-.op3-jag2 span{color:#1E1B14;font-size:clamp(.72rem,3.4vw,.95rem);padding:0 15%}
-.op-p3 .op-logo{bottom:19%;animation:opLogo .5s 3.6s cubic-bezier(.2,1.8,.4,1) both}
-.op3-catch{position:absolute;left:50%;bottom:calc(19% - 46px);transform:translateX(-50%);background:#fff;border:3px solid #0E8A6A;color:#0E6E55;border-radius:999px;padding:4px 16px;font:900 1rem var(--f-disp);white-space:nowrap;z-index:6;opacity:0;animation:opPopC .3s 4.9s both}
+.op3-jag2{left:27%;right:2%;top:calc(env(safe-area-inset-top,0px) + 6%);width:auto;max-width:340px;animation:opPop .3s 9.0s both}
+.op3-jag2 span{color:#1E1B14;font-size:clamp(.78rem,3.6vw,1rem);padding:0 15%}
+.op-p3 .op-logo{bottom:19%;animation:opLogo .5s 10.0s cubic-bezier(.2,1.8,.4,1) both}
+.op3-catch{position:absolute;left:50%;bottom:calc(19% - 46px);transform:translateX(-50%);background:#fff;border:3px solid #0E8A6A;color:#0E6E55;border-radius:999px;padding:4px 16px;font:900 1rem var(--f-disp);white-space:nowrap;z-index:6;opacity:0;animation:opPopC .3s 10.4s both}
+@keyframes op3Stand{from{opacity:0;transform:translateY(8%)}to{opacity:1;transform:none}}
 @keyframes op3Peek{from{opacity:0;transform:translateX(30%) rotate(14deg)}to{opacity:1;transform:rotate(14deg)}}
-@keyframes op3Back{from{transform:scale(1.5)}to{transform:translate(-38%,-62%) scale(.42)}}
-@keyframes op3Side{from{transform:translate(-38%,-62%) scale(.42)}to{transform:translate(30%,2%) scale(.62)}}
+@keyframes op3Back{from{transform:none}to{transform:translate(-38%,-50%) scale(.42)}}
+@keyframes op3Side{from{transform:translate(-38%,-50%) scale(.42)}to{transform:translate(30%,-10%) scale(.62)}}
 @keyframes op3Don{0%{opacity:0;transform:scale(.3) translateY(30%)}100%{opacity:1;transform:none}}
 @keyframes op3Fa{from{opacity:0;transform:translate(-80%,-40%)}to{opacity:1;transform:none}}
-.op-p3 .op-nBoo{font-size:1.45rem;bottom:-14px}
 </style>
 <div id="app"></div>
 <script>
