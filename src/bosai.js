@@ -82,7 +82,7 @@ function vBosai(){
   const b=bosaiNow(); const nm=h(S.set.wx.name);
   let body=`<p class="small muted" style="margin:0 0 6px">場所：<b>${nm}</b>（天気の場所と同じです。<button class="linkb" data-go="weather">天気の画面</button>で変えられます）</p>
   <div class="btns"><button class="btn wxrl" data-act="bosaireload">最新情報に更新 <span class="rl" aria-hidden="true">🔄</span></button></div>`;
-  if(!b){ body+=`<div class="empty">${bosaiLoading?'読み込んでいます…':'読み込めませんでした。電波のある所で「最新情報に更新」を押してください。'}</div>`; return sub('防災情報',body,{crumb:'NEWS・知識 › NEWS'}); }
+  if(!b){ body+=`<div class="empty">${bosaiLoading?'読み込んでいます…':'読み込めませんでした。電波のある所で「最新情報に更新」を押してください。'}</div>`; return sub('防災情報',body,{crumb:'生活管理 › 天気・防災'}); }
   // 警報・注意報
   const w=b.warn;
   body+=`<div class="sec"><h3>⚠️ 警報・注意報</h3>${w?(w.list.length?`<div class="wlist">${w.list.map(x=>`<span class="wtag lv${x.lv}">${h(x.name)}</span>`).join('')}</div>`:'<p style="margin:0">今、警報・注意報は出ていません。</p>')+(w.head?`<p class="small" style="margin:8px 0 0">${h(w.head)}</p>`:'')+`<p class="small muted" style="margin:4px 0 0">${h((w.time||'').slice(0,16).replace('T',' '))} 気象庁発表</p>`:'<p class="small muted" style="margin:0">読み込めませんでした。</p>'}
@@ -97,5 +97,5 @@ function vBosai(){
   body+=`<div class="sec"><h3>🌀 台風情報</h3>${tc==null?'<p class="small muted" style="margin:0">読み込めませんでした。</p>':tc.length?`<p style="margin:0"><b>今、台風が${tc.length}個あります。</b>位置と進路の予想は、気象庁の台風の地図で見られます。</p>`:'<p style="margin:0">今、台風は発生していません。</p>'}
     <a class="btn plain" style="margin-top:8px" href="https://www.jma.go.jp/bosai/map.html#contents=typhoon" target="_blank" rel="noopener">気象庁の台風の位置・進路予想図を開く</a></div>
     <p class="small muted">情報のもと：気象庁・国土地理院・P2P地震情報（どれも無料）。このアプリは補助です。大事な判断は公式の発表で確かめてください。</p>`;
-  return sub('防災情報',body,{crumb:'NEWS・知識 › NEWS'});
+  return sub('防災情報',body,{crumb:'生活管理 › 天気・防災'});
 }
