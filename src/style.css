@@ -543,3 +543,7 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .kkcats{flex-wrap:wrap;overflow:visible}form[data-form=kakei] .two>div{min-width:0}form[data-form=kakei] input{min-width:0;max-width:100%}
 
 .kdrow .ck.on,.kdc .ck.on{background:#2E8B57;color:#fff;border-color:#2E8B57}
+
+.koma img{display:block;width:100%;max-width:560px;height:auto;margin:8px auto 0;border-radius:10px;border:2px solid #1E1B14;background:#fff}
+.sec.koma{padding-left:6px;padding-right:6px}.sec.koma h3,.sec.koma>.small{padding:0 8px}
+.gktabs{flex-wrap:wrap;overflow:visible}

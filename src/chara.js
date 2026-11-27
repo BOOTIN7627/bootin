@@ -14,6 +14,8 @@ const CHARA=[
  ['angie','アンギエ','ファーの旦那・黒豚','仲間','陽気ないたずら好き。でも面倒見がいい','ファーの旦那。ぶーちんとはカンペー仲間','アンギエ、おなかすいた','#EFEFEF'],
  ['oz','OZ','前の会社の後輩・ネズミ','仲間','頭がよく、気が利く','ぶーちんの前の会社の後輩。クロにゃんの友達','ハハハ、それは無理です','#F5EEE6']
 ];
+/* 4コマ（新しいものを先頭に）。who＝出てくるキャラ（キャラ紹介からつなぐ） */
+const KOMA=[{id:'chi',t:'血は争えん',who:['ton'],d:'2026-11-27'}];
 const EXPR=[['n','ふだん'],['joy','喜'],['ang','怒'],['sad','哀'],['fun','楽']];
 const CIMG={};
 function charaImg(k,e){ e=e||'n'; const key=k+'_'+e; if(CIMG[key]) return CIMG[key];
@@ -22,12 +24,13 @@ function charaImg(k,e){ e=e||'n'; const key=k+'_'+e; if(CIMG[key]) return CIMG[k
 const TAGC={'家族':'#F6C915','仲間':'#9FD3F5','レア':'#F4A7B9'};
 function vGekijo(tab){
   tab=tab||'chara';
-  const tabs=`<div class="chips gktabs">${[['chara','みんな'],['map','相関図'],['rare','レア図鑑'],['otayori','お便り']].map(([k,n])=>`<button class="chip" aria-pressed="${tab===k}" data-go-r="gekijo/${k}">${n}</button>`).join('')}</div>`;
+  const tabs=`<div class="chips gktabs">${[['chara','みんな'],['map','相関図'],['4koma','4コマ'],['rare','レア図鑑'],['otayori','お便り']].map(([k,n])=>`<button class="chip" aria-pressed="${tab===k}" data-go-r="gekijo/${k}">${n}</button>`).join('')}</div>`;
   let body='';
   if(tab==='chara') body=`<div class="cgrid">${CHARA.map(c=>`<button class="ccard" data-go="chara/${c[0]}"><span class="ctag" style="background:${TAGC[c[3]]}">${c[3]}</span><img src="${charaImg(c[0])}" alt=""><b>${h(c[1])}</b><span>${h(c[2])}</span></button>`).join('')}
     <div class="ccard rare"><span class="ctag" style="background:${TAGC['レア']}">レア</span><span class="shadow">？</span><b>？？？</b><span>まだ会っていない</span></div></div>`;
   if(tab==='map') body=soukanzu();
   if(tab==='rare') body=`<div class="sec" style="text-align:center">${sayBoo('めったに会えない「レアキャラ」がいるらしいよ。会えたら、ここに集まるよ。')}<div class="cgrid">${[1,2,3].map(()=>`<div class="ccard rare"><span class="shadow">？</span><b>？？？</b><span>まだ会っていない</span></div>`).join('')}</div></div>`;
+  if(tab==='4koma') body=KOMA.map(m=>`<div class="sec koma" id="koma-${m.id}"><h3 style="margin:2px 0 2px">${h(m.t)}</h3><div class="small muted">${jpDate(m.d)}・${m.who.map(k=>h(CHARA.find(c=>c[0]===k)[1])).join('・')}ほか</div><img src="${KOMA_IMG[m.id]}" alt="4コマ「${h(m.t)}」" loading="lazy"></div>`).join('')+`<p class="small muted" style="text-align:center">4コマは、ときどき増えます。</p>`;
   if(tab==='otayori') body=OTAYORI.map(o=>`<div class="sec"><div class="small muted">${jpDate(o.d)}</div><h3 style="margin:2px 0 6px">${h(o.t)}</h3>${sayBoo(h(o.b).replace(/\n/g,'<br>'))}</div>`).join('');
   return sub('ぶーちん劇場',tabs+body,{crumb:'おたのしみ'});
 }
@@ -38,6 +41,7 @@ function vChara(k){
   return sub(c[1],`<div class="chero" style="background:${c[7]}"><img src="${charaImg(k,e)}" alt="${h(c[1])}"><div><h2>${h(c[1])}</h2><span class="small">${h(c[2])}</span></div></div>
   <dl class="kv cdl"><dt>性格</dt><dd>${h(c[4])}</dd><dt>関係</dt><dd>${h(c[5])}</dd><dt>ひとこと</dt><dd>「${h(c[6])}」</dd></dl>
   ${ex.length?`<div class="sec"><h3>表情 <span class="small muted">押すと上の絵が変わります</span></h3><div class="cexp">${ex.map(([x,n])=>`<button data-act="cexpr" data-k="${k}" data-e="${x}" aria-pressed="${x===e}"><img src="${charaImg(k,x)}" alt=""><span>${n}</span></button>`).join('')}</div></div>`:''}
+  ${KOMA.some(m=>m.who.includes(k))?`<div class="sec"><h3>この子が出てくる4コマ</h3>${KOMA.filter(m=>m.who.includes(k)).map(m=>`<button class="row" data-go-r="gekijo/4koma"><span class="em">📖</span><span class="t"><b>${h(m.t)}</b><span>4コマを読む</span></span><span class="go">›</span></button>`).join('')}</div>`:''}
   <div class="btns"><button class="btn plain" data-go-r="gekijo/map">相関図で見る</button><button class="btn plain" data-go-r="gekijo/chara">みんなにもどる</button></div>`,{crumb:'ぶーちん劇場 › キャラ紹介'});
 }
 function soukanzu(){
