@@ -491,3 +491,18 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .hcks{display:flex;flex-wrap:wrap;gap:6px}.hcks span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.88rem}
 .hcks i{font-style:normal;font-weight:700;margin-left:4px}.hcks i.up{color:#D32F2F}.hcks i.dn{color:#1565C0}
 .hck1{margin:0 0 10px}.hadd summary{cursor:pointer;font-weight:700;color:var(--accent);padding:6px 0}
+.t-stu .stuh{font-size:.95rem;margin:10px 0 4px}
+.ttday{display:flex;flex-wrap:wrap;gap:4px}.ttday span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.9rem}.ttday b{color:var(--accent);margin-right:4px}
+.todo{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.todo .ck{width:30px;height:30px;flex:none;border:2px solid var(--ink);border-radius:8px;background:var(--card);font-weight:900;font-size:1.1rem;cursor:pointer}
+.todo.done .ck{background:#2E8B57;color:#fff;border-color:#2E8B57}.todo.done .tdt{color:var(--sub);text-decoration:line-through}
+.todo .tdt{flex:1;min-width:0}.todo small{display:block;color:var(--sub);font-size:.8rem}.todo small.late{color:var(--warn);font-weight:700}
+.tt{display:grid;grid-template-columns:1.6em repeat(6,1fr);gap:3px;font-size:.82rem}
+.tt .th{text-align:center;font-weight:700;color:var(--sub);align-self:center}
+.tt .td{background:var(--soft);border-radius:6px;min-height:2.2em;display:grid;place-items:center;text-align:center;padding:2px;overflow-wrap:anywhere}
+.tt input{width:100%;min-width:0;padding:4px 2px;border:2px solid var(--line);border-radius:6px;text-align:center;font:inherit;background:var(--card)}
+.tgrp{padding:6px 0;border-bottom:1px dashed var(--line)}.tsc{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.tsc span{background:var(--soft);border-radius:8px;padding:2px 4px 2px 8px;font-size:.9rem}.tsc .x{border:0;background:none;color:var(--sub);cursor:pointer;padding:0 4px}
+.brain{text-align:center}.bq{font-size:2.6rem;font-weight:900;margin:14px 0;font-family:var(--round,inherit)}
+.brain form{display:flex;gap:8px;justify-content:center}.ba{width:6em;font-size:1.8rem;text-align:center;padding:6px;border:3px solid var(--ink);border-radius:12px}
+.famrow{align-items:center}.pinin{font-size:1.4rem;letter-spacing:.4em;text-align:center;padding:8px;border:2px solid var(--line);border-radius:12px;max-width:8em}

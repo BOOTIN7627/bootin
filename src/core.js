@@ -17,7 +17,7 @@ const IMPL={
   '設定・機能/マイルームの設定/データと見やすさ':'data',
   'NEWS・知識/NEWS/天気の詳細':'weather','生活管理/天気・防災/天気':'weather','生活管理/天気・防災/防災情報':'bosai',
   'おたのしみ/ぶーちん劇場/劇場':'otayori',
-  '私と家族/マイプロフィール/マイプロフィール':'profile','私と家族/マイプロフィール/もしものとき':'me'
+  '私と家族/マイプロフィール/マイプロフィール':'profile','私と家族/家族のプロフィール/学生の子':'school','おたのしみ/ゲーム/はじめのゲーム':'brain','NEWS・知識/辞書/辞書':'dict','私と家族/マイプロフィール/もしものとき':'me'
 };
 /* 外せない土台 */
 const LOCKED=new Set(['設定・機能','設定・機能/トップ画面の設定','設定・機能/トップ画面の設定/出すものと見た目','設定・機能/マイルームの設定','設定・機能/マイルームの設定/データと見やすさ','設定・機能/その他の機能','設定・機能/その他の機能/聞く・探す','設定・機能/その他の機能/さっとメモ（メモの一元管理）','おたのしみ','おたのしみ/ぶーちん劇場','おたのしみ/ぶーちん劇場/劇場']);
@@ -48,7 +48,7 @@ function redOf(id){let n=NODES[id];while(n&&n.parent)n=NODES[n.parent];return n?
 function emojiOf(id){const n=NODES[id];if(!n)return '❔';return (n.lv!=='r'&&BLUE_EMOJI[n.name])||RED_EMOJI[redOf(id)]||'📁';}
 function implOf(id){return IMPL[id]||null;}
 function hasImpl(id){ if(IMPL[id])return true; const n=NODES[id]; return !!(n&&n.kids.some(hasImpl)); }
-function isOff(id){ let n=NODES[id]; while(n){ if(S.set.off[n.id]&&!LOCKED.has(n.id))return true; n=NODES[n.parent]; } return false; }
+function isOff(id){ if(S.set.mode==='student'&&String(id).startsWith('ビジネス')) return true; let n=NODES[id]; while(n){ if(S.set.off[n.id]&&!LOCKED.has(n.id))return true; n=NODES[n.parent]; } return false; }
 
 /* ---- 保存 ---- */
 const KEY='bootin.v1';

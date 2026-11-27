@@ -35,7 +35,7 @@ function menuCells(){
   return S.set.grid.slice(0,9).filter(id=>NODES[id]&&!isOff(id)).map(id=>`<button class="cell" data-act="open" data-id="${h(id)}"><span class="em">${emojiOf(id)}</span><span class="nm">${h(NODES[id].name)}</span></button>`).join('');
 }
 function vHome(){
-  const t=today(); const l=lunar(t); const elder=S.set.mode==='elder';
+  const t=today(); const l=lunar(t); const elder=S.set.mode==='elder'; const stu=S.set.mode==='student';
   const items=itemsOn(t).slice(0,4);
   const w=S.cache.wx&&S.cache.wx.data;
   const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><small class="wxlbl">気温</small><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
@@ -60,16 +60,16 @@ function vHome(){
     <button class="ib help" data-act="otasuke">🆘 おたすけ</button></div>
   <button class="clock" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
-  ${elder||UI.editGrid?`<div class="grid ${elder?'big':''}">${cells}</div>`:`<div class="topnav"><div class="grid compact sq">${cells}</div>
+  ${stu&&!UI.editGrid?`<div class="grid big stu">${stuCells()}</div>`:elder||UI.editGrid?`<div class="grid ${elder?'big':''}">${cells}</div>`:`<div class="topnav"><div class="grid compact sq">${cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
     <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
     <button class="qb q-photo" data-act="open" data-id="NEWS・知識/NEWS"><span class="em">📰</span><span>NEWS</span></button></div></div>`}
-  <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':'')}</span>
+  <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':stu?'学生モード：6つのマスにしています':'')}</span>
     <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
   ${bosaiBar()}${laundryBar()}<div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button><button class="wxh" data-go="weather">⏱️ 時間ごとの天気 ›</button></div>
   <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんより</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
   ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
-  ${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
+  ${stuTop()}${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
 }
 function evRow(it,s,compact){
@@ -536,8 +536,7 @@ function vSettings(){
     <button class="row" data-act="gotoedit"><span class="em">⇄</span><span class="t"><b>トップの9マスを変える</b><span>赤・青・黄の枠から自由に選んで置けます</span></span><span class="go">›</span></button>
     <button class="row" data-go="features"><span class="em">🔌</span><span class="t"><b>機能のオン・オフ</b><span>使わない機能を表示しないようにできます（いつでも戻せます）</span></span><span class="go">›</span></button>
   </div>
-  <div class="sec"><h3>モード</h3><div class="choose">${r('mode','normal',s.mode,'通常')}${r('mode','elder',s.mode,'高齢者')}<label style="opacity:.5"><input type="radio" disabled>学生（準備中）</label></div>
-    <p class="small muted" style="margin:4px 0 0">高齢者モードは、トップを大きな6マスにして「よく電話する人」を上に出します。中身は順に作り込みます。</p></div>
+  ${modeSec()}
   <div class="sec"><h3>予定の時刻</h3><div class="choose">${r('minStep',15,+s.minStep,'15分きざみ')}${r('minStep',10,+s.minStep,'10分きざみ')}${r('minStep',5,+s.minStep,'5分きざみ')}${r('minStep',1,+s.minStep,'1分きざみ')}</div>
     <div class="f"><span class="lb">よく使う時間帯（この外は「早朝・深夜」にまとめます）</span><span class="tsel"><select data-act="sethr" data-k="hFrom" aria-label="から">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hFrom===i?'selected':''}>${i}時</option>`).join('')}</select>から<select data-act="sethr" data-k="hTo" aria-label="まで">${[...Array(24).keys()].map(i=>`<option value="${i}" ${+s.hTo===i?'selected':''}>${i}時</option>`).join('')}</select>まで</span></div></div>
   <div class="sec"><h3>文字の大きさ</h3><div class="choose">${r('font',1,s.font,'ふつう')}${r('font',2,s.font,'大きめ')}${r('font',3,s.font,'とても大きい')}</div></div>
