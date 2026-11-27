@@ -573,11 +573,13 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 /* エンちん：右下の隅から */
 .op-en{position:absolute;right:-50vw;top:5%;width:min(30vw,150px);text-align:center;z-index:4;animation:opEn .45s 2.9s cubic-bezier(.2,1.3,.4,1) forwards, opSwat .45s 3.35s ease-in both}
 .op-en img{width:100%;display:block}
-.op-jag{position:absolute;right:88%;top:20%;width:min(64vw,290px);aspect-ratio:2.1;opacity:0;animation:opPop .3s 3.05s both, opHide .3s 6.0s forwards;
-  filter:drop-shadow(2px 0 0 #1E1B14) drop-shadow(-2px 0 0 #1E1B14) drop-shadow(0 2px 0 #1E1B14) drop-shadow(0 -2px 0 #1E1B14) drop-shadow(4px 4px 0 #1E1B14)}
+.op-jag{position:absolute;aspect-ratio:200/120;opacity:0;z-index:5}
+.op-jag svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(3px 3px 0 rgba(30,27,20,.35))}
+/* エンちんの吹き出し：画面の中に収まる位置に固定（エンちんが叩きに動いても一緒に動かない） */
+.op-jagEn{left:2%;top:6%;width:min(62vw,300px);animation:opPop .3s 3.05s both, opHide .3s 6.0s forwards}
 .op-jagIn{position:absolute;inset:0;background:#fff;
   clip-path:polygon(50% 0,58% 14%,72% 2%,74% 18%,92% 10%,86% 28%,100% 32%,88% 46%,100% 60%,84% 64%,92% 82%,74% 76%,70% 96%,58% 80%,48% 100%,40% 80%,24% 94%,24% 76%,6% 84%,14% 64%,0 56%,14% 44%,2% 28%,20% 28%,14% 10%,32% 18%,36% 2%)}
-.op-jag span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 1rem var(--f-disp);color:#C0392B;transform:rotate(-4deg);text-align:center;padding:0 12%;white-space:nowrap}
+.op-jag span{position:absolute;inset:4% 0 12%;display:flex;align-items:center;justify-content:center;font:900 clamp(.85rem,4.3vw,1.15rem) var(--f-disp);color:#C0392B;transform:rotate(-4deg);text-align:center;padding:0 16%;line-height:1.35}
 /* トンじい：しょんぼりの左ななめ後ろ、遠くに小さく */
 .op-ton{position:absolute;left:2%;top:40%;width:min(24vw,110px);text-align:center;opacity:0;z-index:1;animation:opTon .5s 5.0s ease-out forwards}
 .op-ton img{width:100%;display:block;filter:saturate(.9)}
@@ -641,15 +643,15 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .op3-wild{position:absolute;left:5%;right:5%;bottom:11%;text-align:center;z-index:4;opacity:0;animation:op3Don .35s 2.9s cubic-bezier(.2,1.6,.4,1) both, opHide .2s 4.4s forwards}
 .op3-wild img{width:min(90vw,420px);display:block;margin:0 auto -14px}
 .op3-hyoi{left:30%;top:38%;color:#0E8A6A;-webkit-text-stroke:2px #fff;font-size:2.6rem;transform:translateX(-50%) rotate(-14deg);animation:opPopC .3s 2.9s both, opHide .2s 3.6s forwards}
-.op3-jag1{right:3%;left:auto;top:20%;width:min(54vw,250px);animation:opPop .3s 3.0s both, opHide .2s 3.6s forwards}
+.op3-jag1{right:3%;left:auto;top:18%;width:min(58vw,260px);animation:opPop .3s 3.0s both, opHide .2s 3.6s forwards}
 .op3-jag1 span{color:#1E1B14;white-space:normal;line-height:1.35}
 .op3-s2{left:50%;top:14%;transform:translateX(-50%);font-size:1.05rem;animation:opPopC .3s 3.6s both, opHide .2s 4.4s forwards}
 .op3-sad{position:absolute;left:6%;top:38%;width:min(40vw,190px);text-align:center;z-index:3;opacity:0;animation:opTon .4s 4.4s ease-out forwards}
 .op3-sad img{width:100%;display:block;margin-bottom:-6px}
 .op3-fa{position:absolute;left:3%;top:4%;width:min(24vw,110px);text-align:center;z-index:4;opacity:0;animation:op3Fa .45s 4.4s cubic-bezier(.2,1.3,.4,1) forwards}
 .op3-fa img{width:100%;display:block;margin-bottom:-6px}
-.op3-jag2{left:30%;right:auto;top:3%;width:min(66vw,300px);aspect-ratio:1.6;animation:opPop .3s 4.7s both}
-.op3-jag2 span{color:#1E1B14;white-space:normal;line-height:1.4;font-size:.9rem;padding:0 14%}
+.op3-jag2{left:28%;right:2%;top:2%;width:auto;max-width:330px;animation:opPop .3s 4.7s both}
+.op3-jag2 span{color:#1E1B14;font-size:clamp(.72rem,3.4vw,.95rem);padding:0 15%}
 .op-p3 .op-logo{bottom:19%;animation:opLogo .5s 3.6s cubic-bezier(.2,1.8,.4,1) both}
 .op3-catch{position:absolute;left:50%;bottom:calc(19% - 46px);transform:translateX(-50%);background:#fff;border:3px solid #0E8A6A;color:#0E6E55;border-radius:999px;padding:4px 16px;font:900 1rem var(--f-disp);white-space:nowrap;z-index:6;opacity:0;animation:opPopC .3s 4.9s both}
 @keyframes op3Peek{from{opacity:0;transform:translateX(30%) rotate(14deg)}to{opacity:1;transform:rotate(14deg)}}
@@ -1663,6 +1665,12 @@ function opBooWrap(){
   return `<div class="op-booWrap"><div class="op-boo"><img class="op-b1" src="${OP_BOO}" alt="ぶーちん">${arms}<img class="op-b2" src="${OP_SAD}" alt="">${shades}<span class="op-sweat">💧</span></div>
       <span class="op-name op-nBoo">ぶーちん</span></div>`;
 }
+function opJag(html,cls,tail){
+  // tail: 'r'＝右下へ（右にいる人が話す） 'l'＝左下へ 'b'＝下へ
+  const P='100,6 112,22 130,8 134,26 156,14 154,34 180,28 170,46 194,54 176,64 192,80 170,82 178,100 154,94 150,112 132,100 120,114 106,100 90,114 80,98 60,108 58,90 36,98 40,80 14,82 26,66 6,56 26,46 12,30 38,32 34,14 58,24 64,6 80,20';
+  const T=tail==='r'?'<path d="M160 88 L198 116 L146 96 Z"/>':tail==='l'?'<path d="M40 88 L2 116 L54 96 Z"/>':'<path d="M92 104 L100 120 L110 104 Z"/>';
+  return `<div class="op-jag ${cls||''}"><svg viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><g fill="#fff" stroke="#1E1B14" stroke-width="3.5" stroke-linejoin="round">${T}<polygon points="${P}"/></g><path d="M${tail==='l'?'48 92 L58 97':'152 92 L142 97'}" stroke="#fff" stroke-width="6"/></svg><span>${html}</span></div>`;
+}
 const OP_LOGO=`<div class="op-logo" aria-label="BOOTIN"><span>BOOTIN</span></div>`;
 const OP_PATTERNS=[
   /* 1: エンちんに叩かれる → トンじい */
@@ -1671,7 +1679,8 @@ const OP_PATTERNS=[
     ${opBooWrap()}
     <div class="op-say op-s1">何でもオレに任せな！</div>
     <div class="op-say op-s3">しょんぼり…</div>
-    <div class="op-en"><div class="op-jag"><div class="op-jagIn"></div><span>何調子に乗ってんの！</span></div><img src="${OP_EN}" alt=""><span class="op-name">エンちん</span></div>
+    ${opJag('💢 何調子に<br>乗ってんの！','op-jagEn','r')}
+    <div class="op-en"><img src="${OP_EN}" alt=""><span class="op-name">エンちん</span></div>
     <div class="op-pow">バシッ</div>${OP_LOGO}`,
   /* 2: チビえりにお祓いされる → アーヤ */
   ()=>`<div class="op-burst"></div><div class="op-flash op-flashW"></div>
@@ -1689,11 +1698,11 @@ const OP_PATTERNS=[
     <div class="op-say op-s1">最強伝説が始まるぜ！</div>
     <div class="op3-wild"><img src="${s('angie_wild')}" alt=""><span class="op-name">アンギエ</span></div>
     <div class="op-pow op3-hyoi">ヒョイッ</div>
-    <div class="op-jag op3-jag1"><div class="op-jagIn"></div><span>アンギエの<br>方が似合うぜ</span></div>
+    ${opJag('アンギエの<br>方が似合うぜ','op3-jag1','b')}
     <div class="op-say op3-s2">主役はオレなのに…</div>
     <div class="op3-sad"><img src="${s('angie_sad')}" alt=""><span class="op-name">アンギエ</span></div>
     <div class="op3-fa"><img src="${s('fa_ang')}" alt=""><span class="op-name">ファー</span></div>
-    <div class="op-jag op3-jag2"><div class="op-jagIn"></div><span>いたずらアンギエ、<br>お兄さんをイジメると<br>ご飯抜きだよ！</span></div>
+    ${opJag('💢 いたずらアンギエ、<br>お兄さんをイジメると<br>ご飯抜きだよ！','op3-jag2','l')}
     ${OP_LOGO}<div class="op3-catch">ライフサポート万能アプリ</div>`; }
 ];
 function playOpening(n){
