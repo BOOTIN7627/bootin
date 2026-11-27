@@ -122,7 +122,7 @@ a{color:var(--accent)}
 /* 入力 */
 .f{display:grid;gap:4px;margin-top:10px}
 .f>label,.f>.lb{font-weight:700;font-size:.9rem}
-.f input:not([type=checkbox]):not([type=radio]),.f select,.f textarea{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);min-height:46px}
+.f input:not([type=checkbox]):not([type=radio]),.anform input,.f select,.f textarea{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);min-height:46px}
 .f textarea{min-height:110px;resize:vertical}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .two>*{min-width:0}
@@ -466,3 +466,16 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .wxb .wxlbl{font-size:.72rem;font-weight:900;color:var(--sub);line-height:1.1;margin-top:2px}
 .gdcatch{font-weight:900;font-size:1.05rem;background:#FFF7D6;border:2px solid #E0B800;border-radius:12px;padding:8px 12px;margin:0 0 8px;text-align:center}
 .gdcatch b{font-family:var(--f-disp);font-size:1.2rem}
+/* ゴミ出しの日 */
+.gomitag{display:flex;flex-wrap:wrap;gap:4px 12px;width:100%;text-align:left;background:#EAF7EE;border:2px solid #2E8B4F;border-radius:12px;padding:6px 10px;margin:4px 0 8px;color:var(--ink);font-size:.95rem}
+.gomitag b{color:#1E6B3A}
+.gomitag .tm{color:var(--sub)}.gomitag .tm b{color:#7A4B00}
+.gomirow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.gomirow .em{font-size:1.5rem}.gomirow .t{flex:1;display:flex;flex-direction:column}.gomirow .t span{font-size:.85rem;color:var(--sub)}
+.gwrow{display:grid;grid-template-columns:7em 1fr;gap:6px;padding:5px 4px;border-bottom:1px solid var(--line)}
+.gwrow.now{background:#EAF7EE;border-radius:8px;font-weight:700}
+.prof h3{font-size:1.15rem}
+.anrow{align-items:center}.anrow .today{color:var(--warn)}
+.anform{display:grid;gap:6px;margin-top:8px}.anform .f2{display:grid;grid-template-columns:1fr;gap:6px}
+.anrow .t span{white-space:normal;overflow:visible;text-overflow:clip}
+.anform .f2 input{min-width:0}

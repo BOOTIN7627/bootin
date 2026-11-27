@@ -125,7 +125,7 @@ a{color:var(--accent)}
 /* 入力 */
 .f{display:grid;gap:4px;margin-top:10px}
 .f>label,.f>.lb{font-weight:700;font-size:.9rem}
-.f input:not([type=checkbox]):not([type=radio]),.f select,.f textarea{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);min-height:46px}
+.f input:not([type=checkbox]):not([type=radio]),.anform input,.f select,.f textarea{width:100%;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:var(--card);min-height:46px}
 .f textarea{min-height:110px;resize:vertical}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .two>*{min-width:0}
@@ -477,6 +477,11 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .gomirow .em{font-size:1.5rem}.gomirow .t{flex:1;display:flex;flex-direction:column}.gomirow .t span{font-size:.85rem;color:var(--sub)}
 .gwrow{display:grid;grid-template-columns:7em 1fr;gap:6px;padding:5px 4px;border-bottom:1px solid var(--line)}
 .gwrow.now{background:#EAF7EE;border-radius:8px;font-weight:700}
+.prof h3{font-size:1.15rem}
+.anrow{align-items:center}.anrow .today{color:var(--warn)}
+.anform{display:grid;gap:6px;margin-top:8px}.anform .f2{display:grid;grid-template-columns:1fr;gap:6px}
+.anrow .t span{white-space:normal;overflow:visible;text-overflow:clip}
+.anform .f2 input{min-width:0}
 
 /* オープニング（約6秒）
    0.2/0.9/1.6s ズン×3で豆粒→画面いっぱい / 1.9s「何でもオレに任せな！」
@@ -586,7 +591,8 @@ const IMPL={
   '設定・機能/トップ画面の設定':'settings','設定・機能/トップ画面の設定/出すものと見た目':'settings',
   '設定・機能/マイルームの設定/データと見やすさ':'data',
   'NEWS・知識/NEWS/天気の詳細':'weather','生活管理/天気・防災/天気':'weather','生活管理/天気・防災/防災情報':'bosai',
-  'おたのしみ/ぶーちん劇場/劇場':'otayori'
+  'おたのしみ/ぶーちん劇場/劇場':'otayori',
+  '私と家族/マイプロフィール/マイプロフィール':'profile','私と家族/マイプロフィール/もしものとき':'me'
 };
 /* 外せない土台 */
 const LOCKED=new Set(['設定・機能','設定・機能/トップ画面の設定','設定・機能/トップ画面の設定/出すものと見た目','設定・機能/マイルームの設定','設定・機能/マイルームの設定/データと見やすさ','設定・機能/その他の機能','設定・機能/その他の機能/聞く・探す','設定・機能/その他の機能/さっとメモ（メモの一元管理）','おたのしみ','おたのしみ/ぶーちん劇場','おたのしみ/ぶーちん劇場/劇場']);
@@ -707,6 +713,8 @@ function wareki(s){const d=parseD(s);const y=d.getFullYear();
   if(s>='2019-05-01'){const n=y-2018;return '令和'+(n===1?'元':n)+'年';}
   if(s>='1989-01-08'){const n=y-1988;return '平成'+(n===1?'元':n)+'年';}
   if(s>='1926-12-25'){const n=y-1925;return '昭和'+(n===1?'元':n)+'年';}
+  if(s>='1912-07-30'){const n=y-1911;return '大正'+(n===1?'元':n)+'年';}
+  if(s>='1868-01-25'){const n=y-1867;return '明治'+(n===1?'元':n)+'年';}
   return '';}
 const HOLCACHE={};
 function nthMon(y,m,n){const d=new Date(y,m-1,1);const off=(8-d.getDay())%7;return ymd(new Date(y,m-1,1+off+(n-1)*7));}
@@ -761,6 +769,8 @@ function itemsOn(s,catFilter){
   for(const e of S.events){ if(occurs(e,s)&&(!catFilter||e.cat===catFilter)) out.push({k:'ev',e,allday:!e.time,unk:!e.time&&e.tmode==='unknown',time:e.time||'',color:evCat(e.cat).color}); }
   if(!catFilter||catFilter==='home'){
     for(const p of S.people){ if(p.bday&&p.bday.slice(5)===s.slice(5)){ const a=age(p.bday,s); out.push({k:'bd',p,allday:true,time:'',color:'#D6457A',age:a}); } }
+    const mb=S.set.me&&S.set.me.bday; if(/^\d{4}-\d\d-\d\d$/.test(mb||'')&&mb.slice(5)===s.slice(5)&&mb<=s) out.push({k:'an',a:{name:'あなたの誕生日',me:true},allday:true,time:'',color:'#D6457A',yrs:age(mb,s)});
+    for(const a of (S.annivs||[])){ if(a.date&&a.date.slice(5)===s.slice(5)&&a.date<=s){ const y=+s.slice(0,4)-+a.date.slice(0,4); out.push({k:'an',a,allday:true,time:'',color:'#C07A00',yrs:a.date.startsWith('0000')||y<=0?null:y}); } }
   }
   out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||(!!a.unk-!!b.unk)||a.time.localeCompare(b.time));
   return out;
@@ -864,6 +874,7 @@ function vHome(){
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
 }
 function evRow(it,s,compact){
+  if(it.k==='an'){ const a=it.a; return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">${a.me?'🎂':'💐'}</span><span class="bd"><button style="all:unset;cursor:pointer;display:block" data-go="profile"><b>${h(a.name)}${it.yrs!=null?`（${it.yrs}${a.me?'歳':'周年'}）`:''}</b>${a.memo&&!compact?`<span>${h(a.memo)}</span>`:''}</button></span></div>`; }
   if(it.k==='bd'){ const p=it.p; const tel=p.phones&&p.phones.find(x=>x.num);
     return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">🎂</span><span class="bd"><button style="all:unset;cursor:pointer" data-go="person/${p.id}"><b>${h(p.name)}さんの誕生日${it.age!=null?`（${it.age}歳）`:''}</b></button>${tel&&!compact?`<span class="minis"><a class="mini tel" href="${telHref(tel.num)}">📞 電話</a></span>`:''}</span></div>`; }
   const e=it.e; const pl=placeOf(e); const ppl=(e.people||[]).map(id=>S.people.find(p=>p.id===id)).filter(Boolean);
@@ -945,7 +956,7 @@ function calCells(start,weeks,cat,cls){
   for(let i=0;i<weeks*7;i++){
     const d=new Date(start); d.setDate(start.getDate()+i); const s=ymd(d);
     const its=itemsOn(s,cat); const hj=holJP(s); const hc=holCN(s);
-    const shown=its.slice(0,2).map(it=>`<span class="e" style="background:${it.color}">${it.k==='bd'?'🎂'+h(it.p.name):(it.e.time?it.e.time.replace(/^0/,'')+' ':'')+h(it.e.title)}</span>`).join('');
+    const shown=its.slice(0,2).map(it=>`<span class="e" style="background:${it.color}">${it.k==='bd'?'🎂'+h(it.p.name):it.k==='an'?(it.a.me?'🎂':'💐')+h(it.a.name):(it.e.time?it.e.time.replace(/^0/,'')+' ':'')+h(it.e.title)}</span>`).join('');
     const c=cls(d); cells+=`<button class="dy ${c} ${s===t?'today':''}" data-go="day/${s}" aria-label="${jpDate(s)} 予定${its.length}件"><span class="n ${dayClass(s)}">${d.getDate()===1&&c!=='out'?(d.getMonth()+1)+'/':''}${d.getDate()}</span>${hj?`<span class="hn">${h(hj)}</span>`:hc?`<span class="hn" style="color:#B23A3A">${h(hc)}</span>`:''}${shown}${its.length>2?`<span class="mo">他${its.length-2}件</span>`:''}</button>`;
   }
   return `<div class="cal">${[...WD].map((w,i)=>`<div class="wd ${i===0?'c-sun':i===6?'c-sat':''}">${w}</div>`).join('')}${cells}</div>`;
@@ -1378,7 +1389,7 @@ function vMe(){
   return sub('「私のこと」カード',`
   ${has?`<div class="mecard"><h3>私のこと　关于我　About me</h3><dl class="kv" style="grid-template-columns:8.5em 1fr">
     ${m.name?L('名前','姓名','Name')+`<dd><b style="font-size:1.2rem">${h(m.name)}</b>${m.kana?`<br><span class="small">${h(m.kana)}</span>`:''}</dd>`:''}
-    ${m.bday?L('生年月日','出生日期','Birth')+`<dd>${h(m.bday)}</dd>`:''}
+    ${m.bday?L('生年月日','出生日期','Birth')+`<dd>${/^\d{4}-\d\d-\d\d$/.test(m.bday)?`${h(m.bday.replace(/-/g,'/'))}<br><span class="small">${bdayText(m.bday)}</span>`:h(m.bday)}</dd>`:''}
     ${m.blood?L('血液型','血型','Blood')+`<dd>${h(m.blood)}</dd>`:''}
     ${m.addr?L('住所','住址','Address')+`<dd>${h(m.addr)}</dd>`:''}
     ${m.sick?L('持病','慢性病','Conditions')+`<dd>${h(m.sick)}</dd>`:''}
@@ -1689,6 +1700,10 @@ const GUIDE=[
   ['TOPへ','画面の上と下にある黒い「TOPへ」を押すと、どこからでもトップに戻ります。'],
   ['BOOTINの文字','左上の「BOOTIN」を押すと、オープニングの短いアニメが流れます。押すたびに別のお話が出ます（同じものは続けて出ません）。画面のどこかを押すと閉じます。'],
   ['ぶーちんより','運営からのお知らせです。押すと全文が読めます。']]],
+ ['🙂','マイプロフィール',[
+  ['書いておくこと','「私と家族 → マイプロフィール」に、名前・生年月日・血液型・住所・電話・メール・本籍地を書いておけます。星座と和暦は生年月日から自動で出ます。'],
+  ['「私のこと」カードと同じ','名前・生年月日・血液型・住所・電話は「私のこと」カードと同じものです。どちらで直しても両方に入ります。'],
+  ['記念日','結婚記念日などを入れると、カレンダーと1日のカードに毎年出ます。何周年かも出ます。自分の誕生日も出ます。']]],
  ['🌤️','天気',[
   ['トップの天気の枠','いちばん上に「📍静岡」のように、どこの天気かを出しています。枠か「時間ごとの天気」を押すと詳しい天気が開きます。'],
   ['場所を変える','天気の画面の「場所」で町を選ぶか、「📍 今いる場所にする」を押します。防災情報や日の入りの時刻も、この場所に合わせて変わります。'],
@@ -1762,6 +1777,7 @@ function routeView(r){
     case 'gridpick': return vGridPick(arg);
     case 'otasukeset': return vOtasukeSet();
     case 'me': return vMe();
+    case 'profile': return vProfile();
     case 'data': return vData();
     case 'install': return vInstall();
     case 'meds': return vMeds();
@@ -1985,7 +2001,7 @@ const FORMS={
   },
   search:(f,fd)=>go('search/'+encodeURIComponent((fd.get('q')||'').trim()),true),
   otasuke:(f,fd)=>{ S.set.home={addr:fd.get('addr').trim(),tel:fd.get('tel').trim(),telName:fd.get('telName').trim()}; save(); toast('登録しました'); back(); },
-  me:(f,fd)=>{ for(const [k,v] of fd.entries()) S.set.me[k]=String(v).trim(); save(); toast('登録しました'); render(); window.scrollTo(0,0); },
+  me:(f,fd)=>{ for(const [k,v] of fd.entries()) S.set.me[k]=String(v).trim(); const me=S.set.me; if(me.tels&&me.tels.length){ if(me.tel) me.tels[0]=me.tel; else me.tels.shift(); } save(); toast('登録しました'); render(); window.scrollTo(0,0); },
   qmemo:(f,fd)=>{
     const txt=(fd.get('text')||'').trim(); const ph=fd.get('photo')||''; if(!txt&&!ph){toast('なにか書いてください');return;}
     const now=new Date(); S.memos.push({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes()),text:txt,photo:ph,from:f.dataset.from||''}); save();
@@ -2107,6 +2123,73 @@ FORMS.gomi=(f,fd)=>{
   if(mode==='nth'&&!nth.length){ toast('何週目かを選んでください'); return; }
   S.gomi=S.gomi||[]; S.gomi.push({id:'g'+Date.now().toString(36),name:(fd.get('name')||'').trim()||'ゴミ',em:(fd.get('em')||'').trim(),mode,days,nth:mode==='nth'?nth:[]});
   save(); toast('登録しました'); render();
+};
+
+/* ===== マイプロフィール（★1）と記念日（★2）=====
+   名前・ふりがな・生年月日・血液型・住所・電話は「私のこと」カード（S.set.me）と同じものを使う。
+   S.set.me に足すもの：zip, tels[], mails[], honseki
+   S.annivs=[{id,date:'YYYY-MM-DD',name,memo}] → カレンダーと1日のカードに毎年出る */
+const BLOODS=['','A','B','O','AB','わからない'];
+function meTels(){ const m=S.set.me; const t=(m.tels&&m.tels.length)?m.tels:(m.tel?[m.tel]:[]); return t.filter(Boolean); }
+function bdayText(b){
+  if(!/^\d{4}-\d\d-\d\d$/.test(b||'')) return h(b||'');
+  const w=wareki(b); const a=age(b,today());
+  return `${jpDate(b,false)}${w?`（${w}）`:''}${a!=null&&a>=0?`　${a}歳`:''}`;
+}
+function annivOn(s){ return (S.annivs||[]).filter(a=>a.date&&a.date.slice(5)===s.slice(5)&&a.date<=s); }
+function annivYears(a,s){ const y=+s.slice(0,4)-+a.date.slice(0,4); return y>0?y:null; }
+function vProfile(){
+  const m=S.set.me; const tels=meTels(); const mails=(m.mails||[]).filter(Boolean);
+  const isD=/^\d{4}-\d\d-\d\d$/.test(m.bday||'');
+  const sz=isD?seiza(m.bday.slice(5)):'';
+  const has=m.name||tels.length||m.addr||m.bday;
+  const pad=a=>a.concat(['','']).slice(0,Math.max(2,a.length+1)); const ts=pad(tels), ms=pad(mails);
+  const an=(S.annivs||[]).slice().sort((a,b)=>a.date.slice(5).localeCompare(b.date.slice(5)));
+  return sub('マイプロフィール',`
+  ${has?`<div class="sec prof"><h3>${h(m.name||'（名前なし）')}${m.kana?`<span class="small muted">　${h(m.kana)}</span>`:''}</h3><dl class="kv">
+    ${m.bday?`<dt>生年月日</dt><dd>${bdayText(m.bday)}</dd>`:''}
+    ${sz?`<dt>星座</dt><dd>${sz}</dd>`:''}
+    ${m.blood?`<dt>血液型</dt><dd>${h(m.blood)}${/^(A|B|O|AB)$/.test(m.blood)?'型':''}</dd>`:''}
+    ${m.addr||m.zip?`<dt>住所</dt><dd>${m.zip?`〒${h(m.zip)}<br>`:''}${h(m.addr||'')}${m.addr?`<span class="minis">${mapBtns(m.addr)}</span>`:''}</dd>`:''}
+    ${tels.map((t,i)=>`<dt>電話${tels.length>1?i+1:''}</dt><dd><a href="${telHref(t)}">${h(t)}</a></dd>`).join('')}
+    ${mails.map((t,i)=>`<dt>メール${mails.length>1?i+1:''}</dt><dd><a href="mailto:${h(t)}">${h(t)}</a></dd>`).join('')}
+    ${m.honseki?`<dt>本籍地</dt><dd>${h(m.honseki)}</dd>`:''}
+  </dl></div>`:sayBoo('あなたのことを書いておくページだよ。名前や生年月日は「私のこと」カードと同じものを使うよ。')}
+  <div class="sec"><h3>記念日</h3>
+    ${an.length?`<div class="list">${an.map(a=>{const nx=nextAnniv(a);return `<div class="row anrow"><span class="em">💐</span><span class="t"><b>${h(a.name)}</b><span>${+a.date.slice(5,7)}月${+a.date.slice(8)}日${a.date.slice(0,4)!=='0000'?`（${jpDate(a.date,false)}から）`:''}${nx.days===0?'　<b class="today">今日です</b>':`　あと${nx.days}日`}</span>${a.memo?`<span>${h(a.memo)}</span>`:''}</span><button class="mini" data-act="anndel" data-id="${a.id}">削除</button></div>`;}).join('')}</div>`:'<p class="muted small" style="margin:0 0 6px">まだありません。結婚記念日や、家族の大事な日などを入れておけます。</p>'}
+    <form data-form="anniv" class="anform"><div class="f2"><input type="date" name="date" required aria-label="記念日の日付"><input name="name" required placeholder="例：結婚記念日" aria-label="記念日の名前"></div>
+      <input name="memo" placeholder="メモ（なくてもよい）" aria-label="メモ"><button class="btn plain" type="submit">＋ 記念日を足す</button></form>
+    <p class="small muted" style="margin:6px 0 0">記念日はカレンダーと1日のカードに毎年出ます。</p></div>
+  <form class="sec" data-form="profile"><h3>${has?'書き直す':'書いておくこと'}</h3>
+    <div class="f"><label for="pf-name">名前</label><input id="pf-name" name="name" value="${h(m.name||'')}"></div>
+    <div class="f"><label for="pf-kana">ふりがな</label><input id="pf-kana" name="kana" value="${h(m.kana||'')}"></div>
+    <div class="f"><label for="pf-bday">生年月日</label><input id="pf-bday" name="bday" type="${isD||!m.bday?'date':'text'}" value="${h(m.bday||'')}" min="1900-01-01"><span class="small muted">星座と和暦は自動で出ます</span></div>
+    <div class="f"><label for="pf-blood">血液型</label><select id="pf-blood" name="blood">${BLOODS.concat(BLOODS.includes(m.blood||'')?[]:[m.blood]).map(b=>`<option value="${h(b)}" ${b===(m.blood||'')?'selected':''}>${b?h(b)+(/^(A|B|O|AB)$/.test(b)?'型':''):'（選ぶ）'}</option>`).join('')}</select></div>
+    <div class="f"><label for="pf-zip">郵便番号</label><input id="pf-zip" name="zip" inputmode="numeric" placeholder="例：420-0000" value="${h(m.zip||'')}" style="max-width:10em"></div>
+    <div class="f"><label for="pf-addr">住所</label><input id="pf-addr" name="addr" value="${h(m.addr||'')}"></div>
+    <div class="f"><span class="lb">電話（いくつでも）</span>${ts.map((t,i)=>`<input name="tels" type="tel" value="${h(t)}" placeholder="${i?(i+1)+'つ目の番号':'例：090-0000-0000'}" aria-label="電話${i+1}" style="margin-bottom:4px">`).join('')}</div>
+    <div class="f"><span class="lb">メール（いくつでも）</span>${ms.map((t,i)=>`<input name="mails" type="email" value="${h(t)}" placeholder="${i?(i+1)+'つ目のアドレス':'例：name@example.com'}" aria-label="メール${i+1}" style="margin-bottom:4px">`).join('')}</div>
+    <div class="f"><label for="pf-hon">本籍地</label><input id="pf-hon" name="honseki" value="${h(m.honseki||'')}"></div>
+    <p class="small muted">暗証番号・カード番号・マイナンバーは書かないでください。</p>
+    <div class="btns"><button class="btn" type="submit">登録する</button><button class="btn plain" type="button" data-go="me">「私のこと」カードを見る</button></div>
+  </form>`,{crumb:'私と家族 › マイプロフィール'});
+}
+function nextAnniv(a){ const t=today(); let y=+t.slice(0,4); let s=`${y}-${a.date.slice(5)}`; if(s<t){ y++; s=`${y}-${a.date.slice(5)}`; }
+  return {s,days:Math.round((parseD(s)-parseD(t))/864e5)}; }
+Object.assign(ACTS,{
+  anndel:el=>{ if(el.dataset.sure!=='1'){ el.dataset.sure='1'; el.textContent='もう一度押すと削除'; return; } S.annivs=(S.annivs||[]).filter(a=>a.id!==el.dataset.id); save(); render(); }
+});
+FORMS.profile=(f,fd)=>{
+  const m=S.set.me;
+  for(const k of ['name','kana','bday','blood','zip','addr','honseki']) m[k]=String(fd.get(k)||'').trim();
+  m.tels=fd.getAll('tels').map(x=>String(x).trim()).filter(Boolean); m.tel=m.tels[0]||'';
+  m.mails=fd.getAll('mails').map(x=>String(x).trim()).filter(Boolean);
+  save(); toast('登録しました'); render(); window.scrollTo(0,0);
+};
+FORMS.anniv=(f,fd)=>{
+  const date=fd.get('date'), name=String(fd.get('name')||'').trim(); if(!date||!name){ toast('日付と名前を入れてください'); return; }
+  S.annivs=S.annivs||[]; S.annivs.push({id:'a'+Date.now().toString(36),date,name,memo:String(fd.get('memo')||'').trim()});
+  save(); toast('記念日を足しました'); render();
 };
 
 </script>

@@ -21,6 +21,7 @@ function routeView(r){
     case 'weather': return vWeather(arg);
     case 'bosai': return vBosai();
     case 'guide': return vGuide();
+    case 'gomi': return vGomi();
     case 'otayori': return vOtayori();
     case 'search': return vSearch(arg);
     case 'settings': return vSettings();
@@ -28,6 +29,7 @@ function routeView(r){
     case 'gridpick': return vGridPick(arg);
     case 'otasukeset': return vOtasukeSet();
     case 'me': return vMe();
+    case 'profile': return vProfile();
     case 'data': return vData();
     case 'install': return vInstall();
     case 'meds': return vMeds();
@@ -63,6 +65,7 @@ function after(r){
   const tmo=$('#ev-tmode'); if(tmo) tmo.addEventListener('change',()=>{ const v=$('#ev-tmode input:checked').value; $('#ev-times').hidden=v!=='set'; });
   const pla=$('#plarea'); if(pla) pla.addEventListener('change',()=>{UI.plArea=pla.value; UI.plNear=null; render();});
   const pad_=$('#pl-addr'); if(pad_) pad_.addEventListener('input',()=>{ const pr=prefOf(pad_.value), ct=cityOf(pad_.value); if(pr) $('#pl-pref').value=pr; if(ct) $('#pl-city').value=ct; $('[name=lat]').value=''; $('[name=lon]').value=''; $('#pl-pos').textContent='住所を入れると、登録するときに位置を自動で調べます'; });
+  const gmm=$('#gm-mode'); if(gmm) gmm.addEventListener('change',()=>{ $('#gm-nth').hidden=$('#gm-mode input:checked').value!=='nth'; });
   const gq=$('#gq'); if(gq) gq.addEventListener('input',()=>{UI.gQ=gq.value; const tmp=document.createElement('div'); tmp.innerHTML=vGuide(); const n=tmp.querySelector('#glist'); if(n) $('#glist').innerHTML=n.innerHTML;});
   const mq=$('#mq'); if(mq) mq.addEventListener('input',()=>{UI.memoQ=mq.value;$('#mlist').innerHTML=memoList();});
   const sq=$('#sq'); if(sq&&!sq.value) try{sq.focus();}catch(e){}
@@ -250,7 +253,7 @@ const FORMS={
   },
   search:(f,fd)=>go('search/'+encodeURIComponent((fd.get('q')||'').trim()),true),
   otasuke:(f,fd)=>{ S.set.home={addr:fd.get('addr').trim(),tel:fd.get('tel').trim(),telName:fd.get('telName').trim()}; save(); toast('登録しました'); back(); },
-  me:(f,fd)=>{ for(const [k,v] of fd.entries()) S.set.me[k]=String(v).trim(); save(); toast('登録しました'); render(); window.scrollTo(0,0); },
+  me:(f,fd)=>{ for(const [k,v] of fd.entries()) S.set.me[k]=String(v).trim(); const me=S.set.me; if(me.tels&&me.tels.length){ if(me.tel) me.tels[0]=me.tel; else me.tels.shift(); } save(); toast('登録しました'); render(); window.scrollTo(0,0); },
   qmemo:(f,fd)=>{
     const txt=(fd.get('text')||'').trim(); const ph=fd.get('photo')||''; if(!txt&&!ph){toast('なにか書いてください');return;}
     const now=new Date(); S.memos.push({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes()),text:txt,photo:ph,from:f.dataset.from||''}); save();

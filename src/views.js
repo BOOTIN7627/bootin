@@ -50,7 +50,7 @@ function vHome(){
     const tag=UI.editGrid?'div':'button';
     return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
   }).join('');
-  const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>
+  const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>${gomiTag(t)}
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
     <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button><button class="btn plain" data-go="cal/${t.slice(0,7)}">📅 カレンダー</button></div></div>`;
   const fav=elder?S.people.filter(p=>p.fav&&p.phones&&p.phones[0]&&p.phones[0].num):[];
@@ -73,6 +73,7 @@ function vHome(){
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
 }
 function evRow(it,s,compact){
+  if(it.k==='an'){ const a=it.a; return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">${a.me?'🎂':'💐'}</span><span class="bd"><button style="all:unset;cursor:pointer;display:block" data-go="profile"><b>${h(a.name)}${it.yrs!=null?`（${it.yrs}${a.me?'歳':'周年'}）`:''}</b>${a.memo&&!compact?`<span>${h(a.memo)}</span>`:''}</button></span></div>`; }
   if(it.k==='bd'){ const p=it.p; const tel=p.phones&&p.phones.find(x=>x.num);
     return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">🎂</span><span class="bd"><button style="all:unset;cursor:pointer" data-go="person/${p.id}"><b>${h(p.name)}さんの誕生日${it.age!=null?`（${it.age}歳）`:''}</b></button>${tel&&!compact?`<span class="minis"><a class="mini tel" href="${telHref(tel.num)}">📞 電話</a></span>`:''}</span></div>`; }
   const e=it.e; const pl=placeOf(e); const ppl=(e.people||[]).map(id=>S.people.find(p=>p.id===id)).filter(Boolean);
@@ -115,7 +116,7 @@ function vDay(s){
   <div class="koyomi"><span class="kk">${wareki(s)}</span>${l?`<span class="kk">旧暦 ${l.leap?'閏':''}${l.m}月${l.d}日</span><span class="kk">${rokuyo(s)}</span>`:''}${sk?`<span class="kk">${sk}</span>`:''}
     ${hj?`<button class="kk hol" data-act="explain" data-k="jp" data-n="${h(hj)}">🎌 ${h(hj)} ⓘ</button>`:''}${hc?`<button class="kk cn" data-act="explain" data-k="cn" data-n="${h(hc)}">中国：${h(hc)} ⓘ</button>`:''}
     ${s!==today()?`<button class="kk" data-go-r="day/${today()}">今日へ</button>`:''}</div>
-  <div class="chips">${chips}</div>
+  <div class="chips">${chips}</div>${gomiTag(s)}
   ${items.length?`<div class="evs">${items.map(it=>evRow(it,s,false)).join('')}</div>`:`<div class="empty">この日の予定はありません。</div>`}
   ${medDay(s)}
   <div class="btns"><button class="btn" data-go="evnew/${s}">＋ 予定を入れる</button><button class="btn plain" data-go="cal/${s.slice(0,7)}">📅 月のカレンダー</button></div>
@@ -154,7 +155,7 @@ function calCells(start,weeks,cat,cls){
   for(let i=0;i<weeks*7;i++){
     const d=new Date(start); d.setDate(start.getDate()+i); const s=ymd(d);
     const its=itemsOn(s,cat); const hj=holJP(s); const hc=holCN(s);
-    const shown=its.slice(0,2).map(it=>`<span class="e" style="background:${it.color}">${it.k==='bd'?'🎂'+h(it.p.name):(it.e.time?it.e.time.replace(/^0/,'')+' ':'')+h(it.e.title)}</span>`).join('');
+    const shown=its.slice(0,2).map(it=>`<span class="e" style="background:${it.color}">${it.k==='bd'?'🎂'+h(it.p.name):it.k==='an'?(it.a.me?'🎂':'💐')+h(it.a.name):(it.e.time?it.e.time.replace(/^0/,'')+' ':'')+h(it.e.title)}</span>`).join('');
     const c=cls(d); cells+=`<button class="dy ${c} ${s===t?'today':''}" data-go="day/${s}" aria-label="${jpDate(s)} 予定${its.length}件"><span class="n ${dayClass(s)}">${d.getDate()===1&&c!=='out'?(d.getMonth()+1)+'/':''}${d.getDate()}</span>${hj?`<span class="hn">${h(hj)}</span>`:hc?`<span class="hn" style="color:#B23A3A">${h(hc)}</span>`:''}${shown}${its.length>2?`<span class="mo">他${its.length-2}件</span>`:''}</button>`;
   }
   return `<div class="cal">${[...WD].map((w,i)=>`<div class="wd ${i===0?'c-sun':i===6?'c-sat':''}">${w}</div>`).join('')}${cells}</div>`;
@@ -587,7 +588,7 @@ function vMe(){
   return sub('「私のこと」カード',`
   ${has?`<div class="mecard"><h3>私のこと　关于我　About me</h3><dl class="kv" style="grid-template-columns:8.5em 1fr">
     ${m.name?L('名前','姓名','Name')+`<dd><b style="font-size:1.2rem">${h(m.name)}</b>${m.kana?`<br><span class="small">${h(m.kana)}</span>`:''}</dd>`:''}
-    ${m.bday?L('生年月日','出生日期','Birth')+`<dd>${h(m.bday)}</dd>`:''}
+    ${m.bday?L('生年月日','出生日期','Birth')+`<dd>${/^\d{4}-\d\d-\d\d$/.test(m.bday)?`${h(m.bday.replace(/-/g,'/'))}<br><span class="small">${bdayText(m.bday)}</span>`:h(m.bday)}</dd>`:''}
     ${m.blood?L('血液型','血型','Blood')+`<dd>${h(m.blood)}</dd>`:''}
     ${m.addr?L('住所','住址','Address')+`<dd>${h(m.addr)}</dd>`:''}
     ${m.sick?L('持病','慢性病','Conditions')+`<dd>${h(m.sick)}</dd>`:''}

@@ -16,7 +16,8 @@ const IMPL={
   '設定・機能/トップ画面の設定':'settings','設定・機能/トップ画面の設定/出すものと見た目':'settings',
   '設定・機能/マイルームの設定/データと見やすさ':'data',
   'NEWS・知識/NEWS/天気の詳細':'weather','生活管理/天気・防災/天気':'weather','生活管理/天気・防災/防災情報':'bosai',
-  'おたのしみ/ぶーちん劇場/劇場':'otayori'
+  'おたのしみ/ぶーちん劇場/劇場':'otayori',
+  '私と家族/マイプロフィール/マイプロフィール':'profile','私と家族/マイプロフィール/もしものとき':'me'
 };
 /* 外せない土台 */
 const LOCKED=new Set(['設定・機能','設定・機能/トップ画面の設定','設定・機能/トップ画面の設定/出すものと見た目','設定・機能/マイルームの設定','設定・機能/マイルームの設定/データと見やすさ','設定・機能/その他の機能','設定・機能/その他の機能/聞く・探す','設定・機能/その他の機能/さっとメモ（メモの一元管理）','おたのしみ','おたのしみ/ぶーちん劇場','おたのしみ/ぶーちん劇場/劇場']);
@@ -90,7 +91,7 @@ function fresh(){
       wx:{name:'静岡',lat:34.98,lon:138.38},evcats:EVCATS.map(c=>({...c})),
       pcats:[{id:'c1',name:'家族',color:0},{id:'c2',name:'親せき',color:1},{id:'c3',name:'友人',color:3},{id:'c4',name:'仕事',color:5},{id:'c5',name:'ご近所',color:7},{id:'other',name:'その他',color:9}],
       minStep:15,hFrom:6,hTo:22,topCal:'from',meal:{b:'07:00',l:'12:00',d:'18:00',s:'22:00'},genres:{},started:new Date().toISOString().slice(0,10)},
-    people:[],places:[],events:[],memos:[],meds:[],medlog:{},daymemo:{},cache:{}};
+    gomi:[],people:[],places:[],events:[],memos:[],meds:[],medlog:{},daymemo:{},cache:{}};
 }
 let S;
 function load(){
@@ -137,6 +138,8 @@ function wareki(s){const d=parseD(s);const y=d.getFullYear();
   if(s>='2019-05-01'){const n=y-2018;return '令和'+(n===1?'元':n)+'年';}
   if(s>='1989-01-08'){const n=y-1988;return '平成'+(n===1?'元':n)+'年';}
   if(s>='1926-12-25'){const n=y-1925;return '昭和'+(n===1?'元':n)+'年';}
+  if(s>='1912-07-30'){const n=y-1911;return '大正'+(n===1?'元':n)+'年';}
+  if(s>='1868-01-25'){const n=y-1867;return '明治'+(n===1?'元':n)+'年';}
   return '';}
 const HOLCACHE={};
 function nthMon(y,m,n){const d=new Date(y,m-1,1);const off=(8-d.getDay())%7;return ymd(new Date(y,m-1,1+off+(n-1)*7));}
@@ -191,6 +194,8 @@ function itemsOn(s,catFilter){
   for(const e of S.events){ if(occurs(e,s)&&(!catFilter||e.cat===catFilter)) out.push({k:'ev',e,allday:!e.time,unk:!e.time&&e.tmode==='unknown',time:e.time||'',color:evCat(e.cat).color}); }
   if(!catFilter||catFilter==='home'){
     for(const p of S.people){ if(p.bday&&p.bday.slice(5)===s.slice(5)){ const a=age(p.bday,s); out.push({k:'bd',p,allday:true,time:'',color:'#D6457A',age:a}); } }
+    const mb=S.set.me&&S.set.me.bday; if(/^\d{4}-\d\d-\d\d$/.test(mb||'')&&mb.slice(5)===s.slice(5)&&mb<=s) out.push({k:'an',a:{name:'あなたの誕生日',me:true},allday:true,time:'',color:'#D6457A',yrs:age(mb,s)});
+    for(const a of (S.annivs||[])){ if(a.date&&a.date.slice(5)===s.slice(5)&&a.date<=s){ const y=+s.slice(0,4)-+a.date.slice(0,4); out.push({k:'an',a,allday:true,time:'',color:'#C07A00',yrs:a.date.startsWith('0000')||y<=0?null:y}); } }
   }
   out.sort((a,b)=>(a.allday===b.allday?0:a.allday?-1:1)||(!!a.unk-!!b.unk)||a.time.localeCompare(b.time));
   return out;
