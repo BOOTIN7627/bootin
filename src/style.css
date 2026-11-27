@@ -510,5 +510,13 @@ button.brand{border:0;background:none;color:inherit;padding:0;text-align:left;cu
 .brain{text-align:center}.bq{font-size:2.6rem;font-weight:900;margin:14px 0;font-family:var(--round,inherit)}
 .brain form{display:flex;gap:8px;justify-content:center}.ba{width:6em;font-size:1.8rem;text-align:center;padding:6px;border:3px solid var(--ink);border-radius:12px}
 .famrow{align-items:center}.pinin{font-size:1.4rem;letter-spacing:.4em;text-align:center;padding:8px;border:2px solid var(--line);border-radius:12px;max-width:8em}
+.kksum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}.kksum span{display:block;font-size:.8rem;color:var(--sub)}
+.kksum b{font-size:1.05rem}.kksum b.out,.kkrow .amt.out{color:#C62828}.kksum b.in,.kkrow .amt.in{color:#1565C0}
+.kkio{margin-bottom:6px}.kkcats{padding:0 0 6px}
+.kkday{font-weight:700;color:var(--sub);font-size:.85rem;margin:8px 0 2px}
+.kkrow{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:center;padding:5px 0;border-bottom:1px dashed var(--line)}
+.kkrow .t span{display:block;font-size:.8rem;color:var(--sub)}.kkrow .amt{font-weight:700}
+.kkbar{display:grid;grid-template-columns:7.5em 1fr 6em;gap:6px;align-items:center;font-size:.88rem;margin:3px 0}.kkbar i{display:block;height:12px;border-radius:6px;background:#E57373}.kkbar b{text-align:right}
 .tblist{display:flex;flex-wrap:wrap;gap:4px}.tblist span{background:var(--soft);border-radius:8px;padding:3px 8px;font-size:.88rem}
 .tblist span.on{background:var(--accent);color:#fff;font-weight:700}.tbnow{font-size:1.2rem}
+.kkcats{flex-wrap:wrap;overflow:visible}form[data-form=kakei] .two>div{min-width:0}form[data-form=kakei] input{min-width:0;max-width:100%}
