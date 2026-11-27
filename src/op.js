@@ -27,7 +27,21 @@ const OP_PATTERNS=[
     <div class="op-say op-s1">オレは全知全能だぜ！</div>
     <div class="op-say op-s3">もじもじ…</div>
     <div class="op-eri"><div class="op-say op-sEri">憑いてるね。<br>お祓いしてこ</div><img src="${OP_ERI}" alt=""><span class="op-name">チビえり</span></div>
-    <div class="op-pow op-powE">シャラーン</div>${OP_LOGO}`
+    <div class="op-pow op-powE">シャラーン</div>${OP_LOGO}`,
+  /* 3: アンギエのいたずら（サングラスを取られる）→ ファーの一喝 */
+  ()=>{ const s=k=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(OP3_SVG[k]||'');
+   return `<div class="op-burst"></div><div class="op-flash"></div>
+    <img class="op3-peek" src="${s('angie_joy')}" alt="">
+    ${opBooWrap().replace('<img class="op-b2"',`<img class="op3-bk" src="${s('boo_bikkuri')}" alt=""><img class="op-b2"`)}
+    <div class="op-say op-s1">最強伝説が始まるぜ！</div>
+    <div class="op3-wild"><img src="${s('angie_wild')}" alt=""><span class="op-name">アンギエ</span></div>
+    <div class="op-pow op3-hyoi">ヒョイッ</div>
+    <div class="op-jag op3-jag1"><div class="op-jagIn"></div><span>アンギエの<br>方が似合うぜ</span></div>
+    <div class="op-say op3-s2">主役はオレなのに…</div>
+    <div class="op3-sad"><img src="${s('angie_sad')}" alt=""><span class="op-name">アンギエ</span></div>
+    <div class="op3-fa"><img src="${s('fa_ang')}" alt=""><span class="op-name">ファー</span></div>
+    <div class="op-jag op3-jag2"><div class="op-jagIn"></div><span>いたずらアンギエ、<br>お兄さんをイジメると<br>ご飯抜きだよ！</span></div>
+    ${OP_LOGO}<div class="op3-catch">ライフサポート万能アプリ</div>`; }
 ];
 function playOpening(n){
   $('.op-bg')?.remove();
