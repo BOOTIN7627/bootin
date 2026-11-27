@@ -2,7 +2,7 @@ import base64, json, os, shutil
 d=lambda f:'data:image/png;base64,'+base64.b64encode(open(f,'rb').read()).decode()
 tree=open('tree.json').read(); koyomi=open('koyomi.json').read()
 css=open('style.css').read()+open('op.css').read()
-js=f"const TREE={tree};\nconst KOYOMI={koyomi};\nconst BOO_F='{d('boo_f.png')}';\nconst OP_BOO='{d('op_boo_f.png')}';\nconst OP_SAD='{d('op_boo_sad.png')}';\nconst OP_EN='{d('op_en_angry.png')}';\nconst OP_TON='{d('op_ton.png')}';\nconst OP_ERI='{d('op_eri.png')}';\nconst OP_AYA='{d('op_aya.png')}';\n"+open('core.js').read()+open('views.js').read()+open('meds.js').read()+open('op.js').read()+open('bosai.js').read()+open('guide.js').read()+open('app.js').read()+open('gomi.js').read()+open('profile.js').read()
+js=f"const TREE={tree};\nconst KOYOMI={koyomi};\nconst BOO_F='{d('boo_f.png')}';\nconst OP_BOO='{d('op_boo_f.png')}';\nconst OP_SAD='{d('op_boo_sad.png')}';\nconst OP_EN='{d('op_en_angry.png')}';\nconst OP_TON='{d('op_ton.png')}';\nconst OP_ERI='{d('op_eri.png')}';\nconst OP_AYA='{d('op_aya.png')}';\n"+open('core.js').read()+open('views.js').read()+open('meds.js').read()+open('op.js').read()+open('bosai.js').read()+open('guide.js').read()+open('app.js').read()+open('gomi.js').read()+open('profile.js').read()+open('health.js').read()
 fonts='<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">'
 body=f'<style>{css}</style>\n<div id="app"></div>\n<script>\n{js}\n</script>\n'
 # artifact

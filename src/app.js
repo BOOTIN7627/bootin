@@ -30,6 +30,9 @@ function routeView(r){
     case 'otasukeset': return vOtasukeSet();
     case 'me': return vMe();
     case 'profile': return vProfile();
+    case 'health': return vHealth();
+    case 'hlist': return vHList();
+    case 'hcheck': return vHCheck();
     case 'data': return vData();
     case 'install': return vInstall();
     case 'meds': return vMeds();
@@ -78,6 +81,7 @@ function after(r){
     $('#pl-genre').addEventListener('change',e=>{ const t=e.target; if(t.checked&&t.dataset.big){ const b=$(`#pl-big input[value="${t.dataset.big}"]`); if(b&&!b.checked) b.checked=true; } });
   }
   const imf=$('#imp-file'); if(imf) imf.addEventListener('change',()=>{const f=imf.files[0]; if(!f) return; const fr=new FileReader(); fr.onload=()=>doImport(fr.result); fr.readAsText(f);});
+  const hd=$('#hl-date'); if(hd) hd.addEventListener('change',()=>{UI.hDate=hd.value; render();});
   medAfter();
   $$('details.tree[data-red]').forEach(d=>d.addEventListener('toggle',()=>{d.open?UI.openReds.add(d.dataset.red):UI.openReds.delete(d.dataset.red);}));
 }
