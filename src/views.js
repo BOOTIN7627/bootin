@@ -558,7 +558,7 @@ function vSettings(){
   </div>
   <p class="small muted">BOOTIN 試作版 ${VERSION}</p>
   <div class="sec"><h3>ご意見・ご要望</h3><div class="list"><button class="row" data-go="iken"><span class="em">📮</span><span class="t"><b>ぶーちんへのご意見・ご要望</b><span>使いにくいところ、ほしい機能を送れます。返事も届きます</span></span><span class="go">›</span></button>
-    <button class="row room" data-go="room"><span class="em">🐷</span><span class="t"><b>ぶーちんの部屋</b><span>合言葉で入る部屋です</span></span><span class="go">🔒</span></button></div></div>`,{crumb:'設定・機能'});
+    <button class="row room" data-go="room"><span class="em">🐷</span><span class="t"><b>ぶーちんの部屋</b><span>合言葉で入る部屋です</span></span><span class="go">🔒</span></button></div></div><p class="small muted" style="text-align:center">この画面の版：${BUILD}</p>`,{crumb:'設定・機能'});
 }
 function vFeatures(){
   const sw=(id,cls)=>{const n=NODES[id];const lock=LOCKED.has(id);const on=!S.set.off[id]||lock;
