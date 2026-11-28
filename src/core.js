@@ -48,7 +48,7 @@ function redOf(id){let n=NODES[id];while(n&&n.parent)n=NODES[n.parent];return n?
 function emojiOf(id){const n=NODES[id];if(!n)return '❔';return (n.lv!=='r'&&BLUE_EMOJI[n.name])||RED_EMOJI[redOf(id)]||'📁';}
 function implOf(id){return IMPL[id]||null;}
 function hasImpl(id){ if(IMPL[id])return true; const n=NODES[id]; return !!(n&&n.kids.some(hasImpl)); }
-function isOff(id){ if(S.set.mode==='student'&&String(id).startsWith('ビジネス')) return true; let n=NODES[id]; while(n){ if(S.set.off[n.id]&&!LOCKED.has(n.id))return true; n=NODES[n.parent]; } return false; }
+function isOff(id){ if(S.set.mode==='student'&&String(id).startsWith('ビジネス')) return true; if((S.set.style==='black'||S.set.style==='ladies')&&String(id).startsWith('おたのしみ/ぶーちん劇場')) return true; let n=NODES[id]; while(n){ if(S.set.off[n.id]&&!LOCKED.has(n.id))return true; n=NODES[n.parent]; } return false; }
 
 /* ---- 保存 ---- */
 const KEY='bootin.v1';

@@ -219,7 +219,10 @@ function styleAfter(){
   if(!coolStyle()||/^gekijo/.test(cur())) return;
   $$('#app img').forEach(im=>{ if(isChara(im.getAttribute('src')||'')) im.remove(); });
   $$('#app .hb.kuro').forEach(b=>{ b.childNodes.forEach(n=>{ if(n.nodeType===3) n.textContent=n.textContent.replace('クロにゃんに聞く','AIに聞く'); }); });
-  $$('#app .mini-ota .t').forEach(t=>{ t.textContent='お知らせ'; });
+  $$('#app .mini-ota .t').forEach(t=>{ t.textContent='管理者より'; });
+  /* 「ぶーちんより」などは「管理者より」に */
+  const tw=document.createTreeWalker($('#app'),NodeFilter.SHOW_TEXT); const RP=[[/ぶーちんからのお便り/g,'管理者からのお便り'],[/ぶーちんのお便り/g,'管理者のお便り'],[/ぶーちんより/g,'管理者より']];
+  for(let n=tw.nextNode();n;n=tw.nextNode()){ let v=n.textContent; if(v.indexOf('ぶーちん')<0) continue; RP.forEach(([a,b])=>{v=v.replace(a,b);}); if(v!==n.textContent) n.textContent=v; }
   $$('#app .say').forEach(x=>{ x.classList.add('nochara'); });
 }
 /* オープニングは、クールのモード専用のものを後で作る。それまでは出さない */
