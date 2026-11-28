@@ -79,7 +79,7 @@ function vTrips(id){
       <div class="btns"><button class="btn" type="submit">保存する</button>${tr?`<button class="btn danger" type="button" data-act="tripdel" data-id="${tr.id}">削除</button>`:''}</div></form>`,{crumb:'おたのしみ › 旅行'}); }
   if(!tr) return sub('旅行計画',`${L.length?'':sayBoo('行きたい場所と交通手段を入れると、時間の目安を組み立てて「旅のしおり」にするよ。車なら運行計画表も作るよ。A4で印刷やPDFにもできるよ。')}
     <div class="list">${L.slice().sort((a,b)=>(b.from||'').localeCompare(a.from||'')).map(x=>`<button class="row" data-go="trips/${x.id}"><span class="em">🧳</span><span class="t"><b>${h(x.name)}</b><span>${x.from?jpDate(x.from,false)+(x.to&&x.to!==x.from?'〜'+(+x.to.slice(5,7))+'/'+(+x.to.slice(8)):''):'日にち未定'}・行き先${(x.stops||[]).length}か所</span></span><span class="go">›</span></button>`).join('')}</div>
-    <div class="btns">${L.length<10?'<button class="btn" data-go="trips/new">＋ 旅行を作る</button>':''}</div><p class="small muted">${L.length}/10件</p>`,{crumb:'おたのしみ › 旅行'});
+    <div class="btns">${L.length<10?'<button class="btn" data-go="trips/new">＋ 旅行を作る</button><button class="btn plain" data-act="trippastenew">📋 ジェミニなどで作った計画を貼り付けて作る</button>':''}</div><p class="small muted">${L.length}/10件</p>`,{crumb:'おたのしみ › 旅行'});
   const nd=tripDays(tr); const plan=tripPlan(tr); const ed=UI.stopEdit&&(tr.stops||[]).find(s=>s.id===UI.stopEdit);
   let body=''; for(const D of plan){ if(nd>1) body+=`<div class="kkday">${D.d}日目${D.date?`　${jpDate(D.date)}`:''}</div>`;
     const st=tripStops(tr,D.d);
@@ -96,6 +96,7 @@ function vTrips(id){
   return sub(tr.name,`<div class="sec"><h3>🧳 ${h(tr.name)} <button class="more" data-act="tripedit" data-id="${tr.id}">直す ›</button></h3>
     <p style="margin:0">${tripDateTxt(tr)}</p><p class="small muted" style="margin:4px 0 0">出発：${h(tr.start||'（未入力）')} ${h(tr.startTime||'08:00')}・主な交通：${h(tr.mode||'未選択')}${tripPeople(tr)?'・'+h(tripPeople(tr)):''}${tr.members?'（'+h(tr.members)+'）':''}</p>${tr.memo?`<p class="small" style="white-space:pre-wrap;margin:6px 0 0">${h(tr.memo)}</p>`:''}</div>
   <div class="btns"><button class="btn w" data-act="tripbuild" data-id="${tr.id}">🧭 時間の目安を出して行程を組み立てる</button></div>
+  <div class="btns"><button class="btn plain w" data-go="trippaste/${tr.id}">📋 ジェミニなどで作った計画を貼り付ける</button></div>
   <p class="small muted" style="margin:-2px 0 8px">場所と交通手段から、移動時間の目安（地図の直線距離から計算）を入れて並べます。着く時間・いる時間・移動時間は「✏️ 直す」で自由に変えられます。</p>
   ${(()=>{ const n=(tr.stops||[]).filter(s=>!s.addr).length; return n?`<div class="camnote warn" style="margin:0 0 8px">⚠️ 住所が入っていない場所が <b>${n}か所</b> あります。車のナビに入れるため、各場所の「✏️ 直す」で住所と電話番号（あれば）を入れてください。「MAP」を押すとGoogleマップで住所や電話番号を確かめられます。</div>`:''; })()}
   <div class="sec"><h3>📍 行程</h3>${body}</div>
