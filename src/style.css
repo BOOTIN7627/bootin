@@ -997,3 +997,12 @@ html.f3 .top0 .qb.q-menu .em,.topnav.elder.top0 .qb.q-menu .em{font-size:1rem}
 .top0 .qb.q-menu{border-radius:14px;width:100%;height:auto;min-height:64px;aspect-ratio:auto;align-self:stretch}
 .top0 .qb.q-menu span:last-child{font-size:.7rem}
 html.f3 .top0 .qb.q-menu span:last-child,.topnav.elder.top0 .qb.q-menu span:last-child{font-size:.62rem}
+/* 基本MENU：黄色地に黒字、となりのボタンと同じ大きさ（本人 11/28） */
+.topnav.top0,.topnav.elder.top0{grid-template-columns:3fr 1fr}
+.top0 .t0r{display:block}
+.top0 .qb.q-menu{width:100%;height:100%;min-height:64px;border-radius:14px;background:#FFD43B;color:#1E1B14;border:2px solid #1E1B14;box-shadow:0 3px 0 rgba(0,0,0,.3);filter:none}
+.top0 .qb.q-menu .em{filter:none}
+.top0 .qb.q-menu span:last-child{font-size:.74rem;color:#1E1B14}
+[data-style="black"] .top0 .qb.q-menu{background:linear-gradient(180deg,#3B3418,#211D0E);border-color:#9A8634;color:var(--glowtx);box-shadow:0 0 10px rgba(154,134,52,.45)}
+[data-style="black"] .top0 .qb.q-menu span:last-child{color:var(--glowtx)}
+[data-style="ladies"] .top0 .qb.q-menu{background:#FFE08A;border-color:#A82E45;color:#3B2A2F}
