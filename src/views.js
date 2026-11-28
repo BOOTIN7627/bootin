@@ -46,7 +46,8 @@ function vHome(){
     const tag=UI.editGrid?'div':'button';
     return `<${tag} class="cell" ${UI.editGrid?'':`data-act="open" data-id="${h(id)}"`}><span class="em">${emojiOf(id)}</span><span class="nm">${h(n.name)}</span>${ctl}</${tag}>`;
   }).join('');
-  const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>${gomiTag(t)}${tobanTag()}
+  const star=S.events.filter(e=>e.top&&occurs(e,t));
+  const todaySec=`${star.map(e=>`<button class="evstar" data-go="ev/${e.id}"><span class="em">⭐</span><span class="t"><b>${h(e.title)}</b><span>今日 ${e.time?e.time.replace(/^0/,'')+'から':'（時間なし）'}${e.place?'　'+h(e.place):''}</span></span><span class="go">›</span></button>`).join('')}<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>${gomiTag(t)}${tobanTag()}
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
     <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button>${(S.gomi||[]).length?'':'<button class="btn plain" data-go="gomi">🗑️ ゴミの日を登録</button>'}</div></div>`;
   const fav=elder?S.people.filter(p=>p.fav&&p.phones&&p.phones[0]&&p.phones[0].num):[];
@@ -68,7 +69,7 @@ function vHome(){
   ${quickRows()}
   ${UI.editGrid?`<div class="editbar"><span class="small muted">◀ ▶ で並べかえ、✎ で中身を変えます</span><button class="ib" data-act="gedit">✓ できあがり</button></div>`:''}
   ${rainNote()}${laundryBar()}
-  <div class="mobile-only">${todaySec}</div>${stuTop()}${medTop()}
+  <div class="mobile-only">${todaySec}</div>${stuTop()}${medTop()}${myBtns()}
   <div class="minirow">${miniCal()}<div class="minibox">${wxMini()}${otaMini()}</div></div>
   ${UI.editGrid?'':`<div class="editbar end"><button class="ib ghost" data-act="gedit">⇄ ボタンの並べかえ</button></div>`}
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
@@ -119,9 +120,10 @@ function vNode(id){
       <div class="btns"><button class="btn plain" data-act="qmemo">✏️ ここに欲しいことをメモ</button></div>`,{crumb:crumbOf(id)});
   }
   const kids=n.kids.filter(k=>!isOff(k)).sort((a,b)=>hasImpl(b)-hasImpl(a)); const hidden=n.kids.length-kids.length;
+  const rc=redOf(id), mc=S.memos.filter(m=>m.cat===rc).length;
   return sub(n.name,`${lvBand(n)}<div class="list lvlist lv-${n.lv==='r'?'b':'y'}">${kids.map(k=>{const kn=NODES[k];const ok=hasImpl(k);
       return `<button class="row" data-act="open" data-id="${h(k)}"><span class="em">${emojiOf(k)}</span><span class="t"><b>${h(kn.name)}</b><span>${kn.kids.length?kn.kids.map(x=>NODES[x].name).join('・'):(kn.items||[]).slice(0,2).map(x=>x[0]).join('・')}</span></span>${ok?'<span class="badge ok">使える</span>':'<span class="badge wait">準備中</span>'}<span class="go">›</span></button>`;}).join('')}</div>
-    ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}${id==='設定・機能'?`<button class="row guiderow" data-go="menumap" style="margin-top:10px"><span class="em">🗺️</span><span class="t"><b>メニューの全体図</b><span>どのボタンの中に、どの機能があるかを一覧で見られます</span></span><span class="go">›</span></button><p class="small muted" style="text-align:center">この画面の版：${BUILD}</p>`:''}`,{crumb:crumbOf(id)});
+    ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}<button class="row memorow" data-act="memoof" data-c="${h(rc)}"><span class="em">📝</span><span class="t"><b>「${h(rc)}」のメモ</b><span>${mc?mc+'件あります':'まだありません。右下の「✏️ メモ」で書けます'}</span></span><span class="go">›</span></button>${id==='設定・機能'?`<button class="row guiderow" data-go="menumap" style="margin-top:10px"><span class="em">🗺️</span><span class="t"><b>メニューの全体図</b><span>どのボタンの中に、どの機能があるかを一覧で見られます</span></span><span class="go">›</span></button><p class="small muted" style="text-align:center">この画面の版：${BUILD}</p>`:''}`,{crumb:crumbOf(id)});
 }
 
 /* ---------- 1日のカード ---------- */
@@ -225,6 +227,8 @@ function vEvent(id,date){
   <div class="f"><label for="ev-place">場所（自由に書く）</label><input id="ev-place" name="place" value="${h(e.place||'')}" placeholder="例：静岡駅北口、〇〇公民館"></div>
   ${ppl.length?`<div class="f"><span class="lb">いっしょの人（人物帳から）</span><div class="choose">${ppl.map(p=>`<label><input type="checkbox" name="people" value="${p.id}" ${(e.people||[]).includes(p.id)?'checked':''}>${h(p.name)}</label>`).join('')}</div></div>`:''}
   <div class="f"><label for="ev-memo">メモ</label><textarea id="ev-memo" name="memo" placeholder="持ち物、話すことなど">${h(e.memo||'')}</textarea></div>
+  <div class="f"><label class="ck"><input type="checkbox" name="top" ${e.top?'checked':''}> ⭐ 大事な予定（その日、トップにいちばん目立つように出す）</label></div>
+  <div class="f"><label for="ev-al">🔔 お知らせ（時刻がある予定だけ。ピピッと1回鳴ります）</label><select id="ev-al" name="alarm">${[['','鳴らさない'],['0','その時刻に'],['5','5分前'],['10','10分前'],['15','15分前'],['30','30分前'],['60','1時間前'],['120','2時間前']].map(([v,n])=>`<option value="${v}" ${String(e.alarm??'')===v?'selected':''}>${n}</option>`).join('')}</select></div>
   <div class="btns"><button class="btn" type="submit">登録する</button>${isNew?'':`<button class="btn danger" type="button" data-act="delev" data-id="${id}">${UI.confirm==='ev'+id?'本当に削除する':'この予定を削除'}</button>`}</div>
   </form>`);
 }
@@ -603,7 +607,7 @@ function vFeatures(){
 function vGridPick(i){
   i=+i; const curId=S.set.grid[i];
   const btn=(id,cls)=>{const n=NODES[id];return `<div class="tw ${cls}"><span class="nm">${cls==='r'?RED_EMOJI[id]+' ':''}${h(n.name)} ${hasImpl(id)?'':'<span class="badge wait">準備中</span>'}</span><button class="mini" data-act="gset" data-i="${i}" data-id="${h(id)}" ${curId===id?'disabled':''}>${curId===id?'置いてある':'ここに置く'}</button></div>`;};
-  return sub(`${i+1}番目のマスに置くもの`,`<p class="small muted" style="margin:0">大きな入口（赤枠）だけでなく、中の枠（青・黄）も直接置けます。</p>
+  return sub(i>=9?'マイボタンに置くもの':`${i+1}番目のマスに置くもの`,`<p class="small muted" style="margin:0">大きな入口（赤枠）だけでなく、中の枠（青・黄）も直接置けます。</p>
   <div class="btns"><button class="btn plain" data-act="gset" data-i="${i}" data-id="">このマスを空にする</button></div>
   ${ROOTS.filter(r=>!isOff(r)).map(rid=>`<details class="tree"><summary>${RED_EMOJI[rid]} ${h(rid)}</summary>${btn(rid,'b').replace('tw b','tw')}${NODES[rid].kids.filter(b=>!isOff(b)).map(b=>btn(b,'b')+NODES[b].kids.filter(y=>!isOff(y)).map(y=>btn(y,'y')).join('')).join('')}</details>`).join('')}`);
 }

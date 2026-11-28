@@ -182,3 +182,22 @@ function ymdSel(name,val,o={}){
 document.addEventListener('change',e=>{ const w=e.target.closest&&e.target.closest('.ymd'); if(!w) return;
   const y=w.querySelector('.ymd-y').value, m=w.querySelector('.ymd-m').value, d=w.querySelector('.ymd-d').value;
   w.querySelector('input[type=hidden]').value=y&&m&&d?`${y}-${m}-${d}`:''; });
+
+/* マイボタン：好きな機能（青・黄の枠も）を、トップに8つまで足せる（S.set.grid の10番目から） */
+function myBtns(){
+  const g=S.set.grid||[]; const my=[]; for(let i=9;i<17;i++) if(g[i]&&NODES[g[i]]&&!isOff(g[i])) my.push(i);
+  const free=[...Array(8)].map((_,k)=>k+9).find(i=>!g[i]);
+  if(!my.length&&!UI.editGrid) return `<div class="mybtns"><button class="myb add" data-go="gridpick/${free}">＋ よく使う機能をトップに足す</button></div>`;
+  return `<div class="mybtns"><span class="mylab">マイボタン</span>${my.map(i=>`<span class="mybw"><button class="myb" data-act="open" data-id="${h(g[i])}">${emojiOf(g[i])} ${h(NODES[g[i]].name)}</button>${UI.editGrid?`<button class="myx" data-act="gset" data-i="${i}" data-id="" aria-label="外す">✕</button>`:''}</span>`).join('')}${free!=null?`<button class="myb add" data-go="gridpick/${free}">＋</button>`:''}</div>`;
+}
+
+/* 予定のお知らせ：決めた分だけ前に、ピピッと1回（アプリを開いている間。通知を許可していれば通知も） */
+const EVFIRED=new Set();
+function evAlarmCheck(now){
+  const t=today(); const hm=pad(now.getHours())+':'+pad(now.getMinutes());
+  for(const e of S.events){ if(e.alarm===''||e.alarm==null||!e.time||!occurs(e,t)) continue;
+    if(addMin(e.time,-(+e.alarm))!==hm) continue; const key=e.id+t; if(EVFIRED.has(key)) continue; EVFIRED.add(key);
+    pipi(); toast(`🔔 ${+e.alarm?e.alarm+'分後':'今から'}：${e.title}`);
+    try{ if('Notification' in window&&Notification.permission==='granted') new Notification('BOOTIN 予定のお知らせ',{body:`${e.time} ${e.title}`,icon:'icon4-192.png'}); }catch(x){} }
+}
+function pipi(){ try{ const A=window.AudioContext||window.webkitAudioContext; const a=new A(); [0,.16].forEach(s=>{ const o=a.createOscillator(),g=a.createGain(); o.frequency.value=1320; o.connect(g); g.connect(a.destination); g.gain.setValueAtTime(.25,a.currentTime+s); o.start(a.currentTime+s); o.stop(a.currentTime+s+.1); }); }catch(e){} try{navigator.vibrate&&navigator.vibrate(150);}catch(e){} }

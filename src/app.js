@@ -17,6 +17,7 @@ function routeView(r){
     case 'place': return vPlace(arg);
     case 'pledit': return vPlEdit(arg);
     case 'memo': return vMemo();
+    case 'memoedit': return vMemoEdit(arg);
     case 'tools': return vTools();
     case 'kuro': return vKuro(arg);
     case 'navi': return vNavi();
@@ -118,7 +119,7 @@ function tick(){
   const b=$('#bigT'); if(b) b.textContent=hm+':'+pad(now.getSeconds());
   const w=$('#world'); if(w&&now.getSeconds()===0) w.innerHTML=worldRows();
   const tm=$('#tmT'); if(tm&&T.timerRun) tm.textContent=fmtMS(T.timerEnd-Date.now());
-  if(now.getSeconds()<1) medCheck();
+  if(now.getSeconds()<1){ medCheck(); evAlarmCheck(now); }
   if(T.timerRun&&Date.now()>=T.timerEnd){ T.timerRun=false; T.timerLeft=0; beep(); toast('⏲️ 時間です！'); if(cur()==='tools') render(); }
   const sw=$('#swT'); if(sw&&T.swRun) sw.textContent=fmtSW(swNow());
   if($('#clockD')&&$('#clockD').textContent!==jpDate(today())&&cur()==='home') render();
@@ -250,7 +251,7 @@ const FORMS={
   event:(f,fd)=>{
     const id=f.dataset.id; const e=id?S.events.find(x=>x.id===id):{id:uid()};
     const tm=k=>fd.get(k+'_h')?fd.get(k+'_h')+':'+fd.get(k+'_m'):'';
-    Object.assign(e,{title:fd.get('title').trim(),date:fd.get('date'),time:fd.get('tmode')==='set'?tm('time'):'',etime:fd.get('tmode')==='set'&&tm('time')?tm('etime'):'',tmode:fd.get('tmode')==='unknown'?'unknown':'',cat:fd.get('cat')||'other',rep:fd.get('rep')||'',placeId:fd.get('placeId')||'',place:fd.get('place').trim(),people:fd.getAll('people'),memo:fd.get('memo').trim()});
+    Object.assign(e,{title:fd.get('title').trim(),date:fd.get('date'),time:fd.get('tmode')==='set'?tm('time'):'',etime:fd.get('tmode')==='set'&&tm('time')?tm('etime'):'',tmode:fd.get('tmode')==='unknown'?'unknown':'',cat:fd.get('cat')||'other',rep:fd.get('rep')||'',placeId:fd.get('placeId')||'',place:fd.get('place').trim(),people:fd.getAll('people'),memo:fd.get('memo').trim(),top:!!fd.get('top'),alarm:fd.get('alarm')||''});
     if(!id) S.events.push(e); save(); toast('予定を登録しました'); stack=['home']; go('day/'+e.date,true);
   },
   person:(f,fd)=>{
@@ -285,7 +286,7 @@ const FORMS={
   me:(f,fd)=>{ for(const [k,v] of fd.entries()) S.set.me[k]=String(v).trim(); const me=S.set.me; if(me.tels&&me.tels.length){ if(me.tel) me.tels[0]=me.tel; else me.tels.shift(); } save(); toast('登録しました'); render(); window.scrollTo(0,0); },
   qmemo:(f,fd)=>{
     const txt=(fd.get('text')||'').trim(); const ph=fd.get('photo')||''; if(!txt&&!ph){toast('なにか書いてください');return;}
-    const now=new Date(); S.memos.push({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes()),text:txt,photo:ph,from:f.dataset.from||''}); save();
+    const now=new Date(); S.memos.push({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes()),text:txt,photo:ph,from:f.dataset.from||'',title:String(fd.get('title')||'').trim(),cat:fd.get('cat')||''}); save();
     $('.sheet-bg')?.remove(); toast('メモを登録しました'); if(cur()==='memo') render();
   }
 };
@@ -302,10 +303,12 @@ function sheet(title,body){
 function pageTitle(){ const h1=$('main h1'); return h1?h1.textContent:'トップ'; }
 function quickMemo(){
   const from=pageTitle();
+  const cc=curCat();
   const bg=sheet('✏️ さっとメモ',`<form data-form="qmemo" data-from="${h(from)}">
+    <div class="qmrow"><input name="title" placeholder="題名（なくてもよい）" aria-label="題名"><select name="cat" aria-label="カテゴリー"><option value="">カテゴリー</option>${memoCats().map(c=>`<option ${c===cc?'selected':''}>${h(c)}</option>`).join('')}</select></div>
     <textarea class="search" name="text" id="qm-text" style="min-height:150px" placeholder="思いついたことを、なんでも"></textarea>
     <div class="photo-pick" style="margin-top:8px"><label class="btn plain" for="qm-file" style="flex:none">📷 写真</label><input type="file" id="qm-file" accept="image/*" hidden><input type="hidden" name="photo" id="qm-photo"><span id="qm-prev" class="small muted">${SR?'🎤 は声で入れるボタンです':'キーボードのマイクで声でも入れられます'}</span>${SR?'<button type="button" class="btn plain" id="qm-mic" style="flex:none">🎤 声</button>':''}</div>
-    <p class="small muted" style="margin:6px 0 0">「${h(from)}」で書いた印が付きます。あとで「さっとメモ」の一覧で見られます。</p>
+    <p class="small muted" style="margin:6px 0 0">「${h(from)}」で書いた印が付きます。急ぐときは題名もカテゴリーもなしで大丈夫。あとで「メモ帳」で整理できます。</p>
     <div class="btns"><button class="btn" type="submit">登録する</button></div></form>`);
   const fi=$('#qm-file',bg); fi.addEventListener('change',async()=>{ const f=fi.files[0]; if(!f) return; try{ const d=await readPhoto(f,900); $('#qm-photo',bg).value=d; $('#qm-prev',bg).innerHTML=`<img src="${d}" alt="" style="height:60px;border-radius:8px">`; }catch(e){ toast('写真を読み込めませんでした'); } });
   const mic=$('#qm-mic',bg); if(mic) mic.addEventListener('click',()=>{ try{ const r=new SR(); r.lang='ja-JP'; r.interimResults=false; mic.textContent='🎤 聞いています…'; r.onresult=e=>{ const t=$('#qm-text',bg); t.value+=(t.value?'\n':'')+e.results[0][0].transcript; }; r.onend=()=>{mic.textContent='🎤 声';}; r.onerror=()=>{mic.textContent='🎤 声'; toast('声を聞き取れませんでした');}; r.start(); }catch(e){ toast('この画面では声の入力が使えません'); } });
