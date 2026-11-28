@@ -45,6 +45,7 @@ function routeView(r){
     case 'chara': return vChara(arg);
     case 'oshi': return vOshi(arg);
     case 'trips': return vTrips(arg);
+    case 'tripprint': return vTripPrint(arg);
     case 'kids': return vKids(arg);
     case 'kakei': return vKakei(arg);
     case 'chiiki': return vChiiki();
