@@ -54,10 +54,10 @@ function vHome(){
   const glow=clockGlowOn();
   const head0=elder?`<button class="ib hb moshi" data-go="bosai">🚨 もしものとき</button><button class="ib hb help" data-act="otasuke">🆘 おたすけ</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
     :stu?`<button class="ib hb dic" data-go="dict/kokugo">国語</button><button class="ib hb dic" data-go="dict/kanwa">漢和</button><button class="ib hb dic" data-go="dict/waei">和英</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
-    :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
+    :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb ghost icon" data-go="photos" aria-label="カメラ・写真帳">📷</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
   return `
   <div class="hcol1"><div class="hd hhd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
-    ${elder||stu?'':head0}<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button></div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
+    ${elder||stu?'<button class="ib hb ghost icon" data-go="photos" aria-label="カメラ・写真帳">📷</button>':head0}<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button></div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
   <div class="clockw"><button class="clock ${glow?'glow':''}" id="clockBox" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
     <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>

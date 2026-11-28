@@ -18,6 +18,8 @@ function routeView(r){
     case 'pledit': return vPlEdit(arg);
     case 'memo': return vMemo();
     case 'memoedit': return vMemoEdit(arg);
+    case 'photos': return vPhotos(arg);
+    case 'photo': return vPhoto(arg);
     case 'tools': return vTools();
     case 'kuro': return vKuro(arg);
     case 'navi': return vNavi();
@@ -106,6 +108,7 @@ function after(r){
   const hd=$('#hl-date'); if(hd) hd.addEventListener('change',()=>{UI.hDate=hd.value; render();});
   const dw=$('#dict-w'); if(dw) dw.addEventListener('input',()=>{UI.dictW=dw.value.trim(); $$('a[data-dict]').forEach(a=>{a.href=UI.dictW?a.dataset.dict+encodeURIComponent(UI.dictW):'#'; a.querySelector('.t span').textContent=UI.dictW||'言葉を入れてから押します';});});
   kidsAfter();
+  photosAfter(); photoAfter();
   zipAfter();
   medAfter();
   $$('details.tree[data-red]').forEach(d=>d.addEventListener('toggle',()=>{d.open?UI.openReds.add(d.dataset.red):UI.openReds.delete(d.dataset.red);}));

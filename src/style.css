@@ -738,3 +738,13 @@ html.f3 .qr{font-size:.66rem}
 
 .evstar{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;background:#FFF3C4;border:2.5px solid #E0A800;border-radius:14px;padding:8px 12px;text-align:left;color:var(--ink);box-shadow:0 3px 0 rgba(224,168,0,.45)}
 .evstar .em{font-size:1.5rem}.evstar .t{flex:1;min-width:0;display:flex;flex-direction:column}.evstar b{font-size:1.1rem}.evstar .t span{font-size:.85rem;color:var(--sub)}
+
+.phbtns{display:flex;gap:8px;flex-wrap:wrap}.phbtns .btn{flex:1 1 10em;text-align:center}
+.phcam{background:#1E8E3E;color:#fff;border-color:#1E8E3E}
+.phgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:6px}
+.phc{position:relative;border:0;padding:0;aspect-ratio:1/1;border-radius:8px;overflow:hidden;background:#ddd}
+.phc img{width:100%;height:100%;object-fit:cover;display:block}
+.phc i{position:absolute;right:3px;bottom:3px;font-style:normal;background:#fff;border-radius:6px;font-size:.75rem;padding:0 3px}
+.phbig{width:100%;border-radius:12px;display:block}
+@media (max-width:400px){ .hhd .hb.kuro{font-size:.74rem;padding:4px 6px 4px 4px} .hhd .brand span{font-size:.95rem} .hhd{gap:4px} .hhd .hb.icon{padding:4px 5px} }
+@media (max-width:360px){ .hhd .brand span{display:none} }
