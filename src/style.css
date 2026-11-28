@@ -889,3 +889,19 @@ html:root[data-style="ladies"]{
 [data-style="black"] .mmy{background:#1E1B10;color:#E8D9A0}
 [data-style="black"] .mmy.ok{background:#8C7A2E;color:#0C0D0F}
 [data-style="black"] .mcg .td{color:#0C0D0F}
+/* クールブラック：光っている所の文字は明るいブルーで、背景は暗くしてはっきり読めるように（本人 11/28） */
+[data-style="black"]{--glowtx:#A9DBFF}
+[data-style="black"] .btn:not(.plain):not(.danger),[data-style="black"] .fab,[data-style="black"] .mmy.ok{background:linear-gradient(180deg,#3B3418,#211D0E);color:var(--glowtx);border:2px solid #9A8634;box-shadow:0 0 10px rgba(154,134,52,.45),inset 0 1px 0 rgba(255,255,255,.08);text-shadow:0 0 6px rgba(100,180,255,.35)}
+[data-style="black"] .q-day{background:linear-gradient(160deg,#3B3418,#211D0E);border:2px solid #9A8634;color:var(--glowtx)}
+[data-style="black"] .q-cal{color:var(--glowtx)}
+[data-style="black"] .lvlist .row b{color:var(--glowtx)}
+[data-style="black"] .chip[aria-pressed="true"],[data-style="black"] .seg button[aria-pressed="true"]{background:#16233A;color:var(--glowtx);border-color:#78A6E8;box-shadow:0 0 8px rgba(120,166,232,.45)}
+[data-style="black"] .tabbar button[data-act="back"],[data-style="black"] .topbtn{background:#16233A;color:var(--glowtx);border:2px solid #78A6E8}
+[data-style="black"] .choose label:has(input:checked){background:#16233A;color:var(--glowtx);border-color:#78A6E8}
+[data-style="black"] .mcg .td{background:#16233A;color:var(--glowtx);outline-color:#78A6E8}
+[data-style="black"] .camf button[aria-pressed="true"]{background:#16233A;color:var(--glowtx);border-color:#78A6E8}
+[data-style="black"] .rainnote b,[data-style="black"] .laundry b,[data-style="black"] .gomitag b,[data-style="black"] .evstar b{color:var(--glowtx)}
+[data-style="black"] .tabbar button[aria-current="page"]{background:#16233A;color:var(--glowtx);box-shadow:inset 0 0 0 2px #78A6E8}
+[data-style="black"] .badge.ok{background:#1E4D33;color:#BFF5D6}
+[data-style="black"] .minical .su,[data-style="black"] .su{color:#FF8A8A}[data-style="black"] .minical .sa,[data-style="black"] .sa{color:#8FC0FF}
+[data-style="black"] .empty img,[data-style="ladies"] .empty img{display:none}
