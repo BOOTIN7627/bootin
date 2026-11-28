@@ -905,3 +905,7 @@ html:root[data-style="ladies"]{
 [data-style="black"] .badge.ok{background:#1E4D33;color:#BFF5D6}
 [data-style="black"] .minical .su,[data-style="black"] .su{color:#FF8A8A}[data-style="black"] .minical .sa,[data-style="black"] .sa{color:#8FC0FF}
 [data-style="black"] .empty img,[data-style="ladies"] .empty img{display:none}
+
+.camnote.ok{background:#E6F6EA;border-color:#2E9B4F}
+[data-style="black"] .camnote.ok{background:#12261A;border-color:#2F7A4A;color:var(--ink)}
+.btn.w{width:100%}

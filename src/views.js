@@ -63,7 +63,7 @@ function vHome(){
   <div class="clockrow"><div class="clockw"><button class="clock ${glow?'glow':''}" id="clockBox" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
     <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>
-    <label class="camb" aria-label="カメラで撮る"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden><span class="em">📷</span><b>カメラ</b><small>撮って色を変える</small></label></div>
+    <label class="camb" aria-label="カメラで撮る"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden><span class="em">📷</span><b>カメラ</b><small>押すとすぐ撮れます</small></label></div>
   ${bosaiBar()}
   ${UI.editGrid?`<div class="grid">${cells}</div>`:`<div class="topnav ${elder?'elder':''}"><div class="grid compact sq">${stu?stuCells9():cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>

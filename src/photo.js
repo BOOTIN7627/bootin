@@ -25,10 +25,9 @@ async function phAdd(files,cat){
 }
 function vPhotos(cat){
   cat=cat||UI.phCat||''; UI.phCat=cat;
-  return sub('カメラ・写真帳',`<div class="phbtns"><label class="btn phcam" for="ph-cam">📷 写真を撮る</label><input id="ph-cam" type="file" accept="image/*" capture="environment" hidden>
+  return sub('カメラ・写真帳',`<div class="phbtns"><label class="btn phcam">📷 写真を撮る<input type="file" accept="image/*" capture="environment" class="cam-in" hidden></label>
     <label class="btn plain" for="ph-pick">🖼️ スマホの写真から選ぶ</label><input id="ph-pick" type="file" accept="image/*" multiple hidden></div>
-  <button class="row" data-go="cam" style="margin-top:6px"><span class="em">🎨</span><span class="grow"><b>撮って色を変える・切り取る</b><br><span class="small muted">トップの「カメラ」と同じです</span></span></button>
-  <div class="f" style="margin:6px 0 0"><label for="ph-cat" class="small">撮った写真を入れる場所</label><select id="ph-cat">${phCats().map(c=>`<option ${c===(UI.phPut||cat||phCats()[0])?'selected':''}>${h(c)}</option>`).join('')}</select></div>
+  <div class="f" style="margin:6px 0 0"><label for="ph-cat" class="small">「スマホの写真から選ぶ」で入れる場所</label><select id="ph-cat">${phCats().map(c=>`<option ${c===(UI.phPut||cat||phCats()[0])?'selected':''}>${h(c)}</option>`).join('')}</select></div>
   <div class="chips">${['',...phCats()].map(c=>`<button class="chip" aria-pressed="${cat===c}" data-act="phcat" data-c="${h(c)}">${c?h(c):'すべて'}</button>`).join('')}</div>
   <div id="phgrid" class="phgrid"><p class="muted">読み込んでいます…</p></div>
   <p class="small muted">写真はこのスマホの中だけに残ります（どこにも送りません）。スマホを替えるときやアプリを消すときは、残したい写真を「共有」でスマホのアルバムなどに移してください。</p>`,{crumb:'設定・機能 › 写真管理'});
@@ -37,7 +36,7 @@ async function photosAfter(){
   const g=$('#phgrid'); if(!g) return;
   const cam=$('#ph-cam'), pick=$('#ph-pick'), sel=$('#ph-cat');
   const add=async inp=>{ const fs=[...inp.files]; if(!fs.length) return; UI.phPut=sel.value; toast('保存しています…'); const n=await phAdd(fs,sel.value); inp.value=''; toast(n?`📷 ${n}枚を「${sel.value}」に入れました`:'保存できませんでした'); render(); };
-  if(cam&&!cam.dataset.w){ cam.dataset.w=1; cam.addEventListener('change',()=>add(cam)); pick.addEventListener('change',()=>add(pick)); sel.addEventListener('change',()=>{UI.phPut=sel.value;}); }
+  if(pick&&!pick.dataset.w){ pick.dataset.w=1; pick.addEventListener('change',()=>add(pick)); sel.addEventListener('change',()=>{UI.phPut=sel.value;}); }
   try{ const all=(await phAll()).filter(p=>!UI.phCat||p.cat===UI.phCat);
     g.innerHTML=all.length?all.map(p=>`<button class="phc" data-go="photo/${p.id}"><img src="${p.thumb}" alt="${h(p.cat||'写真')}" loading="lazy">${p.memo?'<i>📝</i>':''}</button>`).join(''):`<div class="empty" style="grid-column:1/-1">${BOO_IMG}まだ写真はありません。「📷 写真を撮る」から始めよう。</div>`;
   }catch(e){ g.innerHTML='<p class="muted">このスマホでは写真を保存できませんでした（シークレットモードなど）。</p>'; }

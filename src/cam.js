@@ -13,7 +13,7 @@ function camStart(file){
   const fr=new FileReader();
   fr.onerror=()=>toast('写真を読み込めませんでした');
   fr.onload=()=>{ const img=new Image(); img.onerror=()=>toast('写真を読み込めませんでした');
-    img.onload=()=>{ UI.cam={img,fx:'none',light:0,crop:'',box:null,rot:0,frame:'',out:''}; UI.camCut=false; UI.camThumbs=null; if(cur()==='cam') render(); else go('cam'); };
+    img.onload=()=>{ UI.cam={img,fx:'none',light:0,crop:'',box:null,rot:0,frame:'',out:''}; UI.camCut=false; UI.camEdit=false; UI.camSaved=''; UI.camThumbs=null; if(cur()==='cam') render(); else go('cam'); };
     img.src=fr.result; };
   fr.readAsDataURL(file);
 }
@@ -120,8 +120,24 @@ function vCam(){
   <div class="sec"><h3>形</h3>${seg(CAM_CROP,o.crop,'camcrop')}
     <div class="btns"><button class="btn plain" data-act="camrot" data-c="-90">↺ 左に回す</button><button class="btn plain" data-act="camrot" data-c="90">↻ 右に回す</button></div></div>
   <div class="btns"><button class="btn" data-act="camcutok">✓ これで切る</button><button class="btn plain" data-act="camcutno">切り取りをやめる</button></div>`);
+  if(!UI.camEdit){
+    const cats=phCats(); const pc=UI.phPut&&cats.includes(UI.phPut)?UI.phPut:cats[0];
+    return sub('撮った写真',`
+  <div class="camwrap"><canvas id="cam-cv" aria-label="撮った写真"></canvas></div>
+  ${UI.camSaved?`<div class="camnote ok"><b>✅ 写真帳の「${h(UI.camSaved)}」に入れました</b><br>写真帳は、あとで「設定・機能」→「写真管理」からも見られます。</div>
+  <div class="btns"><button class="btn" data-go="photos">🗂️ 写真帳を見る</button><label class="btn plain"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden>📷 もう1枚撮る</label></div>`:`
+  <div class="btns"><button class="btn plain w" data-act="camedit">🎨 編集する（色を変える・切り取る・回す・日付）</button></div>
+  <div class="sec"><h3>💾 どこに入れますか？</h3>
+    <p class="small muted" style="margin:0 0 6px">写真帳の中の場所を選んで、「保存」を押してください。</p>
+    <div class="chips cwrap" style="padding:2px 0">${cats.map(c=>`<button class="chip" aria-pressed="${c===pc}" data-act="camput" data-c="${h(c)}">${h(c)}</button>`).join('')}</div>
+    <div class="btns"><button class="btn w" data-act="camalbum2" data-c="${h(pc)}">💾 写真帳の「${h(pc)}」に保存</button></div>
+    <div class="btns"><button class="btn plain" data-act="camphone">📱 スマホの写真にも保存</button><button class="btn plain" data-act="camapp">📝 メモに保存</button></div>
+    <div id="cam-out" class="camout">${o.out?camOutHtml(o.out):''}</div></div>
+  <div class="btns"><label class="btn plain"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden>📷 撮りなおす</label><button class="btn danger" data-act="camdiscard">🗑️ この写真を捨てる</button></div>
+  <p class="small muted">保存した写真を消すときは、写真帳で写真を押して「削除」を押します。</p>`}`);
+  }
   const T=camThumbs();
-  return sub('カメラ',`
+  return sub('写真の編集',`
   <div class="camwrap"><canvas id="cam-cv" aria-label="いじっている写真"></canvas></div>
   <div class="sec"><h3>✂️ 切り取る・回す</h3>
     <button class="btn w" data-act="camcut">✂️ 指で範囲を決めて切り取る${o.box?'（切り取り中）':''}</button>
@@ -130,12 +146,8 @@ function vCam(){
     <div class="camf">${CAM_FX.map(([k,n])=>`<button aria-pressed="${o.fx===k}" data-act="camfx" data-c="${k}"><i style="background-image:url(${T[k]})"></i>${n}</button>`).join('')}</div>
     <div class="camrow" style="margin-top:10px"><span class="lb">☀️ 明るさ</span><input type="range" id="cam-light" min="-40" max="40" step="2" value="${o.light}" aria-label="明るさ"><button class="mini" data-act="camlight0">もとに</button></div></div>
   <div class="sec"><h3>🖼️ ふち・日付</h3>${seg(CAM_FRAME,o.frame,'camframe')}</div>
-  <div class="sec"><h3>💾 できあがり</h3>
-    <div class="btns"><button class="btn" data-act="camphone">📱 スマホの写真（フォト）に保存</button></div>
-    <div class="btns"><button class="btn plain" data-act="camalbum">🗂️ 写真帳に入れる（家族・レシートなどに分けて）</button></div>
-    <div class="btns"><button class="btn plain" data-act="camapp">📝 アプリの中（メモ）に保存</button></div>
-    <div class="btns"><label class="btn plain"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden>📷 撮りなおす</label><label class="btn plain"><input type="file" accept="image/*" class="cam-in" hidden>🖼️ ほかの写真</label></div>
-    <div id="cam-out" class="camout">${o.out?camOutHtml(o.out):''}</div></div>`);
+  <div class="btns"><button class="btn w" data-act="camedok">✓ 編集を終える（保存の画面へ）</button></div>
+  <div class="btns"><button class="btn plain" data-act="camedreset">↩ 編集を全部やめて元に戻す</button></div>`);
 }
 function camOutHtml(u){ return `<div class="camnote"><b>📱 スマホの写真に入れるには</b><br>下の写真を<b>指で長押し</b>して「<b>"写真"に保存</b>」（Androidは「画像をダウンロード」）を選んでください。パソコンは右クリックで保存。</div><img src="${u}" alt="できあがった写真">`; }
 function camPaint(){ const c=$('#cam-cv'); if(c&&UI.cam) camDraw(c,UI.cam,900,UI.camCut); }
@@ -202,8 +214,13 @@ Object.assign(ACTS,{
     <p class="small muted" style="margin:0 0 8px">どこに入れますか？（あとで写真帳から変えられます）</p>
     <div class="btns" style="flex-direction:column">${phCats().map(c=>`<button class="btn plain" data-act="camalbum2" data-c="${h(c)}">${h(c)}</button>`).join('')}</div></div>`;
     bg.addEventListener('click',e=>{ if(e.target===bg) bg.remove(); }); document.body.appendChild(bg); },
+  camedit:()=>{ UI.camEdit=true; render(); window.scrollTo(0,0); },
+  camedok:()=>{ UI.camEdit=false; UI.cam.out=''; render(); window.scrollTo(0,0); },
+  camedreset:()=>{ Object.assign(UI.cam,{fx:'none',light:0,crop:'',box:null,rot:0,frame:'',out:''}); UI.camThumbs=null; UI.camEdit=false; render(); window.scrollTo(0,0); },
+  camput:(el,d)=>{ UI.phPut=d.c; render(); },
+  camdiscard:(el)=>{ if(el.dataset.sure!=='1'){ el.dataset.sure='1'; el.textContent='もう一度押すと捨てます'; return; } UI.cam=null; toast('写真を捨てました'); back(); },
   camalbum2:async(el,d)=>{ $('.sheet-bg')?.remove(); try{ const c=document.createElement('canvas'); camDraw(c,UI.cam,1600); const img=c.toDataURL('image/jpeg',.85); camDraw(c,UI.cam,320); const thumb=c.toDataURL('image/jpeg',.7);
-      const now=new Date(); await phPut({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds()),cat:d.c,memo:'',img,thumb}); UI.phCat=d.c; toast(`🗂️ 写真帳の「${d.c}」に入れました`); }catch(e){ toast('写真帳に入れられませんでした'); } },
+      const now=new Date(); await phPut({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds()),cat:d.c,memo:'',img,thumb}); UI.phPut=d.c; UI.camSaved=d.c; toast(`🗂️ 写真帳の「${d.c}」に入れました`); if(cur()==='cam') render(); }catch(e){ toast('写真帳に入れられませんでした'); } },
   camboth:()=>{ camToMemo(); camPhone(); }
 });
 
