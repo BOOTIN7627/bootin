@@ -632,7 +632,7 @@ html.f3 .hhd .hb.kuro{font-size:.75rem}
 .hhd .brand span{font-size:1.05rem;letter-spacing:.02em}
 .hhd .hb.kuro img{background:#fff;border-radius:50%;padding:1px}
 .hhd .hb.kuro{padding:4px 8px 4px 5px}
-@media (max-width:370px){ .hhd .brand span{display:none} }
+/* BOOTINの文字はどの幅でも出す（本人 11/28） */
 
 .hbtns{display:grid;gap:6px;margin:-2px 0 8px}
 .hbtns.el{grid-template-columns:1fr 1fr 1fr}
@@ -747,7 +747,7 @@ html.f3 .qr{font-size:.66rem}
 .phc i{position:absolute;right:3px;bottom:3px;font-style:normal;background:#fff;border-radius:6px;font-size:.75rem;padding:0 3px}
 .phbig{width:100%;border-radius:12px;display:block}
 @media (max-width:400px){ .hhd .hb.kuro{font-size:.74rem;padding:4px 6px 4px 4px} .hhd .brand span{font-size:.95rem} .hhd{gap:4px} .hhd .hb.icon{padding:4px 5px} }
-@media (max-width:360px){ .hhd .brand span{display:none} }
+@media (max-width:360px){ .hhd .brand span{font-size:.9rem} .hhd .brand img{width:24px;height:24px} }
 
 
 /* ===== トップのカメラ（時計の右、カレンダーの上） ===== */
@@ -969,3 +969,9 @@ html.f3 .top0 .menub .nm{font-size:.72rem}
 .tptr{display:block;color:var(--ink);background:var(--soft);border-radius:8px;padding:3px 8px;margin:3px 0;white-space:pre-wrap}
 .a4miss{color:#C62828}
 .a4t td.navi{font-size:.75rem}
+
+.top0 .qb.q-srch span:last-child{font-size:.62rem;line-height:1.15;text-align:center}
+.hhd .brand span{white-space:nowrap}
+@media (max-width:340px){ .hhd .hb.kuro{font-size:.66rem;padding:3px 5px 3px 3px} .hhd .hb.kuro img{width:20px;height:20px} .hhd .brand span{font-size:.82rem;letter-spacing:0}
+  .hbtns.el,.hbtns.st{gap:4px} .hbtns .hb{font-size:.74rem;padding:3px 2px;min-width:0} .hbtns .hb.kuro img{width:18px;height:18px} .hhd .hb.gtxt{font-size:.74rem;padding:5px 6px} }
+@media (max-width:340px){ html .hbtns .hb,html.f3 .hbtns .hb{font-size:.7rem;padding:3px 2px;gap:2px;min-width:0;overflow:hidden} .hbtns.el{grid-template-columns:1.25fr 1fr .8fr} }

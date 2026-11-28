@@ -66,7 +66,7 @@ function vHome(){
     <label class="camb" aria-label="カメラで撮る"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden><span class="em">📷</span><b>カメラ</b><small>押すとすぐ撮れます</small></label></div>
   ${bosaiBar()}
   ${UI.editGrid?'':`<div class="topnav top0 ${elder?'elder':''}"><div class="t0l">${wxMini()}<button class="cell menub" data-act="menu" aria-label="基本メニュー（赤枠の入口がいつでも出ます）"><span class="em">▦</span><span class="nm">基本MENU</span></button></div>
-    <div class="t0r"><button class="qb q-srch" data-go="search/" aria-label="アプリ内検索"><span class="em">🔍</span><span>検索</span></button></div></div>`}
+    <div class="t0r"><button class="qb q-srch" data-go="search/" aria-label="アプリ内検索"><span class="em">🔍</span><span>アプリ内<br>検索</span></button></div></div>`}
   ${UI.editGrid?`<div class="grid">${cells}</div>`:`<div class="topnav ${elder?'elder':''}"><div class="grid compact sq">${stu?stuCells9():cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
     <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
