@@ -5,6 +5,8 @@ const UI={plArea:'home',plNear:null,editGrid:false,dayCat:'',calCat:'',pCat:'',p
 const cur=()=>stack[stack.length-1];
 function go(r,replace){
   UI.confirm='';
+  /* カレンダーをよそから開いたときは、いつもマス目で出す */
+  if(!replace&&String(r).startsWith('cal')&&!String(cur()).startsWith('cal')){ UI.calView=''; UI.calWk=''; }
   if(replace) stack[stack.length-1]=r; else stack.push(r);
   if(!IN_FRAME){ try{ replace?history.replaceState(null,'','#'+r):history.pushState(null,'','#'+r);}catch(e){} }
   render(); window.scrollTo(0,0);
@@ -54,13 +56,14 @@ function vHome(){
   const glow=clockGlowOn();
   const head0=elder?`<button class="ib hb moshi" data-go="bosai">🚨 もしものとき</button><button class="ib hb help" data-act="otasuke">🆘 おたすけ</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
     :stu?`<button class="ib hb dic" data-go="dict/kokugo">国語</button><button class="ib hb dic" data-go="dict/kanwa">漢和</button><button class="ib hb dic" data-go="dict/waei">和英</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
-    :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb ghost icon" data-go="photos" aria-label="カメラ・写真帳">📷</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
+    :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
   return `
   <div class="hcol1"><div class="hd hhd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
-    ${elder||stu?'<button class="ib hb ghost icon" data-go="photos" aria-label="カメラ・写真帳">📷</button>':head0}<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button></div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
-  <div class="clockw"><button class="clock ${glow?'glow':''}" id="clockBox" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
+    ${elder||stu?'':head0}<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button></div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
+  <div class="clockrow"><div class="clockw"><button class="clock ${glow?'glow':''}" id="clockBox" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
     <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>
+    <label class="camb" aria-label="カメラで撮る"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden><span class="em">📷</span><b>カメラ</b><small>撮って色を変える</small></label></div>
   ${bosaiBar()}
   ${UI.editGrid?`<div class="grid">${cells}</div>`:`<div class="topnav ${elder?'elder':''}"><div class="grid compact sq">${stu?stuCells9():cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
@@ -193,9 +196,9 @@ function vCal(ym){
   <div class="c" style="text-align:center"><b style="font-size:1.4rem">${y}年${m}月</b> <span class="small muted">${wareki(ym+'-01')}</span></div>
   ${calNav(`${m}月`,`data-go-r="cal/${prev}"`,`data-go-r="cal/${next}"`,ym!==t.slice(0,7)?`data-go-r="cal/${t.slice(0,7)}"`:'')}
   <div class="chips">${chips}</div>
-  <div class="calview"><span class="seg">${[['m','月'],['w','1週間']].map(([k,n])=>`<button aria-pressed="${(S.set.calView||'m')===k}" data-act="calview" data-c="${k}">${n}</button>`).join('')}</span>
+  <div class="calview"><span class="seg">${[['m','▦ マス目'],['w','☰ 縦に並べる']].map(([k,n])=>`<button aria-pressed="${(UI.calView||'m')===k}" data-act="calview" data-c="${k}">${n}</button>`).join('')}</span>
    <span class="seg">${[['','文字ふつう'],['big','文字大きく']].map(([k,n])=>`<button aria-pressed="${(S.set.calBig||'')===k}" data-act="calbig" data-c="${k}">${n}</button>`).join('')}</span></div>
-  ${(S.set.calView||'m')==='w'?calWeek(ym):`<div data-swipe="big" data-prev="${prev}" data-next="${next}" class="${S.set.calBig?'calbig':''}">${calGrid(ym,UI.calCat)}</div>`}
+  ${(UI.calView||'m')==='w'?calWeek(ym):`<div data-swipe="big" data-prev="${prev}" data-next="${next}" class="${S.set.calBig?'calbig':''}">${calGrid(ym,UI.calCat)}</div>`}
   <p class="small muted">左右に指でスライドしても月が変わります。日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol"><span style="display:inline-block;width:1.1em;height:1.1em;border-radius:50%;background:rgba(229,57,53,.2);vertical-align:-3px;margin-right:2px"></span>祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
   <div class="btns"><button class="btn" data-go="evnew/${ym===t.slice(0,7)?t:ym+'-01'}">＋ 予定を入れる</button></div>`);
 }
@@ -579,6 +582,7 @@ function vSettings(){
   <div class="sec"><h3>ふだんの地域</h3><p class="small muted" style="margin:0 0 6px">施設帳では、ふだんはこの地域の店が先に出ます。空のときは自宅の住所から決めます。</p>
   <div class="two"><select data-act="setarea" data-k="pref" aria-label="都道府県"><option value="">（自宅の住所から）</option>${PREFS.map(x=>`<option ${(s.area||{}).pref===x?'selected':''}>${x}</option>`).join('')}</select><input data-act="setarea" data-k="city" value="${h((s.area||{}).city||'')}" placeholder="市区町村（例：静岡市）" aria-label="市区町村"></div></div>
   <div class="sec"><h3>トップの入口の上のライン</h3><div class="choose">${[['r','#E0452B','赤'],['bee','var(--bee)','枠と同じ色'],['ink','#1E1B14','黒'],['b','#3B82D6','青'],['g','#2E9B4F','緑'],['rb','linear-gradient(90deg,#E0452B,#F08A00,#D9B300,#2E9B4F,#2D6CDF,#B94FC8)','にじ'],['none','transparent','なし']].map(([k,c,t])=>r('gline',k,s.gline||'r',`<span class="sw" style="background:${c};width:22px;height:8px;border-radius:4px;display:inline-block;border:1px solid var(--line)"></span>${t}`)).join('')}</div></div>
+  <div class="sec"><h3>デザインのモード</h3><p class="small muted" style="margin:0 0 6px">見た目だけが変わります。中身や入れたデータはそのままです。クール2種類ではキャラは出ません。</p><div class="choose">${[['','🐷 いつもの（キャラあり）'],['black','🖤 クールブラック'],['ladies','🌸 クールレディース']].map(([k,t])=>r('style',k,s.style||'',t)).join('')}</div>${s.style?'<p class="small muted" style="margin:6px 0 0">クールのモードでは、下の「着せかえ」の色は使いません。</p>':''}</div>
   <div class="sec"><h3>着せかえ（枠の色）</h3><p class="small muted" style="margin:0 0 6px">押すとすぐ変わります。気分で変えてください。</p><div class="choose kise">${[['bee','#F6C915','きいろ'],['aka','#D93A2B','あか'],['ao','#2D62C8','あお'],['kuro','#1E1B14','くろ'],['midori','#2E8B4F','みどり'],['orange','#F08A00','オレンジ'],['murasaki','#6B4FC8','むらさき'],['sakura','#F4A7B9','さくら'],['sora','#8CCBF0','そら'],['wakaba','#A8D672','わかば']].map(([k,c,t])=>r('kise',k,s.kise,`<span class="sw" style="background:${c}"></span>${t}`)).join('')}</div>
   <h3 style="margin-top:12px">柄のある着せかえ</h3><div class="choose kise">${[['kisetsu','🍁🌸','季節で自動'],['haru','🌸','春・さくら'],['natsu','🌊','夏・なみ'],['momiji','🍁','秋・もみじ'],['yuki','❄️','冬・ゆき'],['seigaiha','🌀','和・青海波（藍）'],['ichimatsu','◼️','和・市松（渋い緑）']].map(([k,e,t])=>r('kise',k,s.kise,`${e} ${t}`)).join('')}</div>
   <p class="small muted" style="margin:6px 0 0">「季節で自動」は、3〜5月は春、6〜8月は夏、9〜11月は秋、12〜2月は冬に自動で変わります。</p>

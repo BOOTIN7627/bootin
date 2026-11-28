@@ -27,6 +27,7 @@ function vPhotos(cat){
   cat=cat||UI.phCat||''; UI.phCat=cat;
   return sub('カメラ・写真帳',`<div class="phbtns"><label class="btn phcam" for="ph-cam">📷 写真を撮る</label><input id="ph-cam" type="file" accept="image/*" capture="environment" hidden>
     <label class="btn plain" for="ph-pick">🖼️ スマホの写真から選ぶ</label><input id="ph-pick" type="file" accept="image/*" multiple hidden></div>
+  <button class="row" data-go="cam" style="margin-top:6px"><span class="em">🎨</span><span class="grow"><b>撮って色を変える・切り取る</b><br><span class="small muted">トップの「カメラ」と同じです</span></span></button>
   <div class="f" style="margin:6px 0 0"><label for="ph-cat" class="small">撮った写真を入れる場所</label><select id="ph-cat">${phCats().map(c=>`<option ${c===(UI.phPut||cat||phCats()[0])?'selected':''}>${h(c)}</option>`).join('')}</select></div>
   <div class="chips">${['',...phCats()].map(c=>`<button class="chip" aria-pressed="${cat===c}" data-act="phcat" data-c="${h(c)}">${c?h(c):'すべて'}</button>`).join('')}</div>
   <div id="phgrid" class="phgrid"><p class="muted">読み込んでいます…</p></div>

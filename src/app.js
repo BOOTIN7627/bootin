@@ -16,6 +16,7 @@ function routeView(r){
     case 'shops': return vShops();
     case 'place': return vPlace(arg);
     case 'pledit': return vPlEdit(arg);
+    case 'cam': return vCam();
     case 'memo': return vMemo();
     case 'memoedit': return vMemoEdit(arg);
     case 'photos': return vPhotos(arg);
