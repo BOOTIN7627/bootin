@@ -992,3 +992,8 @@ html.f3 .top0 .qb.q-menu span:last-child,.topnav.elder.top0 .qb.q-menu span:last
 html.f3 .top0 .qb.q-menu .em,.topnav.elder.top0 .qb.q-menu .em{font-size:1rem}
 .top0 .srchb .nm{white-space:nowrap}
 @media (max-width:340px){ .top0 .srchb .nm{font-size:.6rem!important} .top0 .mini-wx{padding:4px 6px;gap:4px} .top0 .mini-wx .big{font-size:1.6rem} .top0 .mini-wx b{font-size:1.1rem} }
+/* 基本MENUは四角（本人 11/28） */
+.top0 .t0r{align-items:stretch}
+.top0 .qb.q-menu{border-radius:14px;width:100%;height:auto;min-height:64px;aspect-ratio:auto;align-self:stretch}
+.top0 .qb.q-menu span:last-child{font-size:.7rem}
+html.f3 .top0 .qb.q-menu span:last-child,.topnav.elder.top0 .qb.q-menu span:last-child{font-size:.62rem}
