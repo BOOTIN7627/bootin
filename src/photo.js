@@ -30,7 +30,7 @@ function vPhotos(cat){
   <div class="f" style="margin:6px 0 0"><label for="ph-cat" class="small">「スマホの写真から選ぶ」で入れる場所</label><select id="ph-cat">${phCats().map(c=>`<option ${c===(UI.phPut||cat||phCats()[0])?'selected':''}>${h(c)}</option>`).join('')}</select></div>
   <div class="chips">${['',...phCats()].map(c=>`<button class="chip" aria-pressed="${cat===c}" data-act="phcat" data-c="${h(c)}">${c?h(c):'すべて'}</button>`).join('')}</div>
   <div id="phgrid" class="phgrid"><p class="muted">読み込んでいます…</p></div>
-  <p class="small muted">写真はこのスマホの中だけに残ります（どこにも送りません）。スマホを替えるときやアプリを消すときは、残したい写真を「共有」でスマホのアルバムなどに移してください。</p>`,{crumb:'設定・機能 › 写真管理'});
+  <p class="small muted">⚠️ 写真帳の写真は、容量をとらないよう小さくして残します（印刷や拡大には向きません）。きれいに残したい写真は、撮ったあとの「スマホに保存」も使ってください。写真はこのスマホの中だけに残ります（どこにも送りません）。スマホを替えるときやアプリを消すときは、残したい写真を「共有」でスマホのアルバムなどに移してください。</p>`,{crumb:'設定・機能 › 写真管理'});
 }
 async function photosAfter(){
   const g=$('#phgrid'); if(!g) return;

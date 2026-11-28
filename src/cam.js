@@ -13,7 +13,7 @@ function camStart(file){
   const fr=new FileReader();
   fr.onerror=()=>toast('写真を読み込めませんでした');
   fr.onload=()=>{ const img=new Image(); img.onerror=()=>toast('写真を読み込めませんでした');
-    img.onload=()=>{ UI.cam={img,fx:'none',light:0,crop:'',box:null,rot:0,frame:'',out:''}; UI.camCut=false; UI.camEdit=false; UI.camSaved=''; UI.camThumbs=null; if(cur()==='cam') render(); else go('cam'); };
+    img.onload=()=>{ UI.cam={img,file,fx:'none',light:0,crop:'',box:null,rot:0,frame:'',out:''}; UI.camCut=false; UI.camEdit=false; UI.camSaved=''; UI.camPhoneOk=''; UI.camThumbs=null; if(cur()==='cam') render(); else go('cam'); };
     img.src=fr.result; };
   fr.readAsDataURL(file);
 }
@@ -125,13 +125,20 @@ function vCam(){
     return sub('撮った写真',`
   <div class="camwrap"><canvas id="cam-cv" aria-label="撮った写真"></canvas></div>
   ${UI.camSaved?`<div class="camnote ok"><b>✅ 写真帳の「${h(UI.camSaved)}」に入れました</b><br>写真帳は、あとで「設定・機能」→「写真管理」からも見られます。</div>
+  <div class="btns"><button class="btn plain w" data-act="camphone">📱 スマホにも元の画質で保存${UI.camPhoneOk?'（保存しました ✓）':''}</button></div>
   <div class="btns"><button class="btn" data-go="photos">🗂️ 写真帳を見る</button><label class="btn plain"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden>📷 もう1枚撮る</label></div>`:`
   <div class="btns"><button class="btn plain w" data-act="camedit">🎨 編集する（色を変える・切り取る・回す・日付）</button></div>
-  <div class="sec"><h3>💾 どこに入れますか？</h3>
-    <p class="small muted" style="margin:0 0 6px">写真帳の中の場所を選んで、「保存」を押してください。</p>
+  <div class="sec"><h3>📱 スマホに保存（元の画質のまま）</h3>
+    <p class="small muted" style="margin:0 0 6px">ふつうの写真として残すときはこちら。撮ったままのきれいさで残ります。</p>
+    <div class="btns"><button class="btn w" data-act="camphone">📱 スマホに保存${UI.camPhoneOk?'（保存しました ✓）':''}</button></div>
+    <div class="btns"><button class="btn plain w" data-act="camgp">☁️ Googleフォトに送る</button></div>
+    <p class="small muted" style="margin:4px 0 0">「スマホに保存」はスマホの「ダウンロード」に入ります。Googleフォトでは「ライブラリ」→「Download」から見られます。</p></div>
+  <div class="sec"><h3>🗂️ アプリの中の写真帳に保存</h3>
+    <div class="camnote warn" style="margin:0 0 8px"><b>⚠️ 写真帳の写真は小さくなります</b><br>スマホの容量をとらないよう、写真を小さく（長い辺1600ドット）して残します。スマホの画面で見るには十分ですが、<b>印刷や大きく伸ばすのには向きません</b>。きれいに残したい写真は、上の「スマホに保存」もしてください。</div>
+    <p class="small muted" style="margin:0 0 6px">入れる場所を選んで、「保存」を押してください。</p>
     <div class="chips cwrap" style="padding:2px 0">${cats.map(c=>`<button class="chip" aria-pressed="${c===pc}" data-act="camput" data-c="${h(c)}">${h(c)}</button>`).join('')}</div>
-    <div class="btns"><button class="btn w" data-act="camalbum2" data-c="${h(pc)}">💾 写真帳の「${h(pc)}」に保存</button></div>
-    <div class="btns"><button class="btn plain" data-act="camphone">📱 スマホの写真にも保存</button><button class="btn plain" data-act="camapp">📝 メモに保存</button></div>
+    <div class="btns"><button class="btn plain w" data-act="camalbum2" data-c="${h(pc)}">🗂️ 写真帳の「${h(pc)}」に保存</button></div>
+    <div class="btns"><button class="btn plain" data-act="camapp">📝 メモに貼る（さらに小さくなります）</button></div>
     <div id="cam-out" class="camout">${o.out?camOutHtml(o.out):''}</div></div>
   <div class="btns"><label class="btn plain"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden>📷 撮りなおす</label><button class="btn danger" data-act="camdiscard">🗑️ この写真を捨てる</button></div>
   <p class="small muted">保存した写真を消すときは、写真帳で写真を押して「削除」を押します。</p>`}`);
@@ -184,6 +191,22 @@ function camToMemo(){
   S.memos.push({id:uid(),t:ymd(now)+'T'+pad(now.getHours())+':'+pad(now.getMinutes()),text:'カメラで撮った写真'+(UI.cam.fx!=='none'?'（'+fxn+'）':''),photo:ph,from:'カメラ',title:'',cat:''});
   save(); $('.sheet-bg')?.remove(); toast('アプリの中（メモ）に保存しました');
 }
+const camEdited=o=>o.fx!=='none'||o.light||o.box||o.rot%360||o.frame;
+/* スマホに保存：編集していなければ撮ったままの写真、編集したら元の大きさのまま作る */
+async function camFullBlob(){ const o=UI.cam; if(!camEdited(o)&&o.file) return o.file;
+  const c=document.createElement('canvas'); camDraw(c,o,Math.max(o.img.width,o.img.height)); return await new Promise(ok=>c.toBlob(ok,'image/jpeg',.92)); }
+const camName=(t)=>'BOOTIN_'+today().replace(/-/g,'')+'_'+String(Date.now()).slice(-6)+'.'+((t&&t.type&&t.type.split('/')[1])||'jpg').replace('jpeg','jpg');
+async function camToPhone(){
+  try{ const b=await camFullBlob();
+    if(IN_FRAME){ const u=URL.createObjectURL(b); UI.cam.out=u; const o=$('#cam-out'); if(o){ o.innerHTML=camOutHtml(u); o.scrollIntoView({behavior:'smooth',block:'center'}); } return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=camName(b); document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+    UI.camPhoneOk='1'; toast('📱 スマホの「ダウンロード」に元の画質で保存しました'); if(cur()==='cam') render();
+  }catch(e){ toast('保存できませんでした'); } }
+async function camToGPhotos(){
+  try{ const b=await camFullBlob(); const f=new File([b],camName(b),{type:b.type||'image/jpeg'});
+    if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[f]}))){ toast('出てきた一覧から「フォト」（Googleフォト）を選んでください'); await navigator.share({files:[f]}); }
+    else toast('このスマホでは、ここからGoogleフォトに送れませんでした。「スマホに保存」を使ってください');
+  }catch(e){} }
 async function camPhone(){
   $('.sheet-bg')?.remove();
   const u=camMake(CAM_PHONE_MAX); UI.cam.out=u;
@@ -201,7 +224,8 @@ Object.assign(ACTS,{
   camcutno:()=>{ UI.cam.box=null; UI.cam.crop=''; UI.camCut=false; camRe(); },
   camrot:(el,d)=>{ UI.cam.rot+= +d.c; UI.camThumbs=null; if(UI.cam.crop) camCenterBox(UI.cam); else UI.cam.box=UI.camCut?{x:.1,y:.1,w:.8,h:.8}:null; camRe(); },
   camframe:(el,d)=>{ UI.cam.frame=d.c; camRe(); },
-  camphone:()=>{ camPhone(); },
+  camphone:()=>{ camToPhone(); },
+  camgp:()=>{ camToGPhotos(); },
   /* アプリの中に入れるときは、小さくなることを先に知らせる */
   camapp:()=>{ $('.sheet-bg')?.remove(); const bg=document.createElement('div'); bg.className='sheet-bg';
     bg.innerHTML=`<div class="sheet" role="dialog" aria-label="アプリの中に保存"><h2>📝 アプリの中に保存<button class="ib ghost x" data-act="closesheet" aria-label="閉じる">✕</button></h2>
