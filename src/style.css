@@ -1006,3 +1006,25 @@ html.f3 .top0 .qb.q-menu span:last-child,.topnav.elder.top0 .qb.q-menu span:last
 [data-style="black"] .top0 .qb.q-menu{background:linear-gradient(180deg,#3B3418,#211D0E);border-color:#9A8634;color:var(--glowtx);box-shadow:0 0 10px rgba(154,134,52,.45)}
 [data-style="black"] .top0 .qb.q-menu span:last-child{color:var(--glowtx)}
 [data-style="ladies"] .top0 .qb.q-menu{background:#FFE08A;border-color:#A82E45;color:#3B2A2F}
+/* いちばん右の列（カメラ・基本MENU）を縦長にしない（本人 11/28） */
+.clockrow .clock .d,.clockrow .clock .k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.camb b{white-space:nowrap}
+.camb{min-height:0;padding:4px 2px}
+.top0 .qb.q-menu span:last-child{white-space:nowrap;font-size:.7rem}
+.top0 .qb.q-menu .em{font-size:1.25rem;line-height:1}
+html.f3 .camb .em{font-size:1.6rem}
+html.f3 .camb b{font-size:.82rem}
+@media (max-width:380px){ .camb b{font-size:.74rem} .top0 .qb.q-menu span:last-child{font-size:.62rem} html.f3 .clockrow .clock .t{font-size:2rem} html.f3 .clockrow .clock .d{font-size:.85rem} }
+/* 天気・検索・基本MENUを同じ4列にそろえる。時計の段も同じ割合に */
+.topnav.top0,.topnav.elder.top0{display:block}
+.top0 .t0l{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.top0 .qb.q-menu{height:auto;align-self:stretch}
+.clockrow{grid-template-columns:minmax(0,3fr) minmax(0,1fr);gap:6px}
+.clockrow{align-items:center}
+.clockrow .clockw{align-self:stretch}
+.camb{align-self:center;min-height:64px;height:auto;padding:6px 2px}
+.camb small{display:none}
+.topnav.elder ~ * .camb,html.f3 .camb{min-height:77px}
+.clockrow .clock .d,.clockrow .clock .k{white-space:normal;overflow:visible}
+html.f3 .top0 .qb.q-menu span:last-child,.topnav.elder.top0 .qb.q-menu span:last-child{font-size:.6rem}
+@media (max-width:340px){ .top0 .qb.q-menu span:last-child{font-size:.54rem!important;letter-spacing:-.02em} }

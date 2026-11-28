@@ -65,8 +65,8 @@ function vHome(){
     <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>
     <label class="camb" aria-label="カメラで撮る"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden><span class="em">📷</span><b>カメラ</b><small>押すとすぐ撮れます</small></label></div>
   ${bosaiBar()}
-  ${UI.editGrid?'':`<div class="topnav top0 ${elder?'elder':''}"><div class="t0l">${wxMini()}<button class="cell srchb" data-go="search/" aria-label="アプリ内検索"><span class="em">🔍</span><span class="nm">アプリ内<br>検索</span></button></div>
-    <div class="t0r"><button class="qb q-menu" data-act="menu" aria-label="基本メニュー（赤枠の入口がいつでも出ます）"><span class="em">▦</span><span>基本<br>MENU</span></button></div></div>`}
+  ${UI.editGrid?'':`<div class="topnav top0 ${elder?'elder':''}"><div class="t0l">${wxMini()}<button class="cell srchb" data-go="search/" aria-label="アプリ内検索"><span class="em">🔍</span><span class="nm">アプリ内<br>検索</span></button>
+    <button class="qb q-menu" data-act="menu" aria-label="基本メニュー（赤枠の入口がいつでも出ます）"><span class="em">▦</span><span>基本MENU</span></button></div></div>`}
   ${UI.editGrid?`<div class="grid">${cells}</div>`:`<div class="topnav ${elder?'elder':''}"><div class="grid compact sq">${stu?stuCells9():cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
     <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
