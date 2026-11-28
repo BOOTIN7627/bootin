@@ -875,3 +875,5 @@ html:root[data-style="ladies"]{
 [data-style="ladies"] .hhd .brand::before,[data-style="ladies"] .side .brand::before{border-radius:50%;background:radial-gradient(circle at 50% 50%,#F6B27F 0 28%,#E8707E 30% 62%,#F6B7BF 64%)}
 [data-style] .hhd .brand span{font-family:var(--f-disp);letter-spacing:.14em;font-weight:700}
 [data-style] .hhd .hb.kuro{padding-left:10px}
+
+.hhd .hb.gtxt{font-weight:900;font-size:.9rem;padding:6px 10px;white-space:nowrap;border:2px solid var(--ink);background:var(--card);color:var(--ink)}

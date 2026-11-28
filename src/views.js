@@ -59,7 +59,7 @@ function vHome(){
     :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
   return `
   <div class="hcol1"><div class="hd hhd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
-    ${elder||stu?'':head0}<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button></div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
+    ${elder||stu?'':head0}${elder||stu?'<button class="ib hb gear gtxt" data-go="settings" aria-label="設定・機能（モードの切りかえもここ）">⚙️ 設定・機能</button>':'<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button>'}</div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
   <div class="clockrow"><div class="clockw"><button class="clock ${glow?'glow':''}" id="clockBox" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
     <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>
