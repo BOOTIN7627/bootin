@@ -944,3 +944,23 @@ html:root[data-style="ladies"]{
   .a4t tr{break-inside:avoid}
 }
 .a4bring{display:grid;grid-template-columns:1fr 1fr;gap:2px 10px;font-size:.82rem}
+
+/* トップ：9マスの上の段（天気・基本MENU・検索）。本人の案 11/28 */
+.topnav.top0{margin-top:8px;align-items:stretch}
+.top0 .t0l{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.top0 .mini-wx{grid-column:span 2;min-height:64px;padding:4px 10px}
+.top0 .mini-wx .big{font-size:2.1rem}
+.top0 .menub{min-height:64px;aspect-ratio:auto;background:#E0452B;color:#fff;border:2px solid #1E1B14;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;font-weight:900;box-shadow:0 3px 0 rgba(0,0,0,.3)}
+.top0 .menub .em{font-size:1.4rem;line-height:1}.top0 .menub .nm{font-size:.82rem;color:#fff}
+.top0 .menub::before{display:none}
+.top0 .t0r{display:flex;align-items:center;justify-content:center}
+.top0 .qb.q-srch{height:64px;width:64px;aspect-ratio:1/1;background:#5B6470;color:#fff}
+.topnav.top0+.topnav{margin-top:6px}
+.topnav.elder.top0 .t0l{gap:5px}
+.minibox{display:flex;flex-direction:column;gap:8px}
+[data-style="black"] .top0 .menub{background:linear-gradient(180deg,#3A1C1A,#21100F);border-color:#B5413A;color:var(--glowtx);box-shadow:0 0 10px rgba(181,65,58,.4)}
+[data-style="black"] .top0 .menub .nm{color:var(--glowtx)}
+[data-style="black"] .top0 .qb.q-srch{background:linear-gradient(160deg,#4A5058,#2A2E33)}
+[data-style="ladies"] .top0 .menub{background:linear-gradient(160deg,#E8707E,#C93A52);border-color:#A82E45}
+[data-style="ladies"] .top0 .qb.q-srch{background:linear-gradient(160deg,#F6B27F,#E58A5A)}
+html.f3 .top0 .menub .nm{font-size:.72rem}

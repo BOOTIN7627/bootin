@@ -56,7 +56,7 @@ function vHome(){
   const glow=clockGlowOn();
   const head0=elder?`<button class="ib hb moshi" data-go="bosai">🚨 もしものとき</button><button class="ib hb help" data-act="otasuke">🆘 おたすけ</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
     :stu?`<button class="ib hb dic" data-go="dict/kokugo">国語</button><button class="ib hb dic" data-go="dict/kanwa">漢和</button><button class="ib hb dic" data-go="dict/waei">和英</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
-    :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
+    :`<button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
   return `
   <div class="hcol1"><div class="hd hhd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
     ${elder||stu?'':head0}${elder||stu?'<button class="ib hb gear gtxt" data-go="settings" aria-label="設定・機能（モードの切りかえもここ）">⚙️ 設定・機能</button>':'<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button>'}</div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
@@ -65,6 +65,8 @@ function vHome(){
     <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>
     <label class="camb" aria-label="カメラで撮る"><input type="file" accept="image/*" capture="environment" class="cam-in" hidden><span class="em">📷</span><b>カメラ</b><small>押すとすぐ撮れます</small></label></div>
   ${bosaiBar()}
+  ${UI.editGrid?'':`<div class="topnav top0 ${elder?'elder':''}"><div class="t0l">${wxMini()}<button class="cell menub" data-act="menu" aria-label="基本メニュー（赤枠の入口がいつでも出ます）"><span class="em">▦</span><span class="nm">基本MENU</span></button></div>
+    <div class="t0r"><button class="qb q-srch" data-go="search/" aria-label="アプリ内検索"><span class="em">🔍</span><span>検索</span></button></div></div>`}
   ${UI.editGrid?`<div class="grid">${cells}</div>`:`<div class="topnav ${elder?'elder':''}"><div class="grid compact sq">${stu?stuCells9():cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
     <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
@@ -73,7 +75,7 @@ function vHome(){
   ${UI.editGrid?`<div class="editbar"><span class="small muted">◀ ▶ で並べかえ、✎ で中身を変えます</span><button class="ib" data-act="gedit">✓ できあがり</button></div>`:''}
   ${rainNote()}${laundryBar()}
   <div class="mobile-only">${todaySec}</div>${stuTop()}${medTop()}${myBtns()}
-  <div class="minirow">${miniCal()}<div class="minibox">${wxMini()}${otaMini()}</div></div>
+  <div class="minirow">${miniCal()}<div class="minibox">${otaMini()}</div></div>
   ${UI.editGrid?'':`<div class="editbar end"><button class="ib ghost" data-act="gedit">⇄ ボタンの並べかえ</button></div>`}
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
 }
