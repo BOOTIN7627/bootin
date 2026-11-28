@@ -964,3 +964,8 @@ html:root[data-style="ladies"]{
 [data-style="ladies"] .top0 .menub{background:linear-gradient(160deg,#E8707E,#C93A52);border-color:#A82E45}
 [data-style="ladies"] .top0 .qb.q-srch{background:linear-gradient(160deg,#F6B27F,#E58A5A)}
 html.f3 .top0 .menub .nm{font-size:.72rem}
+
+.noaddr{color:#C62828!important;font-weight:700}
+.tptr{display:block;color:var(--ink);background:var(--soft);border-radius:8px;padding:3px 8px;margin:3px 0;white-space:pre-wrap}
+.a4miss{color:#C62828}
+.a4t td.navi{font-size:.75rem}

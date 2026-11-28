@@ -22,6 +22,16 @@ function tripBring(tr){ const n=(+tr.adults||0)+(+tr.children||0); const L=['保
   if(tr.kids==='baby') L.push('おむつ・おしりふき','ミルク・哺乳びん・離乳食','母子手帳・こどもの保険証','着替え（多めに）','抱っこひも・ベビーカー','ビニール袋');
   if(tr.kids==='small') L.push('こどもの保険証','おやつ・飲み物','着替え1組','ハンカチ・ティッシュ','車や電車で遊べるもの');
   return L; }
+const isRail=m=>m==='🚃 電車'||m==='🚌 バス'||m==='✈️ 飛行機'||m==='🚢 船';
+const placeQ=s=>s?(s.addr||s.name||''):'';
+function transitLinks(from,to,date,time){ if(!from||!to) return '';
+  const g=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=transit`;
+  let y=`https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&type=1`;
+  if(date&&time){ const [Y,M,D]=date.split('-'); const [hh,mm]=time.split(':'); y+=`&y=${Y}&m=${M}&d=${D}&hh=${+hh}&m1=${mm[0]}&m2=${mm[1]}`; }
+  return `<a class="mini" href="${y}" target="_blank" rel="noopener">🚃 乗換案内</a><a class="mini" href="${g}" target="_blank" rel="noopener">🗺️ 電車の道順</a>`; }
+/* 名前から場所を探す（国土地理院・無料）。住所らしい名前が返ってきたら住所の目安にする */
+async function tripGeo(q){ try{ const r=await fetch('https://msearch.gsi.go.jp/address-search/AddressSearch?q='+encodeURIComponent(q)); const j=await r.json();
+  if(j&&j[0]){ const [lon,lat]=j[0].geometry.coordinates; const ti=(j[0].properties&&j[0].properties.title)||''; return {lat:+lat,lon:+lon,title:/[都道府県]/.test(ti)?ti:''}; } }catch(e){} return null; }
 function tripDays(tr){ return tr.from&&tr.to?Math.max(1,Math.round((parseD(tr.to)-parseD(tr.from))/864e5)+1):1; }
 function tripStops(tr,d){ return (tr.stops||[]).filter(s=>(+s.day||1)===d).sort((a,b)=>((a.ord??999)-(b.ord??999))||(a.time||'99').localeCompare(b.time||'99')); }
 /* 行程を組み立てる：出発時刻から、移動時間＋滞在時間を足していく。車は2時間ごとに休憩を入れる */
@@ -40,7 +50,7 @@ function tripPlan(tr){
       let mv=+s.mv||mvEst(s.km,mode); if(!mv&&rows.length) mv=30;
       let rest=0; const RE=restEvery(tr); if(isCar(mode)&&mv){ rest=Math.floor((drive+mv)/RE); drive=(drive+mv)%RE; }
       const fixed=t2m(s.time); const arr=fixed!=null?fixed:cur+mv+rest*15; const st0=s.stay!=null&&s.stay!==''?+s.stay:60; const stay=st0+(!s.inn&&st0>0?stayAdd(tr):0);
-      rows.push({kind:'stop',s,mode,mv,rest,from:cur,arr,dep:arr+stay,stay,km:s.km,est:!s.mv});
+      rows.push({kind:'stop',s,mode,mv,rest,fromName:String((prevPt&&prevPt.name)||'').replace(/^🏨 /,'').replace(/（泊まる所）$/,''),from:cur,arr,dep:arr+stay,stay,km:s.km,est:!s.mv});
       if(isCar(mode)){ sumDrive+=mv; sumKm+=s.km||0; }
       cur=arr+stay; prevPt=s;
     }
@@ -76,9 +86,9 @@ function vTrips(id){
     body+=D.rows.map(r=>{
       if(r.kind==='start') return `<div class="tpstop tpst"><span class="tm">${m2t(r.dep)}</span><span class="t"><b>${r.name.startsWith("🏨")?"":"🏠 "}${h(r.name)}</b><span class="small muted">出発</span></span></div>`;
       const s=r.s; const i=st.indexOf(s);
-      const mvl=r.mv?`<div class="tpmove">${h(r.mode||'')} 約${mnTxt(r.mv)}${r.km?`（約${Math.round(r.km)}km）`:''}${r.est?' <span class="muted">目安</span>':''}${r.rest?`<br>☕ 途中で休憩 15分×${r.rest}回（運転${mnTxt(restEvery(tr))}ごと）`:''}</div>`:'';
+      const mvl=r.mv?`<div class="tpmove">${h(r.mode||'')} 約${mnTxt(r.mv)}${r.km?`（約${Math.round(r.km)}km）`:''}${r.est?' <span class="muted">目安</span>':''}${r.rest?`<br>☕ 途中で休憩 15分×${r.rest}回（運転${mnTxt(restEvery(tr))}ごと）`:''}${r.s.transit?`<span class="tptr">🚃 ${h(r.s.transit)}</span>`:''}${isRail(r.mode)&&!r.s.inn?`<span class="minis" style="padding:0">${transitLinks(r.fromName,placeQ(r.s),D.date,m2t(r.from))}</span>`:''}</div>`:'';
       if(s.inn) return `${mvl}<div class="tpstop tpst"><span class="tm">${m2t(r.arr)}</span><span class="t"><b>${h(s.name)}</b><span class="small muted">着</span></span></div>`;
-      return `${mvl}<div class="tpstop"><span class="tm">${m2t(r.arr)}<small>〜${m2t(r.dep)}</small></span><span class="t"><b>${h(s.name)}</b>${s.addr?`<span>${h(s.addr)}</span>`:''}${s.memo?`<span class="small muted">${h(s.memo)}</span>`:''}<span class="small muted">いる時間 ${mnTxt(r.stay)}</span>
+      return `${mvl}<div class="tpstop"><span class="tm">${m2t(r.arr)}<small>〜${m2t(r.dep)}</small></span><span class="t"><b>${h(s.name)}</b>${s.addr?`<span>${h(s.addr)}${s.addrEst?' <i class="muted">（自動で入れた目安）</i>':''}</span>`:`<span class="noaddr">⚠️ 住所がまだです（ナビ用に入れてください）</span>`}${s.tel?`<span>☎ ${h(s.tel)}</span>`:''}${s.memo?`<span class="small muted">${h(s.memo)}</span>`:''}<span class="small muted">いる時間 ${mnTxt(r.stay)}</span>
       <span class="minis">${s.addr||s.name?mapBtns(s.addr||s.name):''}${s.tel?`<a class="mini tel" href="${telHref(s.tel)}">📞 電話</a>`:''}${s.hp?`<a class="mini" href="${h(s.hp)}" target="_blank" rel="noopener">🌐 HP</a>`:''}
       ${i>0?`<button class="mini" data-act="stopmv" data-id="${tr.id}" data-s="${s.id}" data-c="-1" aria-label="上へ">▲</button>`:''}${i<st.length-1?`<button class="mini" data-act="stopmv" data-id="${tr.id}" data-s="${s.id}" data-c="1" aria-label="下へ">▼</button>`:''}
       <button class="mini" data-act="stopedit" data-id="${tr.id}" data-s="${s.id}">✏️ 直す</button><button class="mini" data-act="stopdel" data-id="${tr.id}" data-s="${s.id}">削除</button></span></span></div>`; }).join('')||'<p class="small muted" style="margin:0">まだありません。</p>'; }
@@ -87,6 +97,7 @@ function vTrips(id){
     <p style="margin:0">${tripDateTxt(tr)}</p><p class="small muted" style="margin:4px 0 0">出発：${h(tr.start||'（未入力）')} ${h(tr.startTime||'08:00')}・主な交通：${h(tr.mode||'未選択')}${tripPeople(tr)?'・'+h(tripPeople(tr)):''}${tr.members?'（'+h(tr.members)+'）':''}</p>${tr.memo?`<p class="small" style="white-space:pre-wrap;margin:6px 0 0">${h(tr.memo)}</p>`:''}</div>
   <div class="btns"><button class="btn w" data-act="tripbuild" data-id="${tr.id}">🧭 時間の目安を出して行程を組み立てる</button></div>
   <p class="small muted" style="margin:-2px 0 8px">場所と交通手段から、移動時間の目安（地図の直線距離から計算）を入れて並べます。着く時間・いる時間・移動時間は「✏️ 直す」で自由に変えられます。</p>
+  ${(()=>{ const n=(tr.stops||[]).filter(s=>!s.addr).length; return n?`<div class="camnote warn" style="margin:0 0 8px">⚠️ 住所が入っていない場所が <b>${n}か所</b> あります。車のナビに入れるため、各場所の「✏️ 直す」で住所と電話番号（あれば）を入れてください。「MAP」を押すとGoogleマップで住所や電話番号を確かめられます。</div>`:''; })()}
   <div class="sec"><h3>📍 行程</h3>${body}</div>
   <div class="btns"><button class="btn w" data-go="tripprint/${tr.id}">📄 旅のしおり${tripHasCar(tr)?'・運行計画表':''}を見る（A4で印刷・PDF）</button></div>
   <form class="sec" data-form="stop" data-id="${tr.id}" data-s="${ed?ed.id:''}" id="stopform"><h3>${ed?'✏️ 行き先を直す':'＋ 行きたい場所を足す'}</h3>
@@ -97,6 +108,7 @@ function vTrips(id){
     <div class="two"><div class="f"><label for="sp-st">いる時間（分）</label><input id="sp-st" name="stay" type="number" min="0" step="5" value="${h(sf.stay??60)}"></div><div class="f"><label for="sp-mm">移動時間（分・空なら目安）</label><input id="sp-mm" name="mv" type="number" min="0" step="5" value="${h(sf.mv||'')}"></div></div>
     <div class="f"><label for="sp-t">着く時間を決める（決まっているときだけ）</label><input id="sp-t" type="time" name="time" value="${h(sf.time||'')}"></div>
     <div class="two"><div class="f"><label for="sp-tel">電話</label><input id="sp-tel" name="tel" type="tel" value="${h(sf.tel||'')}"></div><div class="f"><label for="sp-hp">HP</label><input id="sp-hp" name="hp" type="url" placeholder="https://" value="${h(sf.hp||'')}"></div></div>
+    <div class="f"><label for="sp-tr">乗り換え・乗る電車やバス（電車・バスのとき）</label><textarea id="sp-tr" name="transit" rows="2" placeholder="例：静岡 8:05 ひかり → 京都 9:50（2号車）／京都 10:02 JR奈良線 → 稲荷">${h(sf.transit||'')}</textarea><span class="small muted">行程の「🚃 乗換案内」で調べて、ここに書いておくとしおりに載ります。</span></div>
     <div class="f"><label for="sp-m">メモ（しおりに載ります）</label><input id="sp-m" name="memo" value="${h(sf.memo||'')}" placeholder="例：拝観料 400円、駐車場あり"></div>
     <div class="btns"><button class="btn" type="submit">${ed?'直す':'足す'}</button>${ed?'<button class="btn plain" type="button" data-act="stopeditno">やめる</button>':''}</div></form>`,{crumb:'おたのしみ › 旅行'});
 }
@@ -104,15 +116,15 @@ function vTrips(id){
 function tripSheet(tr){
   const plan=tripPlan(tr); const car=tripHasCar(tr);
   const days=plan.map(D=>`<h3 class="a4h">${plan.length>1?`${D.d}日目　`:''}${D.date?jpDate(D.date):''}</h3><table class="a4t"><tr><th style="width:5.5em">時間</th><th>行き先・すること</th><th style="width:30%">メモ</th></tr>
-    ${D.rows.map(r=>r.kind==='start'?`<tr><td>${m2t(r.dep)} 発</td><td>${r.name.startsWith("🏨")?"":"🏠 "}${h(r.name)}</td><td></td></tr>`:`${r.mv?`<tr class="mv"><td></td><td colspan="2">${h(r.mode||'')} 約${mnTxt(r.mv)}${r.km?`・約${Math.round(r.km)}km`:''}${r.rest?`　☕ 途中で休憩15分×${r.rest}回`:''}</td></tr>`:''}<tr><td><b>${m2t(r.arr)}</b>${r.s.inn?' 着':'〜'+m2t(r.dep)}</td><td><b>${h(r.s.name)}</b>${r.s.addr?`<br><small>${h(r.s.addr)}</small>`:''}${r.s.tel?`<br><small>☎ ${h(r.s.tel)}</small>`:''}</td><td><small>${h(r.s.memo||'')}</small></td></tr>`).join('')}</table>`).join('');
+    ${D.rows.map(r=>r.kind==='start'?`<tr><td>${m2t(r.dep)} 発</td><td>${r.name.startsWith("🏨")?"":"🏠 "}${h(r.name)}</td><td></td></tr>`:`${r.mv?`<tr class="mv"><td></td><td colspan="2">${h(r.mode||'')} 約${mnTxt(r.mv)}${r.km?`・約${Math.round(r.km)}km`:''}${r.rest?`　☕ 途中で休憩15分×${r.rest}回`:''}${r.s.transit?`<br>🚃 ${h(r.s.transit)}`:''}</td></tr>`:''}<tr><td><b>${m2t(r.arr)}</b>${r.s.inn?' 着':'〜'+m2t(r.dep)}</td><td><b>${h(r.s.name)}</b>${r.s.addr?`<br><small>〒 ${h(r.s.addr)}</small>`:r.s.inn?'':'<br><small class="a4miss">住所：</small>'}${r.s.tel?`<br><small>☎ ${h(r.s.tel)}</small>`:''}</td><td><small>${h(r.s.memo||'')}</small></td></tr>`).join('')}</table>`).join('');
   const unko=car?`<div class="a4brk"></div><h2 class="a4title">🚗 運行計画表</h2><p class="a4sub">${h(tr.name)}　${tripDateTxt(tr)}</p>
     ${plan.map(D=>{ let n=0; const rs=D.rows.filter(r=>r.kind!=='start'); let from=(D.rows.find(r=>r.kind==='start')||{}).name||'出発地';
       const lines=rs.map(r=>{
-        const row=isCar(r.mode)?`<tr><td>${++n}</td><td>${h(from)} → ${h(r.s.name)}${r.rest?`<br><small>☕ 途中で休憩15分×${r.rest}回</small>`:''}</td><td>${m2t(r.from)}</td><td>${m2t(r.arr)}</td><td>${r.km?Math.round(r.km)+'km':'―'}</td><td>${mnTxt(r.mv)}</td><td></td></tr>`:`<tr class="mv"><td></td><td colspan="6">${h(from)} → ${h(r.s.name)}（${h(r.mode||'車以外')}）</td></tr>`;
+        const row=isCar(r.mode)?`<tr><td>${++n}</td><td>${h(from)} → ${h(r.s.name)}${r.rest?`<br><small>☕ 途中で休憩15分×${r.rest}回</small>`:''}</td><td>${m2t(r.from)}</td><td>${m2t(r.arr)}</td><td>${r.km?Math.round(r.km)+'km':'―'}</td><td>${mnTxt(r.mv)}</td><td class="navi"><small>${r.s.addr?h(r.s.addr):r.s.inn?h(tr.inn):'<span class="a4miss">（住所未入力）</span>'}${r.s.tel?'<br>☎ '+h(r.s.tel):''}</small></td></tr>`:`<tr class="mv"><td></td><td colspan="6">${h(from)} → ${h(r.s.name)}（${h(r.mode||'車以外')}）</td></tr>`;
         from=r.s.name; return row; }).join('');
-      return `<h3 class="a4h">${plan.length>1?`${D.d}日目　`:''}${D.date?jpDate(D.date):''}</h3><table class="a4t"><tr><th>No</th><th>区間</th><th>出発</th><th>到着</th><th>距離</th><th>運転</th><th>運転する人</th></tr>${lines}
+      return `<h3 class="a4h">${plan.length>1?`${D.d}日目　`:''}${D.date?jpDate(D.date):''}</h3><table class="a4t"><tr><th>No</th><th>区間</th><th>出発</th><th>到着</th><th>距離</th><th>運転</th><th style="width:32%">ナビに入れる住所・電話</th></tr>${lines}
         <tr class="sum"><td></td><td>合計</td><td></td><td></td><td>${D.sumKm?'約'+Math.round(D.sumKm)+'km':'―'}</td><td>${mnTxt(D.sumDrive)}</td><td></td></tr></table>`; }).join('')}
-    <p class="a4note">距離と時間は地図の直線距離から計算した目安です（長い距離は高速道路の速さ）。渋滞や道の混み具合で変わります。運転2時間ごとに15分の休憩を入れています。「運転する人」は印刷してから書き込めます。</p>`:'';
+    <p class="a4note">距離と時間は地図の直線距離から計算した目安です（長い距離は高速道路の速さ）。渋滞や道の混み具合で変わります。運転2時間ごとに15分の休憩を入れています。</p>`:'';
   return `<div class="a4" id="a4">
     <h2 class="a4title">🧳 ${h(tr.name)}</h2><p class="a4sub">旅のしおり　${tripDateTxt(tr)}</p>
     <table class="a4t a4info"><tr><th>出発</th><td>${h(tr.start||'')} ${h(tr.startTime||'')}</td></tr>${tripPeople(tr)||tr.members?`<tr><th>行く人</th><td>${h(tripPeople(tr))} ${h(tr.members||'')}</td></tr>`:''}${tr.inn?`<tr><th>泊まる所</th><td>${h(tr.inn)}</td></tr>`:''}<tr><th>主な交通</th><td>${h(tr.mode||'')}</td></tr></table>
@@ -125,7 +137,7 @@ function tripSheet(tr){
 function tripText(tr){
   const plan=tripPlan(tr); let t=`🧳 ${tr.name}\n${tripDateTxt(tr)}\n`; if(tr.members) t+=`行く人：${tr.members}\n`;
   for(const D of plan){ t+=`\n【${plan.length>1?D.d+'日目 ':''}${D.date?jpDate(D.date):''}】\n`;
-    for(const r of D.rows){ if(r.kind==='start') t+=`${m2t(r.dep)} ${r.name} 出発\n`; else { if(r.mv) t+=`　↓ ${r.mode||''} 約${mnTxt(r.mv)}${r.rest?`（休憩${r.rest}回）`:''}\n`; t+=`${m2t(r.arr)} ${r.s.name}${r.s.memo?'（'+r.s.memo+'）':''}\n`; } } }
+    for(const r of D.rows){ if(r.kind==='start') t+=`${m2t(r.dep)} ${r.name} 出発\n`; else { if(r.mv) t+=`　↓ ${r.mode||''} 約${mnTxt(r.mv)}${r.rest?`（休憩${r.rest}回）`:''}\n`; if(r.s.transit) t+=`　🚃 ${r.s.transit}\n`; t+=`${m2t(r.arr)} ${r.s.name}${r.s.memo?'（'+r.s.memo+'）':''}\n`; if(r.s.addr) t+=`　〒 ${r.s.addr}\n`; if(r.s.tel) t+=`　☎ ${r.s.tel}\n`; } } }
   if(tr.memo) t+=`\n📝 ${tr.memo}\n`; return t;
 }
 function vTripPrint(id){
@@ -153,7 +165,7 @@ Object.assign(ACTS,{
     if(t.inn&&t.ilat==null){ const g=await pt(t.inn); if(g){ t.ilat=g.lat; t.ilon=g.lon; } }
     const nd=tripDays(t); let prev=t.slat!=null?{lat:t.slat,lon:t.slon}:null;
     for(let d=1;d<=nd;d++){ const L=tripStops(t,d); L.forEach((x,i)=>x.ord=i); if(d>1&&t.ilat!=null) prev={lat:t.ilat,lon:t.ilon};
-      for(const s of L){ if(s.lat==null){ const g=await pt(s.addr||s.name); if(g){ s.lat=g.lat; s.lon=g.lon; } }
+      for(const s of L){ if(s.lat==null){ const g=await tripGeo(s.addr||s.name); if(g){ s.lat=g.lat; s.lon=g.lon; if(!s.addr&&g.title){ s.addr=g.title; s.addrEst=true; } } }
         if(s.lat!=null&&prev&&prev.lat!=null){ s.km=Math.round(kmBetween(prev.lat,prev.lon,s.lat,s.lon)*1.3*10)/10; ok++; } else if(prev) ng++;
         if(s.lat!=null) prev=s; } }
     save(); render(); toast(ng?`${ok}か所の目安を入れました。${ng}か所は場所が見つからず、移動30分で仮置きしました（住所を入れると直ります）`:'行程を組み立てました。直したい所は「✏️ 直す」で'); },
@@ -169,8 +181,8 @@ FORMS.trip=(f,fd)=>{ S.trips=S.trips||[]; const id=f.dataset.id; const t=id?S.tr
     adults:fd.get('adults')||'',children:fd.get('children')||'',kids:fd.get('kids')||'',start:st,startTime:fd.get('startTime')||'08:00',dayStart:fd.get('dayStart')||'09:00',mode:fd.get('mode')||'',members:String(fd.get('members')||'').trim()});
   if(!id) S.trips.push(t); UI.tripEdit=''; save(); toast('保存しました'); go('trips/'+t.id,true); };
 FORMS.stop=(f,fd)=>{ const t=tripOf(f); if(!t) return; const hp=String(fd.get('hp')||'').trim(); const sid=f.dataset.s;
-  const v={day:+fd.get('day')||1,time:fd.get('time')||'',name:String(fd.get('name')).trim(),addr:String(fd.get('addr')||'').trim(),tel:String(fd.get('tel')||'').trim(),hp:/^https?:\/\//.test(hp)?hp:'',memo:String(fd.get('memo')||'').trim(),move:fd.get('move')||'',
+  const v={day:+fd.get('day')||1,time:fd.get('time')||'',name:String(fd.get('name')).trim(),addr:String(fd.get('addr')||'').trim(),tel:String(fd.get('tel')||'').trim(),hp:/^https?:\/\//.test(hp)?hp:'',memo:String(fd.get('memo')||'').trim(),move:fd.get('move')||'',transit:String(fd.get('transit')||'').trim(),
     mv:fd.get('mv')===''?'':+fd.get('mv'),stay:fd.get('stay')===''?60:+fd.get('stay')};
-  if(sid){ const s=t.stops.find(x=>x.id===sid); if(s){ if(s.addr!==v.addr||s.name!==v.name){ s.lat=null; s.lon=null; s.km=null; } Object.assign(s,v); } UI.stopEdit=''; toast('直しました'); }
+  if(sid){ const s=t.stops.find(x=>x.id===sid); if(s){ if(s.addr!==v.addr||s.name!==v.name){ s.lat=null; s.lon=null; s.km=null; } if(s.addr!==v.addr) s.addrEst=false; Object.assign(s,v); } UI.stopEdit=''; toast('直しました'); }
   else { t.stops.push({id:uid(),ord:tripStops(t,v.day).length,...v}); toast('足しました'); }
   save(); render(); };
