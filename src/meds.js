@@ -38,6 +38,7 @@ function doseBtn(d,s){ const tk=taken(s,d.key);
   return `<div class="ev" style="border-left-color:#2E8B57"><span class="tm">${d.time}</span><span class="bd"><b>💊 ${h(d.med.name)}</b><span>${d.label?h(d.label)+'・':''}${h(d.how)}${d.med.dose?'・'+h(d.med.dose)+h(d.med.unit||''):''}</span></span>
   <button class="mini ${tk?'':'navi'}" data-act="medtake" data-k="${h(d.key)}" data-s="${s}" style="align-self:center">${tk?'✓ '+tk+' 飲んだ':'飲んだ'}</button></div>`; }
 function medTop(){
+  if(S.set.mode!=='elder') return medLine();
   const t=today(); if(isOff('健康')||isOff('健康/健康管理')) return '';
   const ds=dosesOn(t); if(!ds.length&&!(S.meds||[]).some(lowStock)) return '';
   const now=new Date(); const hm=pad(now.getHours())+':'+pad(now.getMinutes());

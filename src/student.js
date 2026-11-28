@@ -68,9 +68,10 @@ function vBrain(){
   return sub('脳トレ',`<div class="sec brain"><p class="small muted" style="margin:0">${BR.i+1} / 10問　${BR.last||''}</p><div class="bq">${q.a} ${q.o} ${q.b} =</div>
     <form data-form="brain"><input id="br-a" name="a" inputmode="numeric" autocomplete="off" aria-label="答え" class="ba"><button class="btn" type="submit">答える</button></form></div>`,{crumb:'おたのしみ › ゲーム'});
 }
-function vDict(){
+function vDict(k){
   const w=UI.dictW||'';
-  const L=[['国語辞典','https://www.weblio.jp/content/'],['英和・和英','https://ejje.weblio.jp/content/'],['中国語','https://cjjc.weblio.jp/content/'],['漢字（読み・書き順）','https://kanji.jitenon.jp/cat/search?getdata='],['ウィキペディア','https://ja.wikipedia.org/wiki/Special:Search?search=']];
+  let L=[['国語辞典','https://www.weblio.jp/content/'],['英和・和英','https://ejje.weblio.jp/content/'],['中国語','https://cjjc.weblio.jp/content/'],['漢字（読み・書き順）','https://kanji.jitenon.jp/cat/search?getdata='],['ウィキペディア','https://ja.wikipedia.org/wiki/Special:Search?search=']];
+  const FIRST={kokugo:'国語辞典',kanwa:'漢字（読み・書き順）',waei:'英和・和英'}[k]; if(FIRST) L=[...L.filter(x=>x[0]===FIRST),...L.filter(x=>x[0]!==FIRST)];
   return sub('辞書',`<div class="sec"><div class="f"><input class="search" id="dict-w" type="search" value="${h(w)}" placeholder="🔍 調べたい言葉" aria-label="調べたい言葉"></div>
     <div class="list">${L.map(([n,u])=>`<a class="row" target="_blank" rel="noopener" data-dict="${u}" href="${w?u+encodeURIComponent(w):'#'}"><span class="em">📖</span><span class="t"><b>${n}で調べる</b><span>${w?h(w):'言葉を入れてから押します'}</span></span><span class="go">↗</span></a>`).join('')}</div>
     <p class="small muted">外の辞書サイト（無料）が開きます。</p></div>`,{crumb:'NEWS・知識 › 辞書'});

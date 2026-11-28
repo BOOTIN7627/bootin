@@ -114,3 +114,8 @@
 @keyframes op3Side{from{transform:translate(-38%,-50%) scale(.42)}to{transform:translate(30%,-10%) scale(.62)}}
 @keyframes op3Don{0%{opacity:0;transform:scale(.3) translateY(30%)}100%{opacity:1;transform:none}}
 @keyframes op3Fa{from{opacity:0;transform:translate(-80%,-40%)}to{opacity:1;transform:none}}
+
+.op-catch{position:absolute;left:50%;bottom:calc(12% - 46px);transform:translateX(-50%);background:#fff;border:3px solid #1E1B14;color:#1E1B14;border-radius:999px;padding:4px 16px;font:900 1rem var(--f-disp);white-space:nowrap;z-index:6;opacity:0;animation:opPopC .3s 4.3s both}
+.op-p2 .op-catch{border-color:#5A2EA6;color:#5A2EA6}
+.op-p1 .op-logo,.op-p2 .op-logo{bottom:18%}
+.op-catch{bottom:calc(18% - 44px)}

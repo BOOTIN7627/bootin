@@ -18,6 +18,9 @@ function routeView(r){
     case 'pledit': return vPlEdit(arg);
     case 'memo': return vMemo();
     case 'tools': return vTools();
+    case 'kuro': return vKuro(arg);
+    case 'navi': return vNavi();
+    case 'games': return vGames();
     case 'weather': return vWeather(arg);
     case 'bosai': return vBosai();
     case 'guide': return vGuide();
@@ -45,7 +48,7 @@ function routeView(r){
     case 'room': return vRoom();
     case 'school': return vSchool();
     case 'brain': return vBrain();
-    case 'dict': return vDict();
+    case 'dict': return vDict(arg);
     case 'famcall': return vFamCall();
     case 'hlist': return vHList();
     case 'hcheck': return vHCheck();
@@ -108,6 +111,7 @@ function after(r){
 function tick(){
   const now=new Date(); const hm=pad(now.getHours())+':'+pad(now.getMinutes());
   const a=$('#clockT'); if(a) a.textContent=hm;
+  const cb=$('#clockBox'); if(cb&&now.getSeconds()===0) cb.classList.toggle('glow',clockGlowOn());
   const b=$('#bigT'); if(b) b.textContent=hm+':'+pad(now.getSeconds());
   const w=$('#world'); if(w&&now.getSeconds()===0) w.innerHTML=worldRows();
   const tm=$('#tmT'); if(tm&&T.timerRun) tm.textContent=fmtMS(T.timerEnd-Date.now());

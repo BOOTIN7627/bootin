@@ -13,8 +13,8 @@ function opBooWrap(){
 function opJag(html,cls,tail){
   // tail: 'r'＝右下へ（右にいる人が話す） 'l'＝左下へ 'b'＝下へ
   const P='100,6 112,22 130,8 134,26 156,14 154,34 180,28 170,46 194,54 176,64 192,80 170,82 178,100 154,94 150,112 132,100 120,114 106,100 90,114 80,98 60,108 58,90 36,98 40,80 14,82 26,66 6,56 26,46 12,30 38,32 34,14 58,24 64,6 80,20';
-  const T=tail==='r'?'<path d="M160 88 L198 116 L146 96 Z"/>':tail==='l'?'<path d="M40 88 L2 116 L54 96 Z"/>':'<path d="M92 104 L100 120 L110 104 Z"/>';
-  return `<div class="op-jag ${cls||''}"><svg viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><g fill="#fff" stroke="#1E1B14" stroke-width="3.5" stroke-linejoin="round">${T}<polygon points="${P}"/></g><path d="M${tail==='l'?'48 92 L58 97':'152 92 L142 97'}" stroke="#fff" stroke-width="6"/></svg><span>${html}</span></div>`;
+  const T=tail==='r'?'M146 80 L198 116 L126 96 Z':tail==='l'?'M60 80 L2 114 L80 98 Z':'M88 96 L100 122 L114 96 Z';
+  return `<div class="op-jag ${cls||''}"><svg viewBox="0 0 200 120" preserveAspectRatio="none" aria-hidden="true"><g fill="#fff" stroke="#1E1B14" stroke-width="3.5" stroke-linejoin="round"><path d="${T}"/><polygon points="${P}"/></g><path d="${T}" fill="#fff"/></svg><span>${html}</span></div>`;
 }
 const OP_LOGO=`<div class="op-logo" aria-label="BOOTIN"><span>BOOTIN</span></div>`;
 const OP_PATTERNS=[
@@ -24,9 +24,9 @@ const OP_PATTERNS=[
     ${opBooWrap()}
     <div class="op-say op-s1">何でもオレに任せな！</div>
     <div class="op-say op-s3">しょんぼり…</div>
-    ${opJag('💢 何調子に<br>乗ってんの！','op-jagEn','r')}
+    ${opJag('💢 なに調子に<br>乗ってんの！','op-jagEn','r')}
     <div class="op-en"><img src="${OP_EN}" alt=""><span class="op-name">エンちん</span></div>
-    <div class="op-pow">バシッ</div>${OP_LOGO}`,
+    <div class="op-pow">バシッ</div>${OP_LOGO}<div class="op-catch">ライフサポート万能アプリ</div>`,
   /* 2: チビえりにお祓いされる → アーヤ */
   ()=>`<div class="op-burst"></div><div class="op-flash op-flashW"></div>
     <div class="op-aya"><img src="${OP_AYA}" alt=""><span class="op-name">アーヤ</span><span class="op-say op-sAya">あ、いつもの<br>情けないぶーちんに<br>戻ったわ</span></div>
@@ -34,7 +34,7 @@ const OP_PATTERNS=[
     <div class="op-say op-s1">オレは全知全能だぜ！</div>
     <div class="op-say op-s3">もじもじ…</div>
     <div class="op-eri"><div class="op-say op-sEri">憑いてるね。<br>お祓いしてこ</div><img src="${OP_ERI}" alt=""><span class="op-name">チビえり</span></div>
-    <div class="op-pow op-powE">シャラーン</div>${OP_LOGO}`,
+    <div class="op-pow op-powE">シャラーン</div>${OP_LOGO}<div class="op-catch">ライフサポート万能アプリ</div>`,
   /* 3: アンギエのいたずら（サングラスを取られる）→ ファーの一喝 */
   ()=>{ const s=k=>'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(OP3_SVG[k]||'');
    return `<div class="op-burst"></div><div class="op-flash"></div>

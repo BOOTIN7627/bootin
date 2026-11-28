@@ -37,12 +37,8 @@ function menuCells(){
 function vHome(){
   const t=today(); const l=lunar(t); const elder=S.set.mode==='elder'; const stu=S.set.mode==='student';
   const items=itemsOn(t).slice(0,4);
-  const w=S.cache.wx&&S.cache.wx.data;
-  const wxHtml=w?`<span class="big">${wxt(w.current.weather_code)[0]}</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><small class="wxlbl">気温</small><b>${Math.round(w.current.temperature_2m)}℃</b> ${h(wxt(w.current.weather_code)[1])}<span class="hilo"><i>最高${Math.round(w.daily.temperature_2m_max[0])}℃</i> <i>最低${Math.round(w.daily.temperature_2m_min[0])}℃</i></span></span>`
-    :`<span class="big">🌤️</span><span class="t"><em class="wxpl">📍${h(S.set.wx.name)}</em><b>天気</b><span>押すと天気を見ます</span></span>`;
-  const ot=OTAYORI[0];
   let grid=S.set.grid.slice(0,9); while(grid.length<9) grid.push('');
-  const show=elder?grid.slice(0,6):grid;
+  const show=grid;
   const cells=show.map((id,i)=>{
     const n=NODES[id]; const ok=n&&!isOff(id);
     const ctl=UI.editGrid?`<span class="ctl"><button data-act="gmove" data-i="${i}" data-d="-1" aria-label="前へ">◀</button><button data-act="gpick" data-i="${i}" aria-label="変える">✎</button><button data-act="gmove" data-i="${i}" data-d="1" aria-label="後ろへ">▶</button></span>`:'';
@@ -52,25 +48,51 @@ function vHome(){
   }).join('');
   const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>${gomiTag(t)}${tobanTag()}
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
-    <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button><button class="btn plain" data-go="cal/${t.slice(0,7)}">📅 カレンダー</button></div></div>`;
+    <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button></div></div>`;
   const fav=elder?S.people.filter(p=>p.fav&&p.phones&&p.phones[0]&&p.phones[0].num):[];
+  const glow=clockGlowOn();
+  const head0=elder?`<button class="ib hb moshi" data-go="bosai">🚨 もしものとき</button><button class="ib hb help" data-act="otasuke">🆘 おたすけ</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
+    :stu?`<button class="ib hb dic" data-go="dict/kokugo">国語</button><button class="ib hb dic" data-go="dict/kanwa">漢和</button><button class="ib hb dic" data-go="dict/waei">和英</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
+    :`<button class="ib hb ghost icon" data-go="search/" aria-label="アプリ内検索">🔍</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">クロにゃんに聞く</button>`;
   return `
-  <div class="hcol1"><div class="hd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
-    <button class="ib ghost" data-go="search/" aria-label="探す">🔍 探す</button>
-    <button class="ib help" data-act="otasuke">🆘 おたすけ</button></div>
-  <button class="clock" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
+  <div class="hcol1"><div class="hd hhd"><button class="brand grow" data-act="opening" aria-label="BOOTIN（オープニングを見る）"><img src="${BOO_F}" alt=""><span>BOOTIN</span></button>
+    ${elder||stu?'':head0}<button class="ib hb ghost icon gear" data-go="settings" aria-label="設定">⚙️</button></div>${elder||stu?`<div class="hbtns ${elder?'el':'st'}">${head0}</div>`:''}
+  <div class="clockw"><button class="clock ${glow?'glow':''}" id="clockBox" data-go="tools"><span class="d" id="clockD">${jpDate(t)}</span><span class="t" id="clockT">--:--</span>
     <span class="k">${wareki(t)}${l?`・旧暦${l.leap?'閏':''}${l.m}月${l.d}日・${rokuyo(t)}`:''}${sekki(t)?`・${sekki(t)}`:''}${holJP(t)?`・${holJP(t)}`:''}</span></button>
-  ${stu&&!UI.editGrid?`<div class="grid big stu">${stuCells()}</div>`:elder||UI.editGrid?`<div class="grid ${elder?'big':''}">${cells}</div>`:`<div class="topnav"><div class="grid compact sq">${cells}</div>
+    <button class="cglow" data-act="cglow" aria-label="時計の光り方を変える（今：${['光らない','夜だけ光る','いつも光る'][['off','night','on'].indexOf(S.set.clockGlow||'off')]}）">${{off:'✨',night:'🌙',on:'💡'}[S.set.clockGlow||'off']}</button></div>
+  ${bosaiBar()}
+  ${UI.editGrid?`<div class="grid">${cells}</div>`:`<div class="topnav ${elder?'elder':''}"><div class="grid compact sq">${stu?stuCells9():cells}</div>
     <div class="quick"><button class="qb q-cal" data-go="cal/${t.slice(0,7)}"><span class="em">📅</span><span>カレンダー</span></button>
     <button class="qb q-day" data-go="day/${t}"><span class="em">🗓️</span><span>1日のカード</span></button>
-    <button class="qb q-photo" data-act="open" data-id="NEWS・知識/NEWS"><span class="em">📰</span><span>NEWS</span></button></div></div>`}
-  <div class="editbar"><span class="small muted">${UI.editGrid?'◀ ▶ で並べかえ、✎ で中身を変えます':(elder?'高齢者モード：大きく6つにしぼっています':stu?'学生モード：6つのマスにしています':'')}</span>
-    <span style="display:flex;gap:6px"><button class="ib ghost" data-go="settings">⚙️ 設定</button><button class="ib ${UI.editGrid?'':'ghost'}" data-act="gedit">${UI.editGrid?'✓ できあがり':'⇄ 並べかえ'}</button></span></div>
-  ${bosaiBar()}${laundryBar()}<div class="wxrow"><div class="wx"><button class="wxb" data-go="weather">${wxHtml}</button><button class="wxh" data-go="weather">⏱️ 時間ごとの天気 ›</button></div>
-  <button class="otayori" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t"><small>ぶーちんより</small><b>${h(ot.t)}</b></span><span class="go">›</span></button></div>
-  ${fav.length?`<div class="sec t-fav"><h2>よく電話する人</h2><div class="list">${fav.map(p=>`<a class="row" href="${telHref(p.phones[0].num)}">${face(p,52)}<span class="t"><b>${h(p.name)}</b><span>${h(p.phones[0].num)}</span></span><span class="go">📞</span></a>`).join('')}</div></div>`:''}
-  ${stuTop()}${medTop()}<div class="mobile-only">${todaySec}${topCal()}</div>
+    <button class="qb q-navi ${elder?'nabi':''}" data-go="navi"><span class="em">🧭</span><span>ナビ</span></button></div></div>`}
+  ${quickRows()}
+  ${UI.editGrid?`<div class="editbar"><span class="small muted">◀ ▶ で並べかえ、✎ で中身を変えます</span><button class="ib" data-act="gedit">✓ できあがり</button></div>`:''}
+  ${rainNote()}${laundryBar()}
+  <div class="mobile-only">${todaySec}</div>${stuTop()}${medTop()}
+  <div class="minirow">${miniCal()}<div class="minibox">${wxMini()}${otaMini()}</div></div>
+  ${UI.editGrid?'':`<div class="editbar end"><button class="ib ghost" data-act="gedit">⇄ ボタンの並べかえ</button></div>`}
   </div><div class="hcol2 pc-only">${todaySec}${topCal()}</div>`;
+}
+/* 時計を光らせる：off／night（夜6時〜朝6時）／on */
+function clockGlowOn(){ const g=S.set.clockGlow||'off'; if(g==='on') return true; if(g==='night'){ const hr=new Date().getHours(); return hr>=18||hr<6; } return false; }
+/* トップの小さい天気：マークと気温だけ。雨のときだけ「今 雨」 */
+function wxMini(){
+  const w=S.cache.wx&&S.cache.wx.data;
+  if(!w) return `<button class="mini-wx" data-go="weather"><span class="big">🌤️</span><span class="t"><em>📍${h(S.set.wx.name)}</em><b>天気</b></span></button>`;
+  const c=w.current.weather_code, raining=RAINCODES.includes(c);
+  return `<button class="mini-wx ${raining?'rain':''}" data-go="weather" aria-label="${h(S.set.wx.name)}の天気 ${h(wxt(c)[1])} ${Math.round(w.current.temperature_2m)}度"><span class="big">${wxt(c)[0]}</span><span class="t"><em>📍${h(S.set.wx.name)}</em><b>${Math.round(w.current.temperature_2m)}℃</b>${raining?'<i>今 雨</i>':''}</span></button>`;
+}
+/* ぶーちんのお便り：キャラと「ぶーちんより」、新しいのが来たら「新着」 */
+function otaKey(){ const o=OTAYORI[0]; return o?o.d+'|'+o.t:''; }
+function otaMini(){ const isNew=S.set.otaSeen!==otaKey();
+  return `<button class="mini-ota" data-go="otayori"><img src="${BOO_F}" alt=""><span class="t">ぶーちんより</span>${isNew?'<span class="newb">新着</span>':''}</button>`; }
+/* 日にちだけの小さいカレンダー（押すと大きいカレンダー、日を押すと1日のカード） */
+function miniCal(){
+  const t=today(); const [y,m]=t.split('-').map(Number); const first=new Date(y,m-1,1), days=new Date(y,m,0).getDate();
+  let cells=''; for(let i=0;i<first.getDay();i++) cells+='<span></span>';
+  for(let d=1;d<=days;d++){ const s=`${y}-${pad(m)}-${pad(d)}`; const wd=(first.getDay()+d-1)%7; const has=itemsOn(s).length>0;
+    cells+=`<button class="${s===t?'td':''} ${wd===0||holJP(s)?'su':wd===6?'sa':''}" data-go="day/${s}" aria-label="${m}月${d}日${has?' 予定あり':''}">${d}${has?'<i></i>':''}</button>`; }
+  return `<div class="minical"><button class="mch" data-go="cal/${t.slice(0,7)}">${y}年${m}月 <span>大きく ›</span></button><div class="mcw">${'日月火水木金土'.split('').map((x,i)=>`<span class="${i===0?'su':i===6?'sa':''}">${x}</span>`).join('')}</div><div class="mcg">${cells}</div></div>`;
 }
 function evRow(it,s,compact){
   if(it.k==='an'){ const a=it.a; return `<div class="ev" style="border-left-color:${it.color}"><span class="tm">${a.em||(a.me?'🎂':'💐')}</span><span class="bd"><button style="all:unset;cursor:pointer;display:block" data-go="${a.go||(a.em?'kids':'profile')}"><b>${h(a.name)}${it.yrs!=null?`（${it.yrs}${a.me?'歳':'周年'}）`:''}</b>${a.memo&&!compact?`<span>${h(a.memo)}</span>`:''}</button></span></div>`; }
@@ -423,7 +445,7 @@ function vTools(){
     <div class="btns"><button class="btn plain" data-act="ck" data-k="tax10">税込10%</button><button class="btn plain" data-act="ck" data-k="tax8">税込8%</button></div>
     <div class="btns" style="align-items:center"><label for="wkp" style="flex:0 0 auto;font-weight:700">割り勘</label><input id="wkp" type="number" min="1" value="${T.calcPeople}" style="width:5em;flex:0 0 auto;padding:8px;border:2px solid var(--line);border-radius:10px;background:var(--card)"> 人で <button class="btn plain" data-act="ck" data-k="split">割る（100円単位で切り上げ）</button></div>
     <p class="small muted" id="splitR"></p></div>`;
-  return sub('便利道具',`<div class="chips">${tabs.map(([k,t])=>`<button class="chip" aria-pressed="${UI.toolTab===k}" data-act="tooltab" data-c="${k}">${t}</button>`).join('')}</div>${body}`,{crumb:'設定・機能 › その他の機能'});
+  return sub('便利道具',`<div class="chips tooltabs">${tabs.map(([k,t])=>`<button class="chip" aria-pressed="${UI.toolTab===k}" data-act="tooltab" data-c="${k}">${t}</button>`).join('')}</div>${body}`,{crumb:'設定・機能 › その他の機能'});
 }
 const WORLD=[['東京','Asia/Tokyo'],['北京・上海','Asia/Shanghai'],['ソウル','Asia/Seoul'],['ハワイ','Pacific/Honolulu'],['ロサンゼルス','America/Los_Angeles'],['ニューヨーク','America/New_York'],['ロンドン','Europe/London'],['パリ','Europe/Paris'],['シドニー','Australia/Sydney']];
 function worldRows(){ const now=new Date(); return WORLD.map(([n,z])=>{ let t='';try{t=new Intl.DateTimeFormat('ja-JP',{timeZone:z,month:'numeric',day:'numeric',weekday:'short',hour:'2-digit',minute:'2-digit'}).format(now);}catch(e){} return `<div class="row"><span class="t"><b>${n}</b></span><span style="font-weight:700;font-variant-numeric:tabular-nums">${t}</span></div>`;}).join(''); }
@@ -464,10 +486,13 @@ function rainSoon(d){
   for(let i=st;i<st+3&&i<H.time.length;i++){ const p=H.precipitation_probability[i]||0, mm=H.precipitation?H.precipitation[i]||0:0; if(p>=50||mm>=0.2) return {at:+H.time[i].slice(11,13)+'時',p}; }
   return null;
 }
+const RAINCODES=[51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99];
+function rainNote(){
+  const w=S.cache.wx&&S.cache.wx.data; const r=rainSoon(w); if(!r||r.now) return '';
+  return `<button class="rainnote" data-go="weather/h"><img src="${charaImg('teru','sad')}" alt="てるチン"><b>まもなく雨</b><span>${h(r.at)}ごろから${r.p!=null?`（${r.p}%）`:''}　傘と洗濯物に注意</span><span class="go">›</span></button>`;
+}
 function laundryBar(){
   if(S.set.laundry===false) return ''; const w=S.cache.wx&&S.cache.wx.data; const nd=new Date(); const hr=nd.getHours();
-  const r=hr>=6&&hr<20?rainSoon(w):null;
-  if(r) return `<button class="laundry rain" data-go="weather/h"><img class="lteru" src="${charaImg('teru','sad')}" alt="てるチン"><span class="t"><b>雨危険、洗濯物取り込んで！</b><span>${r.now?'今、雨が降っています':`${h(r.at)}ごろから雨の予報${r.p!=null?`（${r.p}%）`:''}`}</span></span><span class="go">›</span></button>`;
   const ss=w&&w.daily&&w.daily.sunset&&w.daily.time[0]===today()?w.daily.sunset[0]:null;
   if(ss){ const [H,M]=ss.slice(11,16).split(':').map(Number); const m=hr*60+nd.getMinutes(), s=H*60+M;
     if(m>=s-30&&m<=s+90) return `<button class="laundry sun" data-go="weather"><span class="em">🌇👕</span><span class="t"><b>時間です、洗濯物取り込んで！</b><span>今日の日の入り ${H}:${String(M).padStart(2,'0')}（${h(S.set.wx.name)}）</span></span><span class="go">›</span></button>`; }
@@ -503,6 +528,7 @@ function vWeather(mode){
 
 /* ---------- お便り ---------- */
 function vOtayori(){
+  if(S.set.otaSeen!==otaKey()){ S.set.otaSeen=otaKey(); save(); }
   return sub('ぶーちんからのお便り',OTAYORI.map(o=>`<div class="sec"><div class="small muted">${jpDate(o.d)}</div><h3 style="margin:2px 0 6px">${h(o.t)}</h3>${sayBoo(h(o.b).replace(/\n/g,'<br>'))}</div>`).join('')+`<p class="small muted">運営からのお知らせは、オフにできません。</p>`,{crumb:'おたのしみ › ぶーちん劇場'});
 }
 
@@ -523,8 +549,8 @@ function vSearch(q){
       +sec('メモ',mms,m=>`<button class="row" ${m.go?`data-go="${m.go}"`:'data-go="memo"'}><span class="t"><b>${h(m.text.slice(0,40))}</b><span>${h(m.src)} ${h(m.sub)}</span></span></button>`);
     if(!res) res='<div class="empty">見つかりませんでした。ほかの言葉でも探してみてください。</div>';
   }
-  return sub('探す',`<form data-form="search"><input class="search" id="sq" name="q" type="search" value="${h(q)}" placeholder="「〇〇したい」「歯医者」「誕生日」など" autofocus></form>
-  ${q?'':`<div class="chips">${['予定','誕生日','メモ','病院','割り勘','天気','子育て','幹事'].map(w=>`<button class="chip" data-go="search/${w}">${w}</button>`).join('')}</div><p class="small muted">機能の名前、人、場所、予定、メモをまとめて探します。まだ準備中の機能も見つかります。</p>`}${res}`);
+  return sub('アプリ内検索',`<form data-form="search"><input class="search" id="sq" name="q" type="search" value="${h(q)}" placeholder="「〇〇したい」「歯医者」「誕生日」など" autofocus></form>
+  ${q?'':`<p class="small" style="margin:8px 0 0;font-weight:700">アプリの中の機能・人・場所・予定・メモを、まとめて探します。下は言葉の例です。押すとその言葉で探します。</p><div class="chips wrap">${['予定','誕生日','メモ','病院','割り勘','天気','子育て','幹事'].map(w=>`<button class="chip" data-go="search/${w}">${w}</button>`).join('')}</div><p class="small muted">機能の名前、人、場所、予定、メモをまとめて探します。まだ準備中の機能も見つかります。</p>`}${res}`);
 }
 
 /* ---------- 設定 ---------- */
