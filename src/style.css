@@ -975,3 +975,20 @@ html.f3 .top0 .menub .nm{font-size:.72rem}
 @media (max-width:340px){ .hhd .hb.kuro{font-size:.66rem;padding:3px 5px 3px 3px} .hhd .hb.kuro img{width:20px;height:20px} .hhd .brand span{font-size:.82rem;letter-spacing:0}
   .hbtns.el,.hbtns.st{gap:4px} .hbtns .hb{font-size:.74rem;padding:3px 2px;min-width:0} .hbtns .hb.kuro img{width:18px;height:18px} .hhd .hb.gtxt{font-size:.74rem;padding:5px 6px} }
 @media (max-width:340px){ html .hbtns .hb,html.f3 .hbtns .hb{font-size:.7rem;padding:3px 2px;gap:2px;min-width:0;overflow:hidden} .hbtns.el{grid-template-columns:1.25fr 1fr .8fr} }
+
+/* 天気｜アプリ内検索｜基本MENU（右の丸）に入れかえ（本人 11/28） */
+.top0 .srchb{min-height:64px;aspect-ratio:auto;background:var(--card);color:var(--ink);border:2px solid #5B6470;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;font-weight:900;box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.top0 .srchb::before{display:none}
+.top0 .srchb .em{font-size:1.35rem;line-height:1}.top0 .srchb .nm{font-size:.74rem;line-height:1.15;text-align:center}
+.top0 .qb.q-menu{height:64px;width:64px;aspect-ratio:1/1;background:#E0452B;color:#fff;border:2px solid #1E1B14}
+.top0 .qb.q-menu span:last-child{font-size:.62rem;line-height:1.1;text-align:center}
+[data-style="black"] .top0 .srchb{background:#17191C;border-color:#78A6E8;color:var(--glowtx);box-shadow:0 0 8px rgba(120,166,232,.35)}
+[data-style="black"] .top0 .srchb .nm{color:var(--glowtx)}
+[data-style="black"] .top0 .qb.q-menu{background:linear-gradient(160deg,#3A1C1A,#21100F);border-color:#B5413A;color:var(--glowtx);box-shadow:0 0 10px rgba(181,65,58,.45)}
+[data-style="ladies"] .top0 .srchb{border-color:#E8707E}
+[data-style="ladies"] .top0 .qb.q-menu{background:linear-gradient(160deg,#E8707E,#C93A52);border-color:#A82E45}
+html.f3 .top0 .srchb .nm{font-size:.68rem}
+html.f3 .top0 .qb.q-menu span:last-child,.topnav.elder.top0 .qb.q-menu span:last-child{font-size:.56rem}
+html.f3 .top0 .qb.q-menu .em,.topnav.elder.top0 .qb.q-menu .em{font-size:1rem}
+.top0 .srchb .nm{white-space:nowrap}
+@media (max-width:340px){ .top0 .srchb .nm{font-size:.6rem!important} .top0 .mini-wx{padding:4px 6px;gap:4px} .top0 .mini-wx .big{font-size:1.6rem} .top0 .mini-wx b{font-size:1.1rem} }
