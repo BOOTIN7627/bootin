@@ -877,3 +877,9 @@ html:root[data-style="ladies"]{
 [data-style] .hhd .hb.kuro{padding-left:10px}
 
 .hhd .hb.gtxt{font-weight:900;font-size:.9rem;padding:6px 10px;white-space:nowrap;border:2px solid var(--ink);background:var(--card);color:var(--ink)}
+/* クールブラック：段の色はふちの線と、暗い色のうすい光だけにして文字を読みやすく */
+[data-style="black"] .lvlist.lv-b .row{background:linear-gradient(90deg,rgba(45,108,223,.28),var(--card) 45%)}
+[data-style="black"] .lvlist.lv-y .row{background:linear-gradient(90deg,rgba(224,168,0,.24),var(--card) 45%)}
+[data-style="black"] .lvlist.lv-r .row{background:linear-gradient(90deg,rgba(217,68,63,.24),var(--card) 45%)}
+[data-style="ladies"] .lvlist.lv-b .row{background:linear-gradient(90deg,#EEF2FF,var(--card) 40%)}
+[data-style="black"] .lvlist .row b{color:#F2F4F7}[data-style="black"] .lvlist .row .t span{color:#AEB5BE}
