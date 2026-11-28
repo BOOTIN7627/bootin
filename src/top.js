@@ -127,7 +127,7 @@ Object.assign(ACTS,{
 /* いまどの段にいるか：1段目（赤）→2段目（青）→3段目（黄） */
 const LVNAME={r:['1段目','大きい入口'],b:['2段目','中の入口'],y:['3段目','機能']};
 function lvBand(n){ const path=[]; let x=n; while(x){ path.unshift(x); x=NODES[x.parent]; }
-  return `<div class="lvband">${path.map(p=>`<button class="lvchip lv-${p.lv}" ${p===n?'aria-current="page"':`data-act="open" data-id="${h(p.id)}"`}><i>${LVNAME[p.lv][0]}</i>${h(p.name)}</button>`).join('<span class="lvsep">›</span>')}</div>`; }
+  return `<div class="lvband"><span class="small muted">いまいる場所：</span>${path.map(p=>p===n?`<span class="lvchip lv-${p.lv}" aria-current="page"><i>${LVNAME[p.lv][0]}</i>${h(p.name)}</span>`:`<button class="lvchip lv-${p.lv}" data-act="open" data-id="${h(p.id)}" aria-label="${h(p.name)}にもどる"><i>${LVNAME[p.lv][0]}</i>${h(p.name)}</button>`).join('<span class="lvsep">›</span>')}</div>`; }
 /* メニューの全体図：赤→青→黄の一覧 */
 function vMenuMap(){
   const reds=TREE.map(r=>NODES[r.name]).filter(n=>n&&!isOff(n.id));
