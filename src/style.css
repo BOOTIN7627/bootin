@@ -909,3 +909,11 @@ html:root[data-style="ladies"]{
 .camnote.ok{background:#E6F6EA;border-color:#2E9B4F}
 [data-style="black"] .camnote.ok{background:#12261A;border-color:#2F7A4A;color:var(--ink)}
 .btn.w{width:100%}
+
+.cal .dy.nx{background:#E3EEFF}
+.nxkey{display:inline-block;width:1.1em;height:1.1em;border-radius:4px;background:#E3EEFF;border:1px solid #9DB8E8;vertical-align:-3px}
+[data-style="black"] .cal .dy.nx,[data-style="black"] .nxkey{background:#16233A}
+[data-style="ladies"] .cal .dy.nx,[data-style="ladies"] .nxkey{background:#FDE3E8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .cal .dy.nx{background:#1D2A3A}}
+:root[data-theme="dark"] .cal .dy.nx{background:#1D2A3A}
+.calview .seg button{white-space:nowrap}

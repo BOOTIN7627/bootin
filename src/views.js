@@ -188,6 +188,7 @@ function calCells(start,weeks,cat,cls){
   return `<div class="cal">${[...WD].map((w,i)=>`<div class="wd ${i===0?'c-sun':i===6?'c-sat':''}">${w}</div>`).join('')}${cells}</div>`;
 }
 function vCal(ym){
+  const cv=UI.calView||S.set.calMode||'m';
   if(!/^\d{4}-\d\d$/.test(ym)) ym=today().slice(0,7);
   const [y,m]=ym.split('-').map(Number);
   const prev=ymd(new Date(y,m-2,1)).slice(0,7), next=ymd(new Date(y,m,1)).slice(0,7); const t=today();
@@ -196,9 +197,9 @@ function vCal(ym){
   <div class="c" style="text-align:center"><b style="font-size:1.4rem">${y}年${m}月</b> <span class="small muted">${wareki(ym+'-01')}</span></div>
   ${calNav(`${m}月`,`data-go-r="cal/${prev}"`,`data-go-r="cal/${next}"`,ym!==t.slice(0,7)?`data-go-r="cal/${t.slice(0,7)}"`:'')}
   <div class="chips">${chips}</div>
-  <div class="calview"><span class="seg">${[['m','▦ 1か月'],['w','☰ 今日から1日ずつ']].map(([k,n])=>`<button aria-pressed="${(UI.calView||'m')===k}" data-act="calview" data-c="${k}">${n}</button>`).join('')}</span>
+  <div class="calview"><span class="seg">${[['m','▦ その月'],['f','▦ 今日から1か月'],['w','☰ 1日ずつ']].map(([k,n])=>`<button aria-pressed="${cv===k}" data-act="calview" data-c="${k}">${n}</button>`).join('')}</span>
    <span class="seg">${[['','文字ふつう'],['big','文字大きく']].map(([k,n])=>`<button aria-pressed="${(S.set.calBig||'')===k}" data-act="calbig" data-c="${k}">${n}</button>`).join('')}</span></div>
-  ${(UI.calView||'m')==='w'?calWeek(ym):`<div data-swipe="big" data-prev="${prev}" data-next="${next}" class="${S.set.calBig?'calbig':''}">${calGrid(ym,UI.calCat)}</div>`}
+  ${cv==='w'?calWeek(ym):cv==='f'?`<div class="${S.set.calBig?'calbig':''}">${calFromToday(UI.calCat)}</div><p class="small" style="margin:4px 0 0"><span class="nxkey"></span> 色の付いた日は来月です。月の境目で色が変わります。</p>`:`<div data-swipe="big" data-prev="${prev}" data-next="${next}" class="${S.set.calBig?'calbig':''}">${calGrid(ym,UI.calCat)}</div>`}
   <p class="small muted">左右に指でスライドしても月が変わります。日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol"><span style="display:inline-block;width:1.1em;height:1.1em;border-radius:50%;background:rgba(229,57,53,.2);vertical-align:-3px;margin-right:2px"></span>祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
   <div class="btns"><button class="btn" data-go="evnew/${ym===t.slice(0,7)?t:ym+'-01'}">＋ 予定を入れる</button></div>`);
 }

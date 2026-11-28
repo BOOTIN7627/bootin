@@ -120,7 +120,7 @@ function calWeek(ym){
   return `<div class="wknav"><button class="btn plain" data-act="calwk" data-c="${pw}">◀ 前の週</button><button class="btn plain" data-act="calwk" data-c="${nw}">次の週 ▶</button></div><div class="wk ${S.set.calBig?'calbig':''}">${rows}</div>`;
 }
 Object.assign(ACTS,{
-  calview:(el,d)=>{ UI.calView=d.c; UI.calWk=''; render(); },
+  calview:(el,d)=>{ UI.calView=d.c; UI.calWk=''; if(d.c!=='w'){ S.set.calMode=d.c; save(); } render(); },
   calbig:(el,d)=>{ S.set.calBig=d.c; save(); render(); },
   calwk:(el,d)=>{ UI.calWk=d.c; const ym=d.c.slice(0,7); go('cal/'+ym,true); }
 });
