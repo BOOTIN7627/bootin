@@ -883,3 +883,9 @@ html:root[data-style="ladies"]{
 [data-style="black"] .lvlist.lv-r .row{background:linear-gradient(90deg,rgba(217,68,63,.24),var(--card) 45%)}
 [data-style="ladies"] .lvlist.lv-b .row{background:linear-gradient(90deg,#EEF2FF,var(--card) 40%)}
 [data-style="black"] .lvlist .row b{color:#F2F4F7}[data-style="black"] .lvlist .row .t span{color:#AEB5BE}
+[data-style="black"] .mm{background:var(--card)}
+[data-style="black"] .mmr{background:#2A1A1A;color:var(--ink)}
+[data-style="black"] .mmbh{background:#16233A;color:#BFD6FF}
+[data-style="black"] .mmy{background:#1E1B10;color:#E8D9A0}
+[data-style="black"] .mmy.ok{background:#8C7A2E;color:#0C0D0F}
+[data-style="black"] .mcg .td{color:#0C0D0F}

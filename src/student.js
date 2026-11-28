@@ -107,7 +107,7 @@ FORMS.pin=(f,fd)=>{ const v=String(fd.get('pin')||'').trim(); if(v&&!/^\d{4}$/.t
 function modeSec(){
   const s=S.set; const r=(val,label)=>`<label><input type="radio" name="mode" value="${val}" ${s.mode===val?'checked':''} data-act="setr">${label}</label>`;
   const locked=s.mode==='student'&&s.parentPin&&!UI.pinOk;
-  return `<div class="sec"><h3>モード</h3>
+  return `<div class="sec"><h3>使う人のモード（ボタンの並び）</h3><p class="small muted" style="margin:0 0 6px">ボタンの並び方が変わります。黒・ピンクなどの見た目は、すぐ下の「デザインのモード」で変えます。</p>
     ${locked?`<p class="small" style="margin:0 0 6px">学生モードを変えるには、親の合言葉（4けた）を入れてください。</p><div class="two"><input id="pin-in" inputmode="numeric" maxlength="4" aria-label="親の合言葉" class="pinin"><button class="btn plain" data-act="pinunlock">開ける</button></div>`
       :`<div class="choose">${r('normal','通常')}${r('elder','高齢者')}${r('student','学生')}</div>`}
     <p class="small muted" style="margin:4px 0 0">高齢者モード：トップを大きな6マスにして「よく電話する人」を上に出します。<br>学生モード：トップを「カレンダー・やること・時間割とテスト・脳トレ・辞書・家族に連絡」の6マスにします。ビジネスの入口は出しません。</p>

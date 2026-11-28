@@ -112,7 +112,7 @@ Object.assign(ACTS,{ gamedel:(el,d)=>{ S.set.games.splice(+d.i,1); save(); rende
 /* カレンダー：1週間を大きな字で（その週の予定を全部、文字で並べる） */
 function calWeek(ym){
   const t=today(); let st=UI.calWk||'';
-  if(!st||st.slice(0,7)!==ym&&ymd(new Date(parseD(st).getTime()+6*864e5)).slice(0,7)!==ym){ const base=ym===t.slice(0,7)?t:ym+'-01'; const d=parseD(base); d.setDate(d.getDate()-d.getDay()); st=ymd(d); }
+  if(!st||st.slice(0,7)!==ym&&ymd(new Date(parseD(st).getTime()+6*864e5)).slice(0,7)!==ym){ st=ym===t.slice(0,7)?t:ym+'-01'; }
   const sd=parseD(st); const days=[...Array(7)].map((_,i)=>{const d=new Date(sd); d.setDate(sd.getDate()+i); return ymd(d);});
   const pw=ymd(new Date(sd.getTime()-7*864e5)), nw=ymd(new Date(sd.getTime()+7*864e5));
   const rows=days.map(s=>{ const its=itemsOn(s,UI.calCat); const d=parseD(s); const hj=holJP(s);
