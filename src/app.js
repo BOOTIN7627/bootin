@@ -76,7 +76,8 @@ function sideNav(){
 function render(){
   const root=document.documentElement;
   root.classList.toggle('f2',S.set.font==2); root.classList.toggle('f3',S.set.font==3||(S.set.mode==='elder'&&S.set.font==1));
-  if(S.set.theme) root.setAttribute('data-theme',S.set.theme); else root.removeAttribute('data-theme');
+  /* いつもは明るい画面。スマホのダークモードに合わせるのは「スマホに合わせる」を選んだときだけ */
+  if(S.set.theme==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',S.set.theme||'light');
   root.setAttribute('data-gline',S.set.gline||'r'); root.setAttribute('data-kise',(S.set.kise==='kisetsu')?['yuki','yuki','haru','haru','haru','natsu','natsu','natsu','momiji','momiji','momiji','yuki'][new Date().getMonth()]:(S.set.kise||'bee'));
   const r=cur();
   if(r==='home'&&!IN_FRAME) {}
