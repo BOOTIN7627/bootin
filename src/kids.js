@@ -11,7 +11,7 @@ function vKids(id){
   const tabs=K.length?`<div class="chips">${K.map(x=>`<button class="chip" aria-pressed="${k&&x.id===k.id}" data-go-r="kids/${x.id}">👶 ${h(x.name)}</button>`).join('')}<button class="chip" data-go-r="kids/new">＋ 子どもを足す</button></div>`:'';
   if(!k||id==='new') return sub('子育て',`${tabs}${K.length?'':sayBoo('お子さんの名前と生まれた日を入れると、成長の記録と、健診・予防接種の表が使えるよ。')}
     <form class="sec" data-form="kid"><h3>子どもを足す</h3><div class="f"><label for="kd-n">名前</label><input id="kd-n" name="name" required placeholder="例：はると"></div>
-    <div class="f"><label for="kd-b">生まれた日</label><input id="kd-b" type="date" name="bday" required max="${today()}"></div><div class="btns"><button class="btn" type="submit">足す</button></div></form>`,{crumb:'私と家族 › 子育て'});
+    <div class="f"><span class="lb">生まれた日（年・月・日を選ぶ）</span>${ymdSel('bday','',{y0:+today().slice(0,4)-30,y1:+today().slice(0,4),req:true})}</div><div class="btns"><button class="btn" type="submit">足す</button></div></form>`,{crumb:'私と家族 › 子育て'});
   const g=(k.grow||[]).slice().sort((a,b)=>a.date.localeCompare(b.date));
   const ser=(key,name,color,unit)=>{ const pts=g.filter(x=>x[key]!==''&&x[key]!=null&&!isNaN(+x[key])).map(x=>[x.date,+x[key]]); return pts.length?`<div class="hck1"><b>${name}</b><span class="small muted">（${unit}）　最新 ${pts[pts.length-1][1]}${unit}</span>${pts.length>1?lineChart([{name,color,pts}],{label:name+'のグラフ',h:110}):''}</div>`:''; };
   const sh=k.shots||{}; const ck=k.checks||{};

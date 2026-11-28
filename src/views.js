@@ -48,7 +48,7 @@ function vHome(){
   }).join('');
   const todaySec=`<div class="sec t-today"><h2>今日の予定 <button class="more" data-go="day/${t}">1日のカード ›</button></h2>${gomiTag(t)}${tobanTag()}
     ${items.length?`<div class="evs">${items.map(it=>evRow(it,t,true)).join('')}</div>`:`<p class="muted" style="margin:0">今日の予定はまだありません。</p>`}
-    <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button></div></div>`;
+    <div class="btns"><button class="btn plain" data-go="evnew/${t}">＋ 予定を入れる</button>${(S.gomi||[]).length?'':'<button class="btn plain" data-go="gomi">🗑️ ゴミの日を登録</button>'}</div></div>`;
   const fav=elder?S.people.filter(p=>p.fav&&p.phones&&p.phones[0]&&p.phones[0].num):[];
   const glow=clockGlowOn();
   const head0=elder?`<button class="ib hb moshi" data-go="bosai">🚨 もしものとき</button><button class="ib hb help" data-act="otasuke">🆘 おたすけ</button><button class="ib hb kuro" data-go="kuro"><img src="${charaImg('kuro')}" alt="">聞く</button>`
@@ -114,14 +114,14 @@ function vNode(id){
   const n=NODES[id]; if(!n) return sub('見つかりません','<p>この画面は見つかりませんでした。</p>');
   if(n.lv==='y'||!n.kids.length){
     const items=n.items||[];
-    return sub(n.name,`<div class="junbi">${BOO_IMG}<div><span class="stamp">【準備中】</span></div><p>「${h(n.name)}」はただいま準備中です。<br>できたら、ぶーちんのお便りでお知らせします。</p></div>
+    return sub(n.name,`${lvBand(n)}<div class="junbi">${BOO_IMG}<div><span class="stamp">【準備中】</span></div><p>「${h(n.name)}」はただいま準備中です。<br>できたら、ぶーちんのお便りでお知らせします。</p></div>
       ${items.length?`<div class="sec"><h3>この中に入る予定のもの</h3><ul class="plan">${items.map(([t,c,w])=>`<li>${WHEN[w]?`<span class="when ${WHEN[w][0]}">${WHEN[w][1]}</span>`:''}<span>${h(t)}</span></li>`).join('')}</ul></div>`:''}
       <div class="btns"><button class="btn plain" data-act="qmemo">✏️ ここに欲しいことをメモ</button></div>`,{crumb:crumbOf(id)});
   }
   const kids=n.kids.filter(k=>!isOff(k)).sort((a,b)=>hasImpl(b)-hasImpl(a)); const hidden=n.kids.length-kids.length;
-  return sub(n.name,`<div class="list">${kids.map(k=>{const kn=NODES[k];const ok=hasImpl(k);
+  return sub(n.name,`${lvBand(n)}<div class="list lvlist lv-${n.lv==='r'?'b':'y'}">${kids.map(k=>{const kn=NODES[k];const ok=hasImpl(k);
       return `<button class="row" data-act="open" data-id="${h(k)}"><span class="em">${emojiOf(k)}</span><span class="t"><b>${h(kn.name)}</b><span>${kn.kids.length?kn.kids.map(x=>NODES[x].name).join('・'):(kn.items||[]).slice(0,2).map(x=>x[0]).join('・')}</span></span>${ok?'<span class="badge ok">使える</span>':'<span class="badge wait">準備中</span>'}<span class="go">›</span></button>`;}).join('')}</div>
-    ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}${id==='設定・機能'?`<p class="small muted" style="text-align:center">この画面の版：${BUILD}</p>`:''}`,{crumb:crumbOf(id)});
+    ${hidden?`<p class="small muted">オフにしている機能が${hidden}個あります。<button class="more" style="background:none;border:0;color:var(--accent);font-weight:700" data-go="features">設定で出す</button></p>`:''}${id==='設定・機能'?`<button class="row guiderow" data-go="menumap" style="margin-top:10px"><span class="em">🗺️</span><span class="t"><b>メニューの全体図</b><span>どのボタンの中に、どの機能があるかを一覧で見られます</span></span><span class="go">›</span></button><p class="small muted" style="text-align:center">この画面の版：${BUILD}</p>`:''}`,{crumb:crumbOf(id)});
 }
 
 /* ---------- 1日のカード ---------- */
@@ -191,7 +191,9 @@ function vCal(ym){
   <div class="c" style="text-align:center"><b style="font-size:1.4rem">${y}年${m}月</b> <span class="small muted">${wareki(ym+'-01')}</span></div>
   ${calNav(`${m}月`,`data-go-r="cal/${prev}"`,`data-go-r="cal/${next}"`,ym!==t.slice(0,7)?`data-go-r="cal/${t.slice(0,7)}"`:'')}
   <div class="chips">${chips}</div>
-  <div data-swipe="big" data-prev="${prev}" data-next="${next}">${calGrid(ym,UI.calCat)}</div>
+  <div class="calview"><span class="seg">${[['m','月'],['w','1週間']].map(([k,n])=>`<button aria-pressed="${(S.set.calView||'m')===k}" data-act="calview" data-c="${k}">${n}</button>`).join('')}</span>
+   <span class="seg">${[['','文字ふつう'],['big','文字大きく']].map(([k,n])=>`<button aria-pressed="${(S.set.calBig||'')===k}" data-act="calbig" data-c="${k}">${n}</button>`).join('')}</span></div>
+  ${(S.set.calView||'m')==='w'?calWeek(ym):`<div data-swipe="big" data-prev="${prev}" data-next="${next}" class="${S.set.calBig?'calbig':''}">${calGrid(ym,UI.calCat)}</div>`}
   <p class="small muted">左右に指でスライドしても月が変わります。日にちを押すと、その日の「1日のカード」が開きます。<span class="c-hol"><span style="display:inline-block;width:1.1em;height:1.1em;border-radius:50%;background:rgba(229,57,53,.2);vertical-align:-3px;margin-right:2px"></span>祝日</span>　<span class="c-sun">■日曜</span>　<span class="c-sat">■土曜</span></p>
   <div class="btns"><button class="btn" data-go="evnew/${ym===t.slice(0,7)?t:ym+'-01'}">＋ 予定を入れる</button></div>`);
 }
@@ -231,13 +233,16 @@ function vEvent(id,date){
 function vPeople(){
   const chips=[{id:'',name:'すべて'}].concat(S.set.pcats).map(c=>`<button class="chip" aria-pressed="${UI.pCat===c.id}" data-act="pcat" data-c="${c.id}">${c.color!=null?`<span class="dot" style="background:${COLORS10[c.color]}"></span>`:''}${h(c.name)}</button>`).join('');
   return sub('人物帳',`<input class="search" id="pq" type="search" placeholder="名前・ふりがな・メモで探す" value="${h(UI.pQ)}">
-  <div class="chips">${chips}</div><div id="plist">${peopleList()}</div>
+  <div class="chips">${chips}</div><div class="gojuon">${GOJU.map(([k])=>`<button aria-pressed="${UI.pRow===k}" data-act="prow" data-c="${k}">${k}</button>`).join('')}</div><div id="plist">${peopleList()}</div>
   <div class="btns"><button class="btn" data-go="pedit/new">＋ 人を登録</button><button class="btn plain" data-go="pcats">🎨 カテゴリーと色</button></div>`,{crumb:'交友・アドレス'});
 }
 function peopleList(){
-  const q=UI.pQ.trim();
-  const list=S.people.filter(p=>(!UI.pCat||(p.cats&&p.cats.length?p.cats:['other']).includes(UI.pCat))&&(!q||[p.name,p.kana,(p.log||[]).map(x=>x.text).join(' ')].join(' ').includes(q)))
-    .sort((a,b)=>(a.kana||a.name).localeCompare(b.kana||b.name,'ja'));
+  const q=UI.pQ.trim(), qh=toHira(q);
+  const row=UI.pRow?GOJU.find(x=>x[0]===UI.pRow):null;
+  const list=S.people.filter(p=>(!UI.pCat||(p.cats&&p.cats.length?p.cats:['other']).includes(UI.pCat))
+      &&(!q||p.name.includes(q)||toHira(p.kana||'').startsWith(qh)||toHira(p.name).startsWith(qh)||(p.log||[]).some(x=>x.text.includes(q)))
+      &&(!row||row[1].includes(toHira(p.kana||p.name).charAt(0))))
+    .sort((a,b)=>toHira(a.kana||a.name).localeCompare(toHira(b.kana||b.name),'ja'));
   if(!S.people.length) return `<div class="empty">${BOO_IMG}まだだれも登録されていません。<br>まずは家族や友だちから登録してみよう。<div class="btns"><button class="btn plain" data-act="sample">見本の人とお店を入れてみる</button></div></div>`;
   if(!list.length) return `<div class="empty">見つかりませんでした。</div>`;
   return `<div class="list">${list.map(p=>{const tel=p.phones&&p.phones.find(x=>x.num);
@@ -287,7 +292,7 @@ function vPEdit(id){
   <div class="f"><label for="p-m1">メール2</label><input id="p-m1" name="m1" type="email" value="${h((p.emails||[])[1]||'')}"></div>
   <div class="two"><div class="f"><label for="p-zip">郵便番号</label><input id="p-zip" name="zip" inputmode="numeric" value="${h(p.zip||'')}" placeholder="420-0000"></div><div class="f"><label for="p-blood">血液型</label><select id="p-blood" name="blood">${['','A','B','O','AB'].map(b=>`<option ${p.blood===b?'selected':''} value="${b}">${b||'―'}</option>`).join('')}</select></div></div>
   <div class="f"><label for="p-addr">住所</label><input id="p-addr" name="addr" value="${h(p.addr||'')}"></div>
-  <div class="f"><label for="p-bday">誕生日</label><input id="p-bday" type="date" name="bday" value="${p.bday&&!noYear?p.bday:p.bday?'2000'+p.bday.slice(4):''}"><label class="ck"><input type="checkbox" name="noyear" ${noYear?'checked':''}> 生まれた年はわからない</label></div>
+  <div class="f"><span class="lb">誕生日（年・月・日を選ぶ）</span>${ymdSel('bday',p.bday&&!noYear?p.bday:p.bday?'2000'+p.bday.slice(4):'',{y0:1910,y1:+today().slice(0,4)})}<label class="ck"><input type="checkbox" name="noyear" ${noYear?'checked':''}> 生まれた年はわからない</label></div>
   <div class="two"><div class="f"><label for="p-line">LINE ID</label><input id="p-line" name="line" value="${h(p.line||'')}"></div><div class="f"><label for="p-wc">WeChat ID</label><input id="p-wc" name="wechat" value="${h(p.wechat||'')}"></div></div>
   <div class="f"><label for="p-fb">Facebook（名前かアドレス）</label><input id="p-fb" name="fb" value="${h(p.fb||'')}"></div>
   <label class="ck"><input type="checkbox" name="fav" ${p.fav?'checked':''}> よく電話する人（高齢者モードのトップに顔と名前を出す）</label>
@@ -550,13 +555,14 @@ function vSearch(q){
     if(!res) res='<div class="empty">見つかりませんでした。ほかの言葉でも探してみてください。</div>';
   }
   return sub('アプリ内検索',`<form data-form="search"><input class="search" id="sq" name="q" type="search" value="${h(q)}" placeholder="「〇〇したい」「歯医者」「誕生日」など" autofocus></form>
-  ${q?'':`<p class="small" style="margin:8px 0 0;font-weight:700">アプリの中の機能・人・場所・予定・メモを、まとめて探します。下は言葉の例です。押すとその言葉で探します。</p><div class="chips wrap">${['予定','誕生日','メモ','病院','割り勘','天気','子育て','幹事'].map(w=>`<button class="chip" data-go="search/${w}">${w}</button>`).join('')}</div><p class="small muted">機能の名前、人、場所、予定、メモをまとめて探します。まだ準備中の機能も見つかります。</p>`}${res}`);
+  ${q?'':`<p class="small" style="margin:8px 0 0;font-weight:700">アプリの中の機能・人・場所・予定・メモを、まとめて探します。下は言葉の例です。押すとその言葉で探します。</p><div class="chips cwrap">${['予定','誕生日','メモ','病院','割り勘','天気','子育て','幹事'].map(w=>`<button class="chip" data-go="search/${w}">${w}</button>`).join('')}</div><p class="small muted">機能の名前、人、場所、予定、メモをまとめて探します。まだ準備中の機能も見つかります。</p>`}${res}`);
 }
 
 /* ---------- 設定 ---------- */
 function vSettings(){
   const s=S.set; const r=(name,val,cur,label)=>`<label><input type="radio" name="${name}" value="${val}" ${cur===val?'checked':''} data-act="setr">${label}</label>`;
   return sub('設定',`
+  <button class="row guiderow" data-go="menumap"><span class="em">🗺️</span><span class="t"><b>メニューの全体図</b><span>どのボタンの中に、どの機能があるかを一覧で見られます</span></span><span class="go">›</span></button>
   <button class="row guiderow" data-go="guide"><span class="em">📖</span><span class="t"><b>使い方・機能の説明</b><span>ライフサポート万能アプリ「BOOTIN」の細かい機能の説明がぜんぶ見られます</span></span><span class="go">›</span></button>
   <div class="list">
     <button class="row" data-act="gotoedit"><span class="em">⇄</span><span class="t"><b>トップの9マスを変える</b><span>赤・青・黄の枠から自由に選んで置けます</span></span><span class="go">›</span></button>
@@ -578,7 +584,7 @@ function vSettings(){
   <div class="list">
     <button class="row" data-go="otasukeset"><span class="em">🆘</span><span class="t"><b>おたすけボタンの準備</b><span>${s.home.addr?'自宅：'+h(s.home.addr):'自宅の住所と家族の電話を入れておきます'}</span></span><span class="go">›</span></button>
     <button class="row" data-go="me"><span class="em">🪪</span><span class="t"><b>「私のこと」カード</b><span>もしものときに見せるカード（日本語・中国語・英語）</span></span><span class="go">›</span></button>
-    <button class="row" data-go="weather"><span class="em">🌤️</span><span class="t"><b>天気の場所</b><span>${h(s.wx.name)}</span></span><span class="go">›</span></button>
+    <button class="row" data-go="weather"><span class="em">🌤️</span><span class="t"><b>天気の場所</b><span>${h(s.wx.name)}</span></span><span class="go">›</span></button><button class="row" data-go="gomi"><span class="em">🗑️</span><span class="t"><b>ゴミ出しの日</b><span>${(S.gomi||[]).length?(S.gomi||[]).map(g=>h(g.name)).join('・'):'まだ登録していません'}</span></span><span class="go">›</span></button><button class="row" data-go="zip"><span class="em">〒</span><span class="t"><b>郵便番号を調べる</b><span>〒から住所、住所から〒</span></span><span class="go">›</span></button><button class="row" data-go="games"><span class="em">🎮</span><span class="t"><b>よく使うゲーム</b><span>学生モードのトップに並べるリンク</span></span><span class="go">›</span></button>
     <button class="row" data-go="data"><span class="em">💾</span><span class="t"><b>データ（書き出し・読み込み・見本）</b><span>スマホの中に保存しているデータの管理</span></span><span class="go">›</span></button>
     <button class="row" data-go="install"><span class="em">📲</span><span class="t"><b>ホーム画面に置く方法</b><span>アプリのように1回押しで開けます</span></span><span class="go">›</span></button>
   </div>

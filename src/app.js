@@ -21,6 +21,8 @@ function routeView(r){
     case 'kuro': return vKuro(arg);
     case 'navi': return vNavi();
     case 'games': return vGames();
+    case 'menumap': return vMenuMap();
+    case 'zip': return vZip();
     case 'weather': return vWeather(arg);
     case 'bosai': return vBosai();
     case 'guide': return vGuide();
@@ -103,6 +105,7 @@ function after(r){
   const hd=$('#hl-date'); if(hd) hd.addEventListener('change',()=>{UI.hDate=hd.value; render();});
   const dw=$('#dict-w'); if(dw) dw.addEventListener('input',()=>{UI.dictW=dw.value.trim(); $$('a[data-dict]').forEach(a=>{a.href=UI.dictW?a.dataset.dict+encodeURIComponent(UI.dictW):'#'; a.querySelector('.t span').textContent=UI.dictW||'言葉を入れてから押します';});});
   kidsAfter();
+  zipAfter();
   medAfter();
   $$('details.tree[data-red]').forEach(d=>d.addEventListener('toggle',()=>{d.open?UI.openReds.add(d.dataset.red):UI.openReds.delete(d.dataset.red);}));
 }

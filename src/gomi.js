@@ -28,11 +28,11 @@ function vGomi(){
   return sub('ゴミ出しの日',`
   ${list.length?`<div class="sec"><h3>これから1週間</h3>${week}</div>`:''}
   <div class="sec"><h3>登録したゴミ</h3>${list.length?list.map(g=>`<div class="gomirow"><span class="em">${g.em||'🗑️'}</span><span class="t"><b>${h(g.name)}</b><span>${gomiRule(g)}</span></span><button class="mini" data-act="gomidel" data-id="${g.id}">削除</button></div>`).join(''):'<p class="muted" style="margin:0">まだありません。下から登録してください。</p>'}</div>
-  <form class="sec" data-form="gomi"><h3>ゴミの日を登録する</h3>
+  <form class="sec" data-form="gomi"><h3>ゴミの日を登録する</h3><p class="small" style="margin:0 0 6px">ゴミの出し方は町によって違うので、自分で登録します。①ゴミの種類を入れる → ②毎週か毎月かを選ぶ → ③曜日を選ぶ、の順です。</p>
     <div class="f"><span class="lb">ゴミの種類（押すと入ります）</span><div class="chips">${GOMI_PRESET.map(([e,n])=>`<button type="button" class="chip" data-act="gomipick" data-e="${e}" data-n="${n}">${e} ${n}</button>`).join('')}</div>
       <div style="display:flex;gap:6px;margin-top:6px"><input name="em" id="gm-em" value="🗑️" style="width:3.2em;text-align:center" aria-label="印"><input name="name" id="gm-name" required placeholder="例：燃えるゴミ" style="flex:1;min-width:0"></div></div>
-    <div class="f"><span class="lb">いつ出す？</span><div class="choose" id="gm-mode"><label><input type="radio" name="mode" value="week" checked>毎週</label><label><input type="radio" name="mode" value="nth">第○週だけ（例：第1・第3）</label></div></div>
-    <div class="f" id="gm-nth" hidden><span class="lb">何週目？</span><div class="choose">${nt}</div></div>
+    <div class="f"><span class="lb">いつ出す？</span><div class="choose" id="gm-mode"><label><input type="radio" name="mode" value="week" checked>毎週（例：火曜と金曜）</label><label><input type="radio" name="mode" value="nth">毎月（例：第2水曜、第1・第3月曜）</label></div></div>
+    <div class="f" id="gm-nth" hidden><span class="lb">毎月の第何週？（月1回なら1つだけ選ぶ）</span><div class="choose">${nt}</div></div>
     <div class="f"><span class="lb">曜日（いくつでも）</span><div class="choose">${wk}</div></div>
     <button class="btn" type="submit">登録する</button>
   </form>

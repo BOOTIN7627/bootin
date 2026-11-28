@@ -17,7 +17,7 @@ function vOshi(id){
     return sub(o?'推しを直す':'推しを登録',`<form class="sec" data-form="oshi" data-id="${o?o.id:''}">
       <div class="f"><label for="os-n">名前</label><input id="os-n" name="name" required value="${h(x.name)}" placeholder="例：好きな歌手、チーム"></div>
       <div class="f"><label for="os-k">種類</label><select id="os-k" name="kind">${OSHI_KIND.map(k=>`<option ${k===x.kind?'selected':''}>${k}</option>`).join('')}</select></div>
-      <div class="f"><label for="os-b">誕生日（わかれば。年は分からなければ今年で）</label><input id="os-b" type="date" name="bday" value="${h(x.bday||'')}"></div>
+      <div class="f"><span class="lb">誕生日（わかれば。年は分からなければ今年で）</span>${ymdSel('bday',x.bday||'',{y0:1910,y1:+today().slice(0,4)})}</div>
       <div class="f"><label for="os-m">メモ（好きなところ、公式サイトなど）</label><textarea id="os-m" name="memo" rows="3">${h(x.memo||'')}</textarea></div>
       <div class="btns"><button class="btn" type="submit">保存する</button>${o?`<button class="btn danger" type="button" data-act="oshidel" data-id="${o.id}">削除</button>`:''}</div></form>`,{crumb:'おたのしみ › 推しの帳'}); }
   const lives=(o.lives||[]).slice().sort((a,b)=>a.date.localeCompare(b.date)); const t=today();
